@@ -20,11 +20,19 @@ class Inicio_sesion
      * 
      * @return bool true si las credenciales son válidas, false en caso contrario.
      */
+public function verificarCredenciales(): int
+    {
+      $query = "SELECT e.id_Empleado FROM empleados e WHERE e.correo = ':correo';";
+      $stmt = $this->conn->prepare($query);
+      //this->correo = htmlspecialchars(strip_tags($this->correo));
+
+        return false;
+    }
     public function verificarCredencialesPorId(): bool
     {
         // Query: solo trae la info del usuario/empleado si ambos están activos
         $query = "SELECT  u.id_Usuario, u.rol, u.estado AS estado_usuario, e.estado AS estado_empleado, e.correo, e.clave
-                  FROM empleados e INNER JOIN usuarios u ON e.id_Usuario = u.id_Usuario WHERE u.id_Usuario = :id_Usuario
+                  FROM empleados e INNER JOIN usuarios u ON e.id_Usuario = u.id_Usuario WHERE e.correo = :correo
                   AND u.estado = TRUE 
                   AND e.estado = TRUE;";
 

@@ -1,7 +1,7 @@
 <?php
 session_start();
 include_once '../../conexion/conexion.php';
-include_once '../inicio_sesion/inicio_sesion.php';
+include_once '../login/inicio_sesion.php';
 
 $conexion = new Conexion();
 $db = $conexion->getConnection();
