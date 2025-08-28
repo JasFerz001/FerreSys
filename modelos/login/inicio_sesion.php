@@ -19,6 +19,18 @@ class Inicio_sesion
      * Verifica las credenciales de inicio de sesión (correo + clave),
      * y además que tanto el empleado como el rol (usuario) estén activos.
      */
+
+    public function existeAlgunUsuario(): bool
+{
+    $query = "SELECT COUNT(*) as total FROM " . $this->table;
+    $stmt = $this->conn->prepare($query);
+    $stmt->execute();
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $row['total'] > 0; // true si ya hay usuarios, false si está vacío
+}
+
+
     public function verificarCredenciales(): bool
     {
         $query = "SELECT u.id_Usuario, u.rol, u.estado AS estado_usuario, 
