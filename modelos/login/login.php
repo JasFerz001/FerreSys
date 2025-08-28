@@ -2,38 +2,44 @@
 session_start();
 include_once '../../conexion/conexion.php';
 include_once '../login/inicio_sesion.php';
+include_once '../usuario/usuario.php';
 
 $conexion = new Conexion();
 $db = $conexion->getConnection();
 $login = new Inicio_sesion($db);
+$usuario = new Usuario($db);
 
 $message = '';
 $correo = $clave = "";
 
-// Manejo del POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $correo = strtolower(trim($_POST['correo']));
     $clave = trim($_POST['clave']);
 
-    // Asignar valores al objeto
     $login->correo = $correo;
     $login->clave = $clave;
 
-    // Verificar credenciales
+    if (!$login->existeAlgunUsuario()) {
+        header("Location: ../usuario/crear_usuario.php?primera_vez=1");
+        exit();
+    }
+
+
     if ($login->verificarCredenciales()) {
-        // Guardamos la sesión
+
         $_SESSION['id_Usuario'] = $login->id_Usuario;
         $_SESSION['correo'] = $login->correo;
         $_SESSION['rol'] = $login->rol;
 
-        header("Location: ../empleado/crear_empleado.php"); // redirigir
+        header("Location: ../empleado/crear_empleado.php"); 
         exit();
     } else {
         $message = 'error';
     }
 }
-?>
 
+$mostrarCrearUsuario = !$login->existeAlgunUsuario();
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -46,7 +52,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="container vh-100 d-flex justify-content-center align-items-center">
         <div class="card shadow p-4" style="width: 25rem;">
             <h3 class="text-center mb-4">Iniciar Sesión</h3>
-            <form method="post" action="login.php">
+
+            <?php if ($mostrarCrearUsuario): ?>
+                <div class="alert alert-info small" role="alert">
+                    <p class="mb-0">
+                        Si es la primera vez que usa el sistema, deberá presionar en <strong>"Crear nuevo usuario"</strong> para continuar con la configuración del entorno.
+                    </p>
+                </div>
+            <?php endif; ?>
+
+            <form method="post" action="login.php" class="mt-2">
                 <div class="mb-3">
                     <label class="form-label">Correo</label>
                     <input type="email" name="correo" class="form-control" required 
@@ -60,6 +75,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <button type="submit" class="btn btn-success">Ingresar</button>
                 </div>
             </form>
+            <div class="mt-3 text-center">
+<?php if ($mostrarCrearUsuario): ?>
+                    <a href="../usuario/crear_usuario.php?primera_vez=1" class="btn btn-link">Crear nuevo usuario</a>
+<?php endif; ?>
+                </div>
         </div>
     </div>
 
