@@ -39,8 +39,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $usuario->estado = 1; // Alta
 
     if ($usuario->crear()) {
-        header("Location: crear_usuario.php?message=success");
-        exit();
+        if ($rol === "Administrador") {
+            // Si se crea el admin, redirigir a crear empleado
+            header("Location: ../empleado/crear_empleado.php?primera_vez=1");
+            exit();
+        } else {
+            // Para otros roles, mostrar mensaje de éxito
+            header("Location: crear_usuario.php?message=success");
+            exit();
+        }
     } else {
         header("Location: crear_usuario.php?message=error");
         exit();
