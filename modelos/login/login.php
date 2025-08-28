@@ -9,21 +9,18 @@ $login = new Inicio_sesion($db);
 
 $message = '';
 $correo = $clave = "";
-$id_Usuario = 0;
 
 // Manejo del POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $correo = strtolower(trim($_POST['correo']));
     $clave = trim($_POST['clave']);
-    $id_Usuario = intval($_POST['id_Usuario']); // viene del formulario
 
     // Asignar valores al objeto
     $login->correo = $correo;
     $login->clave = $clave;
-    $login->id_Usuario = $id_Usuario;
 
     // Verificar credenciales
-    if ($login->verificarCredencialesPorId()) {
+    if ($login->verificarCredenciales()) {
         // Guardamos la sesión
         $_SESSION['id_Usuario'] = $login->id_Usuario;
         $_SESSION['correo'] = $login->correo;
@@ -51,12 +48,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <h3 class="text-center mb-4">Iniciar Sesión</h3>
             <form method="post" action="login.php">
                 <div class="mb-3">
-                    <label class="form-label">ID Usuario</label>
-                    <input type="number" name="id_Usuario" class="form-control" required value="<?php echo htmlspecialchars($id_Usuario); ?>">
-                </div>
-                <div class="mb-3">
                     <label class="form-label">Correo</label>
-                    <input type="email" name="correo" class="form-control" required value="<?php echo htmlspecialchars($correo); ?>">
+                    <input type="email" name="correo" class="form-control" required 
+                           value="<?php echo htmlspecialchars($correo); ?>">
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Clave</label>
