@@ -11,6 +11,9 @@ $message = '';
 $nombre = $apellido = $DUI = $telefono = $direccion = $correo = $clave = "";
 $id_Usuario = $estado = "";
 
+// Verificar si es la configuración inicial
+$primera_vez = isset($_GET['primera_vez']) && $_GET['primera_vez'] == '1';
+
 // Manejo del POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
@@ -38,6 +41,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Crear el empleado
     if ($empleado->crear()) {
+        // Si es la primera vez (configuración inicial), redirigir al login
+        if (isset($_POST['primera_vez']) && $_POST['primera_vez'] == '1') {
+            header("Location: ../login/login.php");
+            exit();
+        }
+        
         $message = 'success';
         // Limpiar los campos solo si fue exitoso
         $nombre = $apellido = $DUI = $telefono = $direccion = $correo = $clave = "";
@@ -76,6 +85,9 @@ $stmt1 = $empleado->leerUsuariosActivos();
                 <div class="card-form h-100">
                     <div class="card-title">Registro de Empleado</div>
                     <form id="empleadoForm" method="post" action="crear_empleado.php">
+                        <?php if ($primera_vez): ?>
+                            <input type="hidden" name="primera_vez" value="1">
+                        <?php endif; ?>
                         <input type="hidden" name="id_Empleado" id="id_Empleado">
                         <div class="row g-3">
                             <div class="col-md-6">
