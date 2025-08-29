@@ -76,10 +76,11 @@ $mostrarCrearUsuario = !$login->existeAlgunUsuario();
                 </div>
             </form>
             <div class="mt-3 text-center">
+                <a href="recuperar_clave.php" class="btn btn-link">Recuperar usuario</a>
 <?php if ($mostrarCrearUsuario): ?>
                     <a href="../usuario/crear_usuario.php?primera_vez=1" class="btn btn-link">Crear nuevo usuario</a>
 <?php endif; ?>
-                </div>
+            </div>
         </div>
     </div>
 
