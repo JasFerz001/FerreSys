@@ -122,8 +122,8 @@ $stmt1 = $empleado->leerUsuariosActivos();
                             <div class="col-12">
                                 <label class="form-label form-icon"><i class="bi bi-key-fill"></i>Clave</label>
                                 <input type="password" name="clave" class="form-control"
-                                    placeholder="Ingresar clave de acceso" required minlength="8"  required maxlength="12"
-                                    value="<?php echo htmlspecialchars($clave); ?>">
+                                    placeholder="Ingresar clave de acceso" required minlength="8" required
+                                    maxlength="12" value="<?php echo htmlspecialchars($clave); ?>">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label form-icon"><i class="bi bi-person-gear"></i>Usuario</label>

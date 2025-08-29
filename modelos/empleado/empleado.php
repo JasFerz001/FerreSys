@@ -93,7 +93,7 @@ class Empleado
         return $stmt;
     }
 
-     /*llamar todos los roles activos para seleccion en el form empleado*/ 
+    /*llamar todos los roles activos para seleccion en el form empleado*/
 
     public function leerUsuariosActivos(): PDOStatement
     {
@@ -103,6 +103,39 @@ class Empleado
         return $stmt;
     }
 
+    /**
+     * Leer un empleado por su ID.
+     * - Busca el empleado con el ID especificado.
+     * - Carga los datos en los atributos de la clase.
+     * 
+     * true si encontró el empleado, false si no existe.
+     */
+    public function leerPorId(): bool
+    {
+        $query = "SELECT * FROM " . $this->table_name . " WHERE id_Empleado = :id_Empleado LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id_Empleado', $this->id_Empleado, PDO::PARAM_INT);
+        $stmt->execute();
+
+        if ($stmt->rowCount() > 0) {
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            $this->id_Empleado = $row['id_Empleado'];
+            $this->nombre = $row['nombre'];
+            $this->apellido = $row['apellido'];
+            $this->DUI = $row['dui'];
+            $this->telefono = $row['telefono'];
+            $this->direccion = $row['direccion'];
+            $this->correo = $row['correo'];
+            $this->clave = $row['clave'];
+            $this->estado = $row['estado'];
+            $this->id_Usuario = $row['id_Usuario'];
+
+            return true;
+        }
+
+        return false;
+    }
 
     /**
      * Leer un empleado por su DUI.
@@ -188,7 +221,7 @@ class Empleado
         $stmt->bindParam(":telefono", $this->telefono);
         $stmt->bindParam(":direccion", $this->direccion);
         $stmt->bindParam(":correo", $this->correo);
-        $stmt->bindParam(":clave", $this->clave); // ⚠️ Clave sin encriptar
+        $stmt->bindParam(":clave", $this->clave); // 
         $stmt->bindParam(":estado", $this->estado, PDO::PARAM_INT);
         $stmt->bindParam(":id_Usuario", $this->id_Usuario, PDO::PARAM_INT);
         $stmt->bindParam(":id_Empleado", $this->id_Empleado, PDO::PARAM_INT);
@@ -198,23 +231,19 @@ class Empleado
 
     /**
      * Dar de baja a un empleado
-     * - Cambia el estado del empleado a 0 (inactivo/baja)
-     * - No elimina el registro de la base de datos
+     * - Cambia el estado del empleado a 0 (inactivo/baja) solo si está activo
      * 
-     * true si se actualizó correctamente, false si falla
+     * @return bool true si se actualizó correctamente, false si falla o ya está de baja
      */
     public function darDeBaja(): bool
     {
-        $query = "UPDATE " . $this->table_name . " SET estado = 0 WHERE id_Empleado = :id_Empleado";
+        $query = "UPDATE " . $this->table_name . " SET estado = 0 WHERE id_Empleado = :id_Empleado AND estado = 1";
         $stmt = $this->conn->prepare($query);
-
-        // Sanitizar id_Empleado
-        $this->id_Empleado = (int) $this->id_Empleado;
-
-        // Vincular parámetro
         $stmt->bindParam(":id_Empleado", $this->id_Empleado, PDO::PARAM_INT);
+        $stmt->execute();
 
-        return $stmt->execute();
+        // Retorna true si se actualizó al menos una fila
+        return $stmt->rowCount() > 0;
     }
 
 }

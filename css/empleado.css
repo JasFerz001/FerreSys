@@ -14,7 +14,9 @@
         }
 
         .card-title {
-            background: linear-gradient(to right, #f6b26b, #6fa8dc);
+
+            /*background: linear-gradient(to right, #f6b26b, #6fa8dc);*/
+            background-color: black;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             font-size: 1.8rem;
@@ -31,7 +33,8 @@
         .form-icon i {
             margin-right: 10px;
             font-size: 1.2rem;
-            color: #6fa8dc;
+          /*  color: #6fa8dc;*/
+            color: black;
         }
 
         .table-section {
