@@ -173,7 +173,7 @@ $stmt1 = $empleado->leerUsuariosActivos();
                                     </select>
                                 </div>
                                 <div class="col-12 text-center mt-4">
-                                    <button type="reset" class="btn btn-warning px-5 py-2">Cancelar</button>
+                                    <button id="btnCancelar" type="button" class="btn btn-warning px-5 py-2">Cancelar</button>
                                     <button type="submit" class="btn btn-success px-5 py-2">Actualizar</button>
                                 </div>
                             </div>
@@ -236,6 +236,11 @@ $stmt1 = $empleado->leerUsuariosActivos();
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
+
+        document.getElementById('btnCancelar').addEventListener('click', () => {
+            window.location.href = 'crear_empleado.php';
+        });
+
         // Mostrar SweetAlert y redireccionar después
         const message = "<?php echo $message; ?>";
         if (message === 'success') {
@@ -255,7 +260,7 @@ $stmt1 = $empleado->leerUsuariosActivos();
             // Limpiar el mensaje para evitar que se muestre al recargar
             <?php $message = ''; ?>
         } else if (message === 'error') {
-            Swal.fire('Empleado', 'Error al actualizar el empleado. Puede que el DUI ya exista.', 'error');
+            Swal.fire('Empleado', 'Error al actualizar el empleado. Puede que el DUI ya exista o el correo esta registrado.', 'error');
         }
 
         $(document).ready(function () {
