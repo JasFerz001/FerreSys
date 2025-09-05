@@ -2,43 +2,24 @@
 session_start();
 include_once '../../conexion/conexion.php';
 include_once '../login/inicio_sesion.php';
-include_once '../usuario/usuario.php';
 
+// Esta lógica se queda aquí porque afecta directamente a la vista
 $conexion = new Conexion();
 $db = $conexion->getConnection();
 $login = new Inicio_sesion($db);
-$usuario = new Usuario($db);
 
-$message = '';
-$correo = $clave = "";
+// Determinar si se debe mostrar el enlace para crear el primer usuario
+$mostrarCrearUsuario = !$login->existeAlgunUsuario();
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $correo = strtolower(trim($_POST['correo']));
-    $clave = trim($_POST['clave']);
-
-    $login->correo = $correo;
-    $login->clave = $clave;
-
-    if (!$login->existeAlgunUsuario()) {
-        header("Location: ../usuario/crear_usuario.php?primera_vez=1");
-        exit();
-    }
-
-
-    if ($login->verificarCredenciales()) {
-
-        $_SESSION['id_Usuario'] = $login->id_Usuario;
-        $_SESSION['correo'] = $login->correo;
-        $_SESSION['rol'] = $login->rol;
-
-        header("Location: ../empleado/crear_empleado.php"); 
-        exit();
-    } else {
-        $message = 'error';
-    }
+// Si no hay usuarios, la primera acción debe ser crear uno.
+if (isset($_GET['primera_vez']) && $_GET['primera_vez'] == '1') {
+    $mostrarCrearUsuario = true;
 }
 
-$mostrarCrearUsuario = !$login->existeAlgunUsuario();
+// Recuperar el correo si hubo un error para no tener que volver a escribirlo
+$correo = isset($_GET['correo']) ? htmlspecialchars($_GET['correo']) : '';
+$error_type = $_GET['error'] ?? '';
+$attempts_left = isset($_GET['attempts_left']) ? (int)$_GET['attempts_left'] : 0;
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -61,11 +42,11 @@ $mostrarCrearUsuario = !$login->existeAlgunUsuario();
                 </div>
             <?php endif; ?>
 
-            <form method="post" action="login.php" class="mt-2">
+            <form method="post" action="procesar_login.php" class="mt-2">
                 <div class="mb-3">
                     <label class="form-label">Correo</label>
                     <input type="email" name="correo" class="form-control" required 
-                           value="<?php echo htmlspecialchars($correo); ?>">
+                           value="<?php echo $correo; ?>">
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Clave</label>
@@ -85,9 +66,21 @@ $mostrarCrearUsuario = !$login->existeAlgunUsuario();
     </div>
 
     <script>
-        const message = "<?php echo $message; ?>";
-        if (message === 'error') {
-            Swal.fire('Error', 'Credenciales inválidas o usuario inactivo', 'error');
+        const errorType = "<?php echo $error_type; ?>";
+        const attemptsLeft = <?php echo $attempts_left; ?>;
+
+        if (errorType === '1') {
+            let message = 'Credenciales inválidas o usuario inactivo.';
+            if (attemptsLeft > 0) {
+                message += ` Le quedan ${attemptsLeft} intentos.`;
+            }
+            Swal.fire('Error', message, 'error');
+        } else if (errorType === 'locked') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Cuenta Bloqueada',
+                text: 'Ha superado el número máximo de intentos de inicio de sesión. Su cuenta ha sido desactivada por seguridad.',
+            });
         }
     </script>
 </body>

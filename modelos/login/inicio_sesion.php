@@ -2,7 +2,7 @@
 
 class Inicio_sesion
 {
-    private $conn;
+    private $conn; 
     private $table_name = "empleados";
     private $table = "usuarios";
     public string $rol;
