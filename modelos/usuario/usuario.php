@@ -20,7 +20,7 @@ class Usuario
                   SET rol=:rol, estado=:estado";
         $stmt = $this->conn->prepare($query);
 
-        $this->rol = htmlspecialchars(strip_tags($this->rol));
+        $this->rol = strtoupper(htmlspecialchars(strip_tags($this->rol)));
         $this->estado = (int)$this->estado;
 
         $stmt->bindParam(":rol", $this->rol);

@@ -1,5 +1,5 @@
         body {
-            background-color: #2767AF;
+            background-color: #ffffff;
             font-family: 'Segoe UI', sans-serif;
             min-height: 100vh;
             display: flex;
@@ -8,7 +8,7 @@
         }
 
         .container-box {
-            background-color: #ffffffcc;
+            background-color: #ffffff;
             border-radius: 20px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
             padding: 30px;
