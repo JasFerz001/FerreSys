@@ -46,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: ../login/login.php");
             exit();
         }
-        
+
         $message = 'success';
         // Limpiar los campos solo si fue exitoso
         $nombre = $apellido = $DUI = $telefono = $direccion = $correo = $clave = "";
@@ -134,8 +134,8 @@ $stmt1 = $empleado->leerUsuariosActivos();
                             <div class="col-12">
                                 <label class="form-label form-icon"><i class="bi bi-key-fill"></i>Clave</label>
                                 <input type="password" name="clave" class="form-control"
-                                    placeholder="Ingresar clave de acceso" required minlength="8"  required maxlength="12"
-                                    value="<?php echo htmlspecialchars($clave); ?>">
+                                    placeholder="Ingresar clave de acceso" required minlength="8" required
+                                    maxlength="12" value="<?php echo htmlspecialchars($clave); ?>">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label form-icon"><i class="bi bi-person-gear"></i>Usuario</label>
@@ -156,11 +156,12 @@ $stmt1 = $empleado->leerUsuariosActivos();
                                 <select class="form-select" name="estado" required>
                                     <option value="">Seleccione</option>
                                     <option value="1" <?php echo ($estado == 1 ? 'selected' : ''); ?>>Alta</option>
-                                    <option value="0" <?php echo ($estado == 0 ? 'selected' : ''); ?>>Baja</option>
+                                    <!-- <option value="0" <?php echo ($estado == 0 ? 'selected' : ''); ?>>Baja</option> -->
                                 </select>
                             </div>
                             <div class="col-12 text-center mt-4">
-                                <button type="reset" class="btn btn-warning px-5 py-2">Cancelar</button>
+                                <button id="btnCancelar" type="button"
+                                    class="btn btn-warning px-5 py-2">Cancelar</button>
                                 <button type="submit" class="btn btn-success px-5 py-2">Guardar</button>
                             </div>
                         </div>
@@ -197,13 +198,23 @@ $stmt1 = $empleado->leerUsuariosActivos();
                                         <td><?php echo htmlspecialchars($row['direccion']); ?></td>
                                         <td><?php echo htmlspecialchars($row['correo']); ?></td>
                                         <td><?php echo htmlspecialchars($row['nombre_usuario']); ?></td>
-                                        <td><?php echo ($row['estado'] == 1 ? 'Alta' : 'Baja'); ?></td>
                                         <td>
-                                            <button class="btn btn-warning me-2"
-                                                onclick="location.href='actualizar_empleado.php?id=<?php echo $row['id_Empleado']; ?>'">Actualizar</button>
-                                            <button class="btn btn-danger"
-                                                onclick="location.href='dar_baja_empleado.php?id=<?php echo $row['id_Empleado']; ?>'">Dar
-                                                de baja</button>
+                                            <span
+                                                class="badge <?php echo ($row['estado'] == 1 ? 'badge-success' : 'badge-danger'); ?>">
+                                                <?php echo ($row['estado'] == 1 ? 'ALTA' : 'BAJA'); ?>
+                                            </span>
+                                        </td>
+                                        <td class="actions-column">
+                                            <button class="btn btn-sm btn-outline-warning me-1 p-1"
+                                                style="width: 40px; height: 40px;"
+                                                onclick="location.href='actualizar_empleado.php?id=<?php echo $row['id_Empleado']; ?>'">
+                                                <i class="bi bi-pencil" style="font-size: 1.2rem;"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger p-1"
+                                                style="width: 40px; height: 40px;"
+                                                onclick="location.href='dar_baja_empleado.php?id=<?php echo $row['id_Empleado']; ?>'">
+                                                <i class="bi bi-trash" style="font-size: 1.2rem;"></i>
+                                            </button>
                                         </td>
                                     </tr>
                                 <?php endwhile; ?>
@@ -219,12 +230,19 @@ $stmt1 = $empleado->leerUsuariosActivos();
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
+
+        document.getElementById('btnCancelar').addEventListener('click', () => {
+            /* vaciar los datos del form */
+            document.querySelectorAll('#empleadoForm input').forEach(input => input.value = '');
+            document.querySelectorAll('#empleadoForm select').forEach(select => select.selectedIndex = 0);
+        });
+
         // Mostrar SweetAlert solo una vez
         const message = "<?php echo $message; ?>";
         if (message === 'success') {
             Swal.fire('Empleado', 'Empleado creado correctamente', 'success');
         } else if (message === 'error') {
-            Swal.fire('Empleado', 'Ya existe un empleado con ese número de DUI', 'error');
+            Swal.fire('Empleado', 'Ya existe un empleado con ese número de DUI o Correo ya registrado', 'error');
         }
 
         $(document).ready(function () {

@@ -1,55 +1,181 @@
+:root {
+    --primary-color: #3b7ddd;
+    --secondary-color: #6c757d;
+    --success-color: #1cbb8c;
+    --warning-color: #f7b84b;
+    --danger-color: #f06548;
+    --light-bg: #f5f8ff;
+}
 
-        body {
-            background: linear-gradient(135deg, #6fa8dc, #3d85c6, #1c5aa6);
-            font-family: 'Segoe UI', sans-serif;
-            padding: 20px;
-        }
+/* ===== Global ===== */
+body {
+    background-color: var(--light-bg);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
+}
 
-        .card-form {
-            background-color: #ffffffcc;
-            padding: 20px 30px;
-            border-radius: 20px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-            margin-bottom: 30px;
-        }
+.btn {
+    border-radius: 8px;
+    padding: 10px 25px;
+    font-weight: 500;
+    transition: all 0.2s;
+    cursor: pointer;
+}
 
-        .card-title {
-            background: linear-gradient(to right, #f6b26b, #6fa8dc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 1.8rem;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 20px;
-        }
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
 
-        .form-icon {
-            display: flex;
-            align-items: center;
-        }
+.btn-warning {
+    background-color: var(--warning-color);
+    border-color: var(--warning-color);
+}
 
-        .form-icon i {
-            margin-right: 10px;
-            font-size: 1.2rem;
-            color: #6fa8dc;
-        }
+.btn-success {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+}
 
-        .table-section {
-            background-color: #ffffffcc;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            height: 100%;
-        }
+.btn-warning:hover {
+    background-color: #e9ab39;
+    border-color: #e9ab39;
+}
 
-        table th {
-            background-color: #6fa8dc;
-            color: black;
-        }
+.btn-success:hover {
+    background-color: #19a87d;
+    border-color: #19a87d;
+}
 
-        @media (max-width: 767px) {
-            .form-table-container {
-                flex-direction: column;
-            }
-        }
-   
+/* ===== Form Cards ===== */
+.card-form {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    padding: 25px;
+    height: 100%;
+}
+
+.card-title {
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    text-align: center;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #eaeef5;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 8px;
+}
+
+.form-icon {
+    color: var(--primary-color);
+    margin-right: 8px;
+}
+
+.form-control,
+.form-select {
+    border-radius: 8px;
+    padding: 10px 15px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s;
+}
+
+.form-control:focus,
+.form-select:focus {
+    box-shadow: 0 0 0 3px rgba(59, 125, 221, 0.15);
+    border-color: var(--primary-color);
+}
+
+/* ===== Header ===== */
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.page-title {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin: 0;
+}
+
+/* ===== Tables ===== */
+.table-container {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+}
+
+#tablaEmpleados {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+}
+
+#tablaEmpleados thead th {
+    background-color: #f8f9fa;
+    color: var(--primary-color);
+    font-weight: 600;
+    padding: 12px 15px;
+    border-bottom: 2px solid #eaeef5;
+}
+
+#tablaEmpleados tbody td {
+    padding: 12px 15px;
+    vertical-align: middle;
+    border-bottom: 1px solid #eaeef5;
+}
+
+#tablaEmpleados tbody tr:last-child td {
+    border-bottom: none;
+}
+
+#tablaEmpleados tbody tr:hover {
+    background-color: #f8fbff;
+}
+
+/* ===== Badges ===== */
+.badge {
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.badge-success {
+    background-color: rgba(28, 187, 140, 0.15);
+    color: var(--success-color);
+}
+
+.badge-danger {
+    background-color: rgba(240, 101, 72, 0.15);
+    color: var(--danger-color);
+}
+
+.actions-column {
+    white-space: nowrap;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .table-container {
+        padding: 10px;
+    }
+
+    #tablaEmpleados thead th,
+    #tablaEmpleados tbody td {
+        padding: 8px 10px;
+    }
+}
