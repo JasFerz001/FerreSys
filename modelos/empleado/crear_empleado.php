@@ -172,7 +172,7 @@ $stmt1 = $empleado->leerUsuariosActivos();
             <!-- Tabla -->
             <div class="col-md-8" id="tablaCol">
                 <div class="table-section">
-                    <div class="card-title" id="tablaTitle" style="cursor: pointer;">Registros</div>
+                    <div class="card-title" id="tablaTitle" style="cursor: pointer;">LISTA DE EMPLEADOS</div>
                     <div class="table-responsive">
                         <table id="tablaEmpleados" class="table table-bordered text-center align-middle">
                             <thead>
@@ -230,6 +230,64 @@ $stmt1 = $empleado->leerUsuariosActivos();
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const passInput = document.querySelector('input[name="clave"]');
+            const form = document.getElementById('empleadoForm');
+            const passFeedback = document.createElement('div');
+            passFeedback.className = 'small mt-1';
+            passInput.parentNode.appendChild(passFeedback);
+
+            // Función para validar si la contraseña cumple todos los requisitos
+            function validarContrasenaCompleta(pass) {
+                const hasUpper = /[A-Z]/.test(pass);
+                const hasLower = /[a-z]/.test(pass);
+                const hasNumber = /[0-9]/.test(pass);
+                const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pass);
+                const hasLength = pass.length >= 8 && pass.length <= 12;
+
+                return hasUpper && hasLower && hasNumber && hasSpecial && hasLength;
+            }
+
+            // Validación en tiempo real
+            passInput.addEventListener('input', function () {
+                const pass = this.value;
+                const hasUpper = /[A-Z]/.test(pass);
+                const hasLower = /[a-z]/.test(pass);
+                const hasNumber = /[0-9]/.test(pass);
+                const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pass);
+                const hasLength = pass.length >= 8 && pass.length <= 12;
+
+                let message = '';
+                if (pass.length > 0) {
+                    message = `
+                <div class="text-${hasLength ? 'success' : 'danger'}">✓ 8-12 caracteres</div>
+                <div class="text-${hasUpper ? 'success' : 'danger'}">✓ Mayúscula</div>
+                <div class="text-${hasLower ? 'success' : 'danger'}">✓ Minúscula</div>
+                <div class="text-${hasNumber ? 'success' : 'danger'}">✓ Número</div>
+                <div class="text-${hasSpecial ? 'success' : 'danger'}">✓ Carácter especial</div>
+            `;
+                }
+                passFeedback.innerHTML = message;
+            });
+
+            // Validar antes de enviar el formulario
+            form.addEventListener('submit', function (e) {
+                const pass = passInput.value;
+
+                if (!validarContrasenaCompleta(pass)) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Contraseña inválida',
+                        text: 'La contraseña debe cumplir todos los requisitos: 8-12 caracteres, mayúscula, minúscula, número y carácter especial.',
+                        confirmButtonColor: '#dc3545'
+                    });
+
+                    // Enfocar el campo de contraseña
+                    passInput.focus();
+                }
+            });
+        });
 
         document.getElementById('btnCancelar').addEventListener('click', () => {
             /* vaciar los datos del form */
