@@ -6,7 +6,7 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     header("Location: login.php");
     exit();
 }
-
+ 
 include_once '../../conexion/conexion.php';
 include_once '../login/inicio_sesion.php';
 
@@ -60,7 +60,7 @@ if ($login->verificarCredenciales()) {
     $_SESSION['correo'] = $login->correo;
     $_SESSION['rol'] = $login->rol;
 
-    header("Location: ../empleado/crear_empleado.php"); 
+    header("Location: ../login/dashboard.html"); 
     exit();
 } else {
     // Si son incorrectas, incrementar el contador
