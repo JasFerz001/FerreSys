@@ -21,67 +21,54 @@ class Empleado
         $this->conn = $db;
     }
 
-    /**
-     * Crear un nuevo empleado
-     * - Verifica que no exista un empleado con el mismo DUI.
-     * - Si no existe, inserta el registro en la tabla.
-     * 
-     * true si se creó correctamente, false si el DUI ya existe o falla la inserción.
-     */
-   public function crear(): bool
-{
-    // Verificar si ya existe un empleado con el mismo DUI o correo
-    $checkQuery = "SELECT id_Empleado FROM " . $this->table_name . " 
+    // Crear un empleado nuevo (valida DUI/correo únicos)
+    public function crear(): bool
+    {
+        $checkQuery = "SELECT id_Empleado FROM " . $this->table_name . " 
                    WHERE DUI = :DUI OR correo = :correo LIMIT 1";
-    $checkStmt = $this->conn->prepare($checkQuery);
-    $checkStmt->bindParam(":DUI", $this->DUI);
-    $checkStmt->bindParam(":correo", $this->correo);
-    $checkStmt->execute();
+        $checkStmt = $this->conn->prepare($checkQuery);
+        $checkStmt->bindParam(":DUI", $this->DUI);
+        $checkStmt->bindParam(":correo", $this->correo);
+        $checkStmt->execute();
 
-    if ($checkStmt->rowCount() > 0) {
-        // Ya existe un empleado con ese DUI o correo
-        return false;
-    }
+        if ($checkStmt->rowCount() > 0) {
+            return false;
+        }
 
-    // Query para insertar un nuevo empleado
-    $query = "INSERT INTO " . $this->table_name . " 
+        $clave_encriptada = password_hash($this->clave, PASSWORD_DEFAULT);
+
+        $query = "INSERT INTO " . $this->table_name . " 
               SET nombre=:nombre, apellido=:apellido, DUI=:DUI, 
                   telefono=:telefono, direccion=:direccion, 
                   correo=:correo, clave=:clave, estado=:estado, id_Usuario=:id_Usuario";
 
-    $stmt = $this->conn->prepare($query);
+        $stmt = $this->conn->prepare($query);
 
-    // Sanitizar valores
-    $this->nombre = htmlspecialchars(strip_tags($this->nombre));
-    $this->apellido = htmlspecialchars(strip_tags($this->apellido));
-    $this->DUI = htmlspecialchars(strip_tags($this->DUI));
-    $this->telefono = htmlspecialchars(strip_tags($this->telefono));
-    $this->direccion = htmlspecialchars(strip_tags($this->direccion));
-    $this->correo = htmlspecialchars(strip_tags($this->correo));
-    $this->clave = htmlspecialchars(strip_tags($this->clave));
-    $this->estado = (int) $this->estado;
-    $this->id_Usuario = (int) $this->id_Usuario;
+        // Sanitizar valores
+        $this->nombre = htmlspecialchars(strip_tags($this->nombre));
+        $this->apellido = htmlspecialchars(strip_tags($this->apellido));
+        $this->DUI = htmlspecialchars(strip_tags($this->DUI));
+        $this->telefono = htmlspecialchars(strip_tags($this->telefono));
+        $this->direccion = htmlspecialchars(strip_tags($this->direccion));
+        $this->correo = htmlspecialchars(strip_tags($this->correo));
+        $this->estado = (int) $this->estado;
+        $this->id_Usuario = (int) $this->id_Usuario;
 
-    // Vincular parámetros
-    $stmt->bindParam(":nombre", $this->nombre);
-    $stmt->bindParam(":apellido", $this->apellido);
-    $stmt->bindParam(":DUI", $this->DUI);
-    $stmt->bindParam(":telefono", $this->telefono);
-    $stmt->bindParam(":direccion", $this->direccion);
-    $stmt->bindParam(":correo", $this->correo);
-    $stmt->bindParam(":clave", $this->clave);
-    $stmt->bindParam(":estado", $this->estado, PDO::PARAM_INT);
-    $stmt->bindParam(":id_Usuario", $this->id_Usuario, PDO::PARAM_INT);
+        // Bind params
+        $stmt->bindParam(":nombre", $this->nombre);
+        $stmt->bindParam(":apellido", $this->apellido);
+        $stmt->bindParam(":DUI", $this->DUI);
+        $stmt->bindParam(":telefono", $this->telefono);
+        $stmt->bindParam(":direccion", $this->direccion);
+        $stmt->bindParam(":correo", $this->correo);
+        $stmt->bindParam(":clave", $clave_encriptada);
+        $stmt->bindParam(":estado", $this->estado, PDO::PARAM_INT);
+        $stmt->bindParam(":id_Usuario", $this->id_Usuario, PDO::PARAM_INT);
 
-    return $stmt->execute();
-}
+        return $stmt->execute();
+    }
 
-
-    /**
-     * Leer todos los empleados.
-     * 
-     *  PDOStatement Conjunto de resultados con todos los empleados.
-     */
+    // Leer todos los empleados
     public function leer(): PDOStatement
     {
         $query = "
@@ -96,8 +83,7 @@ class Empleado
         return $stmt;
     }
 
-    /*llamar todos los roles activos para seleccion en el form empleado*/
-
+    // Leer usuarios activos
     public function leerUsuariosActivos(): PDOStatement
     {
         $query = "SELECT * FROM usuarios WHERE estado = 1 ORDER BY id_Usuario ASC";
@@ -106,13 +92,7 @@ class Empleado
         return $stmt;
     }
 
-    /**
-     * Leer un empleado por su ID.
-     * - Busca el empleado con el ID especificado.
-     * - Carga los datos en los atributos de la clase.
-     * 
-     * true si encontró el empleado, false si no existe.
-     */
+    // Leer un empleado por ID
     public function leerPorId(): bool
     {
         $query = "SELECT * FROM " . $this->table_name . " WHERE id_Empleado = :id_Empleado LIMIT 1";
@@ -140,13 +120,7 @@ class Empleado
         return false;
     }
 
-    /**
-     * Leer un empleado por su DUI.
-     * - Busca el empleado con el DUI especificado.
-     * - Carga los datos en los atributos de la clase.
-     * 
-     * true si encontró el empleado, false si no existe.
-     */
+    // Leer un empleado por DUI
     public function leerPorDUI(): bool
     {
         $query = "SELECT * FROM " . $this->table_name . " WHERE DUI = :DUI LIMIT 1";
@@ -174,71 +148,69 @@ class Empleado
         return false;
     }
 
-    /**
-     * Actualizar los datos de un empleado existente.
-     * - Verifica que no exista otro empleado con el mismo DUI.
-     * - Si la validación pasa, actualiza los datos.
-     * 
-     * true si se actualizó correctamente, false si ya existe otro DUI o falla la actualización.
-     */
+    // Actualizar un empleado existente
     public function actualizar(): bool
-{
-    // Verificar si el DUI o el correo ya existen en otro registro
-    $checkQuery = "SELECT id_Empleado FROM " . $this->table_name . " 
+    {
+        $checkQuery = "SELECT id_Empleado FROM " . $this->table_name . " 
                    WHERE (DUI = :DUI OR correo = :correo) 
                    AND id_Empleado != :id_Empleado LIMIT 1";
-    $checkStmt = $this->conn->prepare($checkQuery);
-    $checkStmt->bindParam(":DUI", $this->DUI);
-    $checkStmt->bindParam(":correo", $this->correo);
-    $checkStmt->bindParam(":id_Empleado", $this->id_Empleado, PDO::PARAM_INT);
-    $checkStmt->execute();
+        $checkStmt = $this->conn->prepare($checkQuery);
+        $checkStmt->bindParam(":DUI", $this->DUI);
+        $checkStmt->bindParam(":correo", $this->correo);
+        $checkStmt->bindParam(":id_Empleado", $this->id_Empleado, PDO::PARAM_INT);
+        $checkStmt->execute();
 
-    if ($checkStmt->rowCount() > 0) {
-        // Ya existe otro empleado con ese DUI o correo
-        return false;
-    }
+        if ($checkStmt->rowCount() > 0) {
+            return false;
+        }
 
-    // Query para actualizar
-    $query = "UPDATE " . $this->table_name . " 
+        if (!empty($this->clave)) {
+            $clave_encriptada = password_hash($this->clave, PASSWORD_DEFAULT);
+        }
+
+        $query = "UPDATE " . $this->table_name . " 
               SET nombre=:nombre, apellido=:apellido, DUI=:DUI, 
                   telefono=:telefono, direccion=:direccion, 
-                  correo=:correo, clave=:clave, estado=:estado, id_Usuario=:id_Usuario
-              WHERE id_Empleado=:id_Empleado";
+                  correo=:correo, estado=:estado, id_Usuario=:id_Usuario";
 
-    $stmt = $this->conn->prepare($query);
+        if (!empty($this->clave)) {
+            $query .= ", clave=:clave";
+        }
 
-    // Sanitizar valores
-    $this->nombre = htmlspecialchars(strip_tags($this->nombre));
-    $this->apellido = htmlspecialchars(strip_tags($this->apellido));
-    $this->DUI = htmlspecialchars(strip_tags($this->DUI));
-    $this->telefono = htmlspecialchars(strip_tags($this->telefono));
-    $this->direccion = htmlspecialchars(strip_tags($this->direccion));
-    $this->correo = htmlspecialchars(strip_tags($this->correo));
-    $this->clave = htmlspecialchars(strip_tags($this->clave));
-    $this->estado = (int) $this->estado;
-    $this->id_Usuario = (int) $this->id_Usuario;
-    $this->id_Empleado = (int) $this->id_Empleado;
+        $query .= " WHERE id_Empleado=:id_Empleado";
 
-    // Vincular parámetros
-    $stmt->bindParam(":nombre", $this->nombre);
-    $stmt->bindParam(":apellido", $this->apellido);
-    $stmt->bindParam(":DUI", $this->DUI);
-    $stmt->bindParam(":telefono", $this->telefono);
-    $stmt->bindParam(":direccion", $this->direccion);
-    $stmt->bindParam(":correo", $this->correo);
-    $stmt->bindParam(":clave", $this->clave);
-    $stmt->bindParam(":estado", $this->estado, PDO::PARAM_INT);
-    $stmt->bindParam(":id_Usuario", $this->id_Usuario, PDO::PARAM_INT);
-    $stmt->bindParam(":id_Empleado", $this->id_Empleado, PDO::PARAM_INT);
+        $stmt = $this->conn->prepare($query);
 
-    return $stmt->execute();
-}
+        // Sanitizar
+        $this->nombre = htmlspecialchars(strip_tags($this->nombre));
+        $this->apellido = htmlspecialchars(strip_tags($this->apellido));
+        $this->DUI = htmlspecialchars(strip_tags($this->DUI));
+        $this->telefono = htmlspecialchars(strip_tags($this->telefono));
+        $this->direccion = htmlspecialchars(strip_tags($this->direccion));
+        $this->correo = htmlspecialchars(strip_tags($this->correo));
+        $this->estado = (int) $this->estado;
+        $this->id_Usuario = (int) $this->id_Usuario;
+        $this->id_Empleado = (int) $this->id_Empleado;
 
+        // Bind params
+        $stmt->bindParam(":nombre", $this->nombre);
+        $stmt->bindParam(":apellido", $this->apellido);
+        $stmt->bindParam(":DUI", $this->DUI);
+        $stmt->bindParam(":telefono", $this->telefono);
+        $stmt->bindParam(":direccion", $this->direccion);
+        $stmt->bindParam(":correo", $this->correo);
+        $stmt->bindParam(":estado", $this->estado, PDO::PARAM_INT);
+        $stmt->bindParam(":id_Usuario", $this->id_Usuario, PDO::PARAM_INT);
+        $stmt->bindParam(":id_Empleado", $this->id_Empleado, PDO::PARAM_INT);
 
-    /**
-     * Dar de baja a un empleado
-     * - Cambia el estado del empleado a 0 (inactivo/baja) solo si está activo
-     */
+        if (!empty($this->clave)) {
+            $stmt->bindParam(":clave", $clave_encriptada);
+        }
+
+        return $stmt->execute();
+    }
+
+    // Dar de baja (estado = 0) a un empleado
     public function darDeBaja(): bool
     {
         $query = "UPDATE " . $this->table_name . " SET estado = 0 WHERE id_Empleado = :id_Empleado AND estado = 1";
@@ -246,9 +218,7 @@ class Empleado
         $stmt->bindParam(":id_Empleado", $this->id_Empleado, PDO::PARAM_INT);
         $stmt->execute();
 
-        // Retorna true si se actualizó al menos una fila
         return $stmt->rowCount() > 0;
     }
-
 }
 ?>
