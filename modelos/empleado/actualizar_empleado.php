@@ -214,13 +214,23 @@ $stmt1 = $empleado->leerUsuariosActivos();
                                         <td><?php echo htmlspecialchars($row['direccion']); ?></td>
                                         <td><?php echo htmlspecialchars($row['correo']); ?></td>
                                         <td><?php echo htmlspecialchars($row['nombre_usuario']); ?></td>
-                                        <td><?php echo ($row['estado'] == 1 ? 'Alta' : 'Baja'); ?></td>
                                         <td>
-                                            <button class="btn btn-warning me-2"
-                                                onclick="location.href='actualizar_empleado.php?id=<?php echo $row['id_Empleado']; ?>'">Actualizar</button>
-                                            <button class="btn btn-danger"
-                                                onclick="location.href='dar_baja_empleado.php?id=<?php echo $row['id_Empleado']; ?>'">Dar
-                                                de baja</button>
+                                            <span
+                                                class="badge <?php echo ($row['estado'] == 1 ? 'badge-success' : 'badge-danger'); ?>">
+                                                <?php echo ($row['estado'] == 1 ? 'ALTA' : 'BAJA'); ?>
+                                            </span>
+                                        </td>
+                                        <td class="actions-column">
+                                            <button class="btn btn-sm btn-outline-warning me-1 p-1"
+                                                style="width: 40px; height: 40px;"
+                                                onclick="location.href='actualizar_empleado.php?id=<?php echo $row['id_Empleado']; ?>'">
+                                                <i class="bi bi-pencil" style="font-size: 1.2rem;"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger p-1"
+                                                style="width: 40px; height: 40px;"
+                                                onclick="location.href='dar_baja_empleado.php?id=<?php echo $row['id_Empleado']; ?>'">
+                                                <i class="bi bi-trash" style="font-size: 1.2rem;"></i>
+                                                </button>
                                         </td>
                                     </tr>
                                 <?php endwhile; ?>
