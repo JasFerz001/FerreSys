@@ -16,7 +16,6 @@
             <div class="logo-content">
                 <h2>Michapa <span>Ferretería</span></h2>
             </div>
-            <!-- Btn Ocultar Menu Lateral-->
             <button class="toggle-btn" id="toggle-sidebar">
                 <i class="fas fa-bars"></i>
             </button>
@@ -57,53 +56,64 @@
         </div>
     </div>
 
+    <!-- Barra superior tipo footer -->
+    <div class="top-bar">
+        <i class="fas fa-user-circle" id="userTopIcon"></i>
+        <div class="dropdown-top" id="dropdownTop">
+            <a href="../../logout.php">Cerrar Sesión</a>
+        </div>
+    </div>
+
     <!-- Main Content -->
     <div class="main-content">
-        
-
         <!-- Iframe oculto inicialmente -->
-        <iframe name="myFrame" id="myFrame" class="embed-responsive-item"
-            style="height: 100%; width: 100%; border: none; display: none;"></iframe>
+        <iframe name="myFrame" id="myFrame" class="embed-responsive-item"></iframe>
 
-        <!-- Dashboard Cards -->
-        <div class="dashboard-cards" id="dashboardCards">
-            <div class="card stat-card">
-                <div class="icon blue">
-                    <i class="fas fa-shopping-cart"></i>
+        <!-- Contenedor de dashboard cards separado del iframe -->
+        <div class="dashboard-cards-container" id="dashboardCardsContainer">
+            <div class="dashboard-cards" id="dashboardCards">
+                <div class="card stat-card">
+                    <div class="icon blue">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="info">
+                        <h3>152</h3>
+                        <p>Ventas Hoy</p>
+                    </div>
                 </div>
-                <div class="info">
-                    <h3>152</h3>
-                    <p>Ventas Hoy</p>
+                <div class="card stat-card">
+                    <div class="icon green">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="info">
+                        <h3>1,258</h3>
+                        <p>Productos en Stock</p>
+                    </div>
                 </div>
-            </div>
-            <div class="card stat-card">
-                <div class="icon green">
-                    <i class="fas fa-box"></i>
+                <div class="card stat-card">
+                    <div class="icon red">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="info">
+                        <h3>15</h3>
+                        <p>Empleados</p>
+                    </div>
                 </div>
-                <div class="info">
-                    <h3>1,258</h3>
-                    <p>Productos en Stock</p>
-                </div>
-            </div>
-            <div class="card stat-card">
-                <div class="icon red">
-                    <i class="fas fa-users"></i>
-                </div>
-                <div class="info">
-                    <h3>15</h3>
-                    <p>Empleados</p>
-                </div>
-            </div>
-            <div class="card stat-card">
-                <div class="icon orange">
-                    <i class="fas fa-dollar-sign"></i>
-                </div>
-                <div class="info">
-                    <h3>$8,542</h3>
-                    <p>Ganancias Hoy</p>
+                <div class="card stat-card">
+                    <div class="icon orange">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="info">
+                        <h3>$8,542</h3>
+                        <p>Ganancias Hoy</p>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <footer>
+            Universidad Nacional de El Salvador. Todos los derechos reservados &copy; 2025
+        </footer>
     </div>
 
     <script>
@@ -111,22 +121,18 @@
         const toggleButton = document.getElementById('toggle-sidebar');
         const sidebar = document.querySelector('.sidebar');
         const mainContent = document.querySelector('.main-content');
-        const toggleIcon = toggleButton.querySelector('i');
+        const topBar = document.querySelector('.top-bar');
 
         toggleButton.addEventListener('click', function () {
             sidebar.classList.toggle('collapsed');
             mainContent.classList.toggle('expanded');
 
-            if (sidebar.classList.contains('collapsed')) {
-                toggleIcon.classList.remove('fas fa-bars');
-                toggleIcon.classList.add('fas fa-bars');
-            } else {
-                toggleIcon.classList.remove('fas fa-bars');
-                toggleIcon.classList.add('fas fa-bars');
-            }
+            topBar.style.left = sidebar.classList.contains('collapsed')
+                ? 'var(--sidebar-collapsed-width)'
+                : 'var(--sidebar-width)';
         });
 
-        // Simple interactivity for menu items
+        // Menu items active
         document.querySelectorAll('.menu-item').forEach(item => {
             item.addEventListener('click', function () {
                 document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
@@ -134,19 +140,31 @@
             });
         });
 
-        // Función para mostrar el iframe y ocultar las tarjetas
+        // Mostrar iframe y ocultar dashboard
         function abrirFormularios(event) {
-            event.preventDefault(); // evita que el enlace abra la página normalmente
+            event.preventDefault();
             const iframe = document.getElementById('myFrame');
-            const dashboardCards = document.getElementById('dashboardCards');
+            const dashboardCardsContainer = document.getElementById('dashboardCardsContainer');
 
-            // Mostrar iframe
             iframe.style.display = 'block';
             iframe.src = event.currentTarget.getAttribute('href');
 
-            // Ocultar dashboard
-            dashboardCards.style.display = 'none';
+            dashboardCardsContainer.style.display = 'none';
         }
+
+        // Dropdown usuario superior derecho
+        const userTopIcon = document.getElementById('userTopIcon');
+        const dropdownTop = document.getElementById('dropdownTop');
+
+        userTopIcon.addEventListener('click', () => {
+            dropdownTop.style.display = dropdownTop.style.display === 'block' ? 'none' : 'block';
+        });
+
+        document.addEventListener('click', function (event) {
+            if (!userTopIcon.contains(event.target) && !dropdownTop.contains(event.target)) {
+                dropdownTop.style.display = 'none';
+            }
+        });
     </script>
 </body>
 
