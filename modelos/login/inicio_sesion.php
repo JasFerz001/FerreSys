@@ -2,7 +2,7 @@
 
 class Inicio_sesion
 {
-    private $conn;
+    private $conn;  
     private $table_name = "empleados";
     private $table = "usuarios";
     public string $rol;
@@ -56,7 +56,7 @@ class Inicio_sesion
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
             // Verificar que la clave coincida (puede ser encriptada con password_verify)
-            if ($this->clave === $row['clave']) {
+            if (password_verify($this->clave, $row['clave'])) {
                 $this->id_Usuario = (int) $row['id_Usuario'];
                 $this->rol = $row['rol'];
                 return true;
