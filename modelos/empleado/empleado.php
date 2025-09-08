@@ -21,26 +21,41 @@ class Empleado
         $this->conn = $db;
     }
 
-    // Crear un empleado nuevo (valida DUI/correo únicos)
-    public function crear(): bool
+    // Crear un empleado nuevo (valida DUI/correo/teléfono únicos)
+    public function crear(): array
     {
-        $checkQuery = "SELECT id_Empleado FROM " . $this->table_name . " 
-                   WHERE DUI = :DUI OR correo = :correo LIMIT 1";
+        // Verificar duplicados
+        $checkQuery = "SELECT id_Empleado, DUI, correo, telefono FROM " . $this->table_name . " 
+                   WHERE DUI = :DUI OR correo = :correo OR telefono = :telefono LIMIT 1";
         $checkStmt = $this->conn->prepare($checkQuery);
         $checkStmt->bindParam(":DUI", $this->DUI);
         $checkStmt->bindParam(":correo", $this->correo);
+        $checkStmt->bindParam(":telefono", $this->telefono);
         $checkStmt->execute();
 
         if ($checkStmt->rowCount() > 0) {
-            return false;
+            $existing = $checkStmt->fetch(PDO::FETCH_ASSOC);
+            $duplicates = [];
+
+            if ($existing['DUI'] === $this->DUI) {
+                $duplicates[] = 'DUI';
+            }
+            if ($existing['correo'] === $this->correo) {
+                $duplicates[] = 'correo';
+            }
+            if ($existing['telefono'] === $this->telefono) {
+                $duplicates[] = 'teléfono';
+            }
+
+            return ['success' => false, 'duplicates' => $duplicates];
         }
 
         $clave_encriptada = password_hash($this->clave, PASSWORD_DEFAULT);
 
         $query = "INSERT INTO " . $this->table_name . " 
-              SET nombre=:nombre, apellido=:apellido, DUI=:DUI, 
-                  telefono=:telefono, direccion=:direccion, 
-                  correo=:correo, clave=:clave, estado=:estado, id_Usuario=:id_Usuario";
+          SET nombre=:nombre, apellido=:apellido, DUI=:DUI, 
+              telefono=:telefono, direccion=:direccion, 
+              correo=:correo, clave=:clave, estado=:estado, id_Usuario=:id_Usuario";
 
         $stmt = $this->conn->prepare($query);
 
@@ -65,7 +80,11 @@ class Empleado
         $stmt->bindParam(":estado", $this->estado, PDO::PARAM_INT);
         $stmt->bindParam(":id_Usuario", $this->id_Usuario, PDO::PARAM_INT);
 
-        return $stmt->execute();
+        if ($stmt->execute()) {
+            return ['success' => true];
+        } else {
+            return ['success' => false, 'duplicates' => []];
+        }
     }
 
     // Leer todos los empleados
@@ -148,32 +167,46 @@ class Empleado
         return false;
     }
 
-    // Actualizar un empleado existente
-    public function actualizar(): bool
+    // Actualizar un empleado existente (valida DUI/correo/teléfono únicos excluyendo el actual)
+    public function actualizar(): array
     {
-        $checkQuery = "SELECT id_Empleado FROM " . $this->table_name . " 
-                   WHERE (DUI = :DUI OR correo = :correo) 
+        // Verificar duplicados excluyendo el registro actual
+        $checkQuery = "SELECT id_Empleado, DUI, correo, telefono FROM " . $this->table_name . " 
+                   WHERE (DUI = :DUI OR correo = :correo OR telefono = :telefono) 
                    AND id_Empleado != :id_Empleado LIMIT 1";
         $checkStmt = $this->conn->prepare($checkQuery);
         $checkStmt->bindParam(":DUI", $this->DUI);
         $checkStmt->bindParam(":correo", $this->correo);
+        $checkStmt->bindParam(":telefono", $this->telefono);
         $checkStmt->bindParam(":id_Empleado", $this->id_Empleado, PDO::PARAM_INT);
         $checkStmt->execute();
 
         if ($checkStmt->rowCount() > 0) {
-            return false;
+            $existing = $checkStmt->fetch(PDO::FETCH_ASSOC);
+            $duplicates = [];
+
+            if ($existing['DUI'] === $this->DUI) {
+                $duplicates[] = 'DUI';
+            }
+            if ($existing['correo'] === $this->correo) {
+                $duplicates[] = 'correo';
+            }
+            if ($existing['telefono'] === $this->telefono) {
+                $duplicates[] = 'teléfono';
+            }
+
+            return ['success' => false, 'duplicates' => $duplicates];
         }
 
+        // Construir la consulta UPDATE
+        $query = "UPDATE " . $this->table_name . " 
+          SET nombre=:nombre, apellido=:apellido, DUI=:DUI, 
+              telefono=:telefono, direccion=:direccion, 
+              correo=:correo, estado=:estado, id_Usuario=:id_Usuario";
+
+        // Agregar la clave solo si se proporcionó una nueva
         if (!empty($this->clave)) {
             $clave_encriptada = password_hash($this->clave, PASSWORD_DEFAULT);
-        }
-
-        $query = "UPDATE " . $this->table_name . " 
-              SET nombre=:nombre, apellido=:apellido, DUI=:DUI, 
-                  telefono=:telefono, direccion=:direccion, 
-                  correo=:correo, estado=:estado, id_Usuario=:id_Usuario";
-
-        if (!empty($this->clave)) {
             $query .= ", clave=:clave";
         }
 
@@ -181,7 +214,7 @@ class Empleado
 
         $stmt = $this->conn->prepare($query);
 
-        // Sanitizar
+        // Sanitizar valores
         $this->nombre = htmlspecialchars(strip_tags($this->nombre));
         $this->apellido = htmlspecialchars(strip_tags($this->apellido));
         $this->DUI = htmlspecialchars(strip_tags($this->DUI));
@@ -203,11 +236,16 @@ class Empleado
         $stmt->bindParam(":id_Usuario", $this->id_Usuario, PDO::PARAM_INT);
         $stmt->bindParam(":id_Empleado", $this->id_Empleado, PDO::PARAM_INT);
 
+        // Bind de la clave solo si se proporcionó
         if (!empty($this->clave)) {
             $stmt->bindParam(":clave", $clave_encriptada);
         }
 
-        return $stmt->execute();
+        if ($stmt->execute()) {
+            return ['success' => true];
+        } else {
+            return ['success' => false, 'duplicates' => []];
+        }
     }
 
     // Dar de baja (estado = 0) a un empleado
