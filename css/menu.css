@@ -281,16 +281,30 @@ footer {
     position: fixed;
     top: 0;
     left: var(--sidebar-width);
+    /* Mantiene el desplazamiento del sidebar */
     right: 0;
     height: 50px;
     background-color: var(--primary);
+    /* Puedes cambiarlo a #2c3e50 si quieres */
     display: flex;
     align-items: center;
     justify-content: flex-end;
     padding: 0 20px;
+    /* Espaciado interno horizontal */
     z-index: 999;
     transition: all 0.3s ease;
 }
+
+.top-bar .user-name {
+    color: #ffffff;
+    /* Texto blanco */
+    margin-right: 10px;
+    /* Separación entre texto e ícono */
+    font-weight: 500;
+    white-space: nowrap;
+    /* Evita que el texto se rompa en varias líneas */
+}
+
 
 /* Ajuste cuando el sidebar está colapsado */
 .main-content.expanded+.top-bar {

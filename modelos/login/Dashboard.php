@@ -1,3 +1,17 @@
+<?php
+session_start();
+
+// Proteger el dashboard: solo usuarios logueados
+if (!isset($_SESSION['id_Usuario'])) {
+    header("Location: ../login/login.php");
+    exit();
+}
+
+// Obtener nombre y rol del usuario desde la sesión
+$nombre_usuario = $_SESSION['nombre'] ?? "";
+$apellido = $_SESSION['apellido'] ?? '';
+$rol_usuario = $_SESSION['rol'] ?? "";
+?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -56,20 +70,30 @@
         </div>
     </div>
 
-    <!-- Barra superior tipo footer -->
+    <!-- Barra superior -->
     <div class="top-bar">
+        <!-- Nombre completo y rol con guion -->
+        <span class="user-name">
+            <?php
+            $nombre = $_SESSION['nombre'] ?? '';
+            $apellido = $_SESSION['apellido'] ?? '';
+            $rol = $_SESSION['rol'] ?? '';
+            echo htmlspecialchars(trim("$nombre $apellido - $rol"));
+            ?>
+        </span>
         <i class="fas fa-user-circle" id="userTopIcon"></i>
+
         <div class="dropdown-top" id="dropdownTop">
-            <a href="../../logout.php">Cerrar Sesión</a>
+            <a href="../login/login.php">Cerrar Sesión</a>
         </div>
     </div>
 
     <!-- Main Content -->
     <div class="main-content">
         <!-- Iframe oculto inicialmente -->
-        <iframe name="myFrame" id="myFrame" class="embed-responsive-item"></iframe>
+        <iframe name="myFrame" id="myFrame" class="embed-responsive-item" style="display:none;"></iframe>
 
-        <!-- Contenedor de dashboard cards separado del iframe -->
+        <!-- Contenedor de dashboard cards -->
         <div class="dashboard-cards-container" id="dashboardCardsContainer">
             <div class="dashboard-cards" id="dashboardCards">
                 <div class="card stat-card">
@@ -123,18 +147,18 @@
         const mainContent = document.querySelector('.main-content');
         const topBar = document.querySelector('.top-bar');
 
-        toggleButton.addEventListener('click', function () {
+        toggleButton.addEventListener('click', function() {
             sidebar.classList.toggle('collapsed');
             mainContent.classList.toggle('expanded');
 
-            topBar.style.left = sidebar.classList.contains('collapsed')
-                ? 'var(--sidebar-collapsed-width)'
-                : 'var(--sidebar-width)';
+            topBar.style.left = sidebar.classList.contains('collapsed') ?
+                'var(--sidebar-collapsed-width)' :
+                'var(--sidebar-width)';
         });
 
         // Menu items active
         document.querySelectorAll('.menu-item').forEach(item => {
-            item.addEventListener('click', function () {
+            item.addEventListener('click', function() {
                 document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
                 this.classList.add('active');
             });
@@ -160,7 +184,7 @@
             dropdownTop.style.display = dropdownTop.style.display === 'block' ? 'none' : 'block';
         });
 
-        document.addEventListener('click', function (event) {
+        document.addEventListener('click', function(event) {
             if (!userTopIcon.contains(event.target) && !dropdownTop.contains(event.target)) {
                 dropdownTop.style.display = 'none';
             }

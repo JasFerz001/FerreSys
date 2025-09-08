@@ -64,23 +64,19 @@ class Usuario
     public function actualizar()
     {
         $query = "UPDATE " . $this->table_name . " 
-              SET estado = :estado
+              SET rol = :rol, estado = :estado
               WHERE id_Usuario = :id_Usuario";
 
         $stmt = $this->conn->prepare($query);
 
-
-         $this->id_Usuario = (int)$this->id_Usuario;
-         $this->estado = (int)$this->estado;
+        $this->id_Usuario = (int)$this->id_Usuario;
+        $this->estado = (int)$this->estado;
+         $this->rol = strtoupper(trim($this->rol));
 
         $stmt->bindParam(":id_Usuario", $this->id_Usuario, PDO::PARAM_INT);
         $stmt->bindParam(":estado", $this->estado, PDO::PARAM_BOOL);
+        $stmt->bindParam(":rol", $this->rol, PDO::PARAM_STR);
 
-
-        if ($stmt->execute()) {
-            return true;
-        }
-        return false;
+        return $stmt->execute();
     }
 }
-?>
