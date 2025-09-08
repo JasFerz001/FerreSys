@@ -97,9 +97,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <input type="hidden" name="id_Usuario" value="<?php echo $id_Usuario ?? ''; ?>">
                     <div class="mb-3">
                         <label class="form-label"><i class="bi bi-person-gear"></i> Rol</label>
-                        <input type="text" class="form-control" name="rol"
+                        <input type="text" class="form-control" name="rol" id="rol"
                             value="<?php echo htmlspecialchars($_SESSION['old_rol'] ?? ''); ?>"
                             placeholder="Ingrese el rol" autocomplete="off" required>
+                        <small id="rol-error" class="text-danger" style="display:none;">Solo se permiten letras y espacios</small>
                     </div>
                     <div class="mb-3">
                         <label class="form-label"><i class="bi bi-toggle-on"></i> Estado</label>
@@ -160,6 +161,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Validación en tiempo real SOLO para letras -->
+    <script>
+    const inputRol = document.getElementById('rol');
+    const errorRol = document.getElementById('rol-error');
+    const btnGuardar = document.querySelector('button[type="submit"]');
+
+    function validarRol() {
+        const valor = inputRol.value;
+        // Solo letras y espacios
+        const esValido = /^[a-zA-Z\s]*$/.test(valor);
+
+        if (!esValido) {
+            errorRol.style.display = 'inline';
+            inputRol.classList.add('is-invalid');
+            btnGuardar.disabled = true;
+        } else {
+            errorRol.style.display = 'none';
+            inputRol.classList.remove('is-invalid');
+            btnGuardar.disabled = false;
+        }
+    }
+
+    inputRol.addEventListener('input', validarRol);
+    document.addEventListener('DOMContentLoaded', validarRol);
+    </script>
+
     <script>
         let tabla = new DataTable('#tablaUsuarios', {
             pageLength: 5,

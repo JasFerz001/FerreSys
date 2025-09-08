@@ -5,7 +5,7 @@ class Empleado
     private $table_name = "empleados";
 
     // Atributos de la tabla empleados
-    public int $id_Empleado;
+    public int $id_Empleado; 
     public string $nombre;
     public string $apellido;
     public string $DUI;
