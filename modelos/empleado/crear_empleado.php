@@ -189,7 +189,7 @@ $stmt1 = $empleado->leerUsuariosActivos();
                                     <th>Correo</th>
                                     <th>Usuario</th>
                                     <th>Estado</th>
-                                    <th>Acciones</th>
+                                    <th>Accion</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -214,11 +214,13 @@ $stmt1 = $empleado->leerUsuariosActivos();
                                                 onclick="location.href='actualizar_empleado.php?id=<?php echo $row['id_Empleado']; ?>'">
                                                 <i class="bi bi-pencil" style="font-size: 1.2rem;"></i>
                                             </button>
+                                           <!-- 
                                             <button class="btn btn-sm btn-outline-danger p-1"
                                                 style="width: 40px; height: 40px;"
                                                 onclick="location.href='dar_baja_empleado.php?id=<?php echo $row['id_Empleado']; ?>'">
                                                 <i class="bi bi-trash" style="font-size: 1.2rem;"></i>
                                             </button>
+                                            -->
                                         </td>
                                     </tr>
                                 <?php endwhile; ?>
