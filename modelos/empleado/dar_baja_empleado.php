@@ -153,7 +153,7 @@ $stmt1 = $empleado->leerUsuariosActivos();
             <!-- Tabla -->
             <div class="col-md-8" id="tablaCol">
                 <div class="table-section">
-                    <div class="card-title" id="tablaTitle" style="cursor: pointer;">Registros</div>
+                    <div class="card-title" id="tablaTitle" style="cursor: pointer;">LISTA DE EMPLEADOS</div>
                     <div class="table-responsive">
                         <table id="tablaEmpleados" class="table table-bordered text-center align-middle">
                             <thead>

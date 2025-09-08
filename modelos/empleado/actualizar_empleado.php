@@ -7,6 +7,7 @@ $db = $conexion->getConnection();
 $empleado = new Empleado($db);
 
 $message = '';
+$duplicates = [];
 // Variables para mantener los valores del formulario
 $id_Empleado = $nombre = $apellido = $DUI = $telefono = $direccion = $correo = $clave = "";
 $id_Usuario = $estado = "";
@@ -24,11 +25,10 @@ if (isset($_GET['id'])) {
         $telefono = $empleado->telefono;
         $direccion = $empleado->direccion;
         $correo = $empleado->correo;
-        $clave = $empleado->clave;
         $id_Usuario = $empleado->id_Usuario;
         $estado = $empleado->estado;
     } else {
-        $message = 'Empleado no encontrado.';
+        $message = 'not_found';
     }
 }
 
@@ -54,15 +54,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $empleado->telefono = $telefono;
     $empleado->direccion = $direccion;
     $empleado->correo = $correo;
-    $empleado->clave = $clave;
+    $empleado->clave = $clave; // Puede estar vacío
     $empleado->id_Usuario = $id_Usuario;
     $empleado->estado = $estado;
 
     // Actualizar el empleado
-    if ($empleado->actualizar()) {
+    $result = $empleado->actualizar();
+
+    if ($result['success']) {
         $message = 'success';
     } else {
         $message = 'error';
+        $duplicates = $result['duplicates'];
     }
 }
 
@@ -98,7 +101,8 @@ $stmt1 = $empleado->leerUsuariosActivos();
                             Empleado no encontrado.
                         </div>
                     <?php else: ?>
-                        <form id="empleadoForm" method="post" action="actualizar_empleado.php">
+                        <form id="empleadoForm" method="post"
+                            action="actualizar_empleado.php?id=<?php echo $id_Empleado; ?>">
                             <input type="hidden" name="id_Empleado" id="id_Empleado" value="<?php echo $id_Empleado; ?>">
                             <div class="row g-3">
                                 <div class="col-md-6">
@@ -145,8 +149,8 @@ $stmt1 = $empleado->leerUsuariosActivos();
                                 <div class="col-12">
                                     <label class="form-label form-icon"><i class="bi bi-key-fill"></i>Clave</label>
                                     <input type="password" name="clave" class="form-control"
-                                        placeholder="Ingresar clave de acceso" required minlength="8" maxlength="12"
-                                        value="<?php echo htmlspecialchars($clave); ?>">
+                                        placeholder="Dejar en blanco para mantener la actual" minlength="8" maxlength="12"
+                                        value="">
                                     <small class="form-text text-muted">Dejar en blanco si no desea cambiar la clave</small>
                                 </div>
                                 <div class="col-md-6">
@@ -173,7 +177,8 @@ $stmt1 = $empleado->leerUsuariosActivos();
                                     </select>
                                 </div>
                                 <div class="col-12 text-center mt-4">
-                                    <button id="btnCancelar" type="button" class="btn btn-warning px-5 py-2">Cancelar</button>
+                                    <button id="btnCancelar" type="button"
+                                        class="btn btn-warning px-5 py-2">Cancelar</button>
                                     <button type="submit" class="btn btn-success px-5 py-2">Actualizar</button>
                                 </div>
                             </div>
@@ -185,7 +190,7 @@ $stmt1 = $empleado->leerUsuariosActivos();
             <!-- Tabla -->
             <div class="col-md-8" id="tablaCol">
                 <div class="table-section">
-                    <div class="card-title" id="tablaTitle" style="cursor: pointer;">Registros</div>
+                    <div class="card-title" id="tablaTitle" style="cursor: pointer;">LISTA DE EMPLEADOS</div>
                     <div class="table-responsive">
                         <table id="tablaEmpleados" class="table table-bordered text-center align-middle">
                             <thead>
@@ -230,7 +235,7 @@ $stmt1 = $empleado->leerUsuariosActivos();
                                                 style="width: 40px; height: 40px;"
                                                 onclick="location.href='dar_baja_empleado.php?id=<?php echo $row['id_Empleado']; ?>'">
                                                 <i class="bi bi-trash" style="font-size: 1.2rem;"></i>
-                                                </button>
+                                            </button>
                                         </td>
                                     </tr>
                                 <?php endwhile; ?>
@@ -246,31 +251,51 @@ $stmt1 = $empleado->leerUsuariosActivos();
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
-
         document.getElementById('btnCancelar').addEventListener('click', () => {
             window.location.href = 'crear_empleado.php';
         });
 
         // Mostrar SweetAlert y redireccionar después
         const message = "<?php echo $message; ?>";
+        const duplicates = <?php echo json_encode($duplicates); ?>;
+
         if (message === 'success') {
             Swal.fire({
-                title: 'Empleado',
+                title: '¡Éxito!',
                 text: 'Empleado actualizado correctamente',
                 icon: 'success',
+                iconColor: '#1cbb8c',
+                confirmButtonColor: '#3b7ddd',
                 confirmButtonText: 'Aceptar',
                 allowOutsideClick: false
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Redireccionar después de hacer clic en Aceptar
                     window.location.href = 'crear_empleado.php';
                 }
             });
-
-            // Limpiar el mensaje para evitar que se muestre al recargar
-            <?php $message = ''; ?>
         } else if (message === 'error') {
-            Swal.fire('Empleado', 'Error al actualizar el empleado. Puede que el DUI ya exista o el correo esta registrado.', 'error');
+            let errorMessage = 'No se pudo completar la actualización. ';
+
+            if (duplicates.length > 0) {
+                errorMessage += 'Los siguientes datos ya están registrados:\n\n';
+
+                if (duplicates.includes('DUI')) errorMessage += '• Número de DUI\n';
+                if (duplicates.includes('correo')) errorMessage += '• Correo electrónico\n';
+                if (duplicates.includes('teléfono')) errorMessage += '• Número de teléfono\n';
+
+                errorMessage += '\nPor favor, verifique la información.';
+            } else {
+                errorMessage += 'Ocurrió un error inesperado.';
+            }
+
+            Swal.fire({
+                title: 'Error de actualización',
+                text: errorMessage,
+                icon: 'error',
+                iconColor: '#f06548',
+                confirmButtonColor: '#3b7ddd',
+                confirmButtonText: 'Entendido'
+            });
         }
 
         $(document).ready(function () {
@@ -280,6 +305,7 @@ $stmt1 = $empleado->leerUsuariosActivos();
                 "lengthMenu": [5, 10, 25, 50],
             });
         });
+
 
         // Toggle form
         const tablaTitle = document.getElementById('tablaTitle');
