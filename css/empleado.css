@@ -1,5 +1,5 @@
 :root {
-    --primary-color: #3b7ddd;
+    --primary-color: #2c3e50  ;
     --secondary-color: #6c757d;
     --success-color: #1cbb8c;
     --warning-color: #f7b84b;
@@ -9,7 +9,7 @@
 
 /* ===== Global ===== */
 body {
-    background-color: var(--light-bg);
+    background-color:white;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding: 20px;
 }
@@ -126,7 +126,7 @@ body {
 }
 
 #tablaEmpleados thead th {
-    background-color: #f8f9fa;
+    background-color: white;
     color: var(--primary-color);
     font-weight: 600;
     padding: 12px 15px;

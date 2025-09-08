@@ -7,6 +7,7 @@ $db = $conexion->getConnection();
 $empleado = new Empleado($db);
 
 $message = '';
+$duplicates = [];
 // Variables para mantener los valores del formulario
 $nombre = $apellido = $DUI = $telefono = $direccion = $correo = $clave = "";
 $id_Usuario = $estado = "";
@@ -40,7 +41,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $empleado->estado = $estado;
 
     // Crear el empleado
-    if ($empleado->crear()) {
+    $result = $empleado->crear();
+
+    if ($result['success']) {
         // Si es la primera vez (configuración inicial), redirigir al login
         if (isset($_POST['primera_vez']) && $_POST['primera_vez'] == '1') {
             header("Location: ../login/login.php");
@@ -53,6 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $id_Usuario = $estado = "";
     } else {
         $message = 'error';
+        $duplicates = $result['duplicates'];
         // No limpiar campos en caso de error
     }
 }
@@ -295,12 +299,42 @@ $stmt1 = $empleado->leerUsuariosActivos();
             document.querySelectorAll('#empleadoForm select').forEach(select => select.selectedIndex = 0);
         });
 
-        // Mostrar SweetAlert solo una vez
+        // Mostrar SweetAlert con mensajes específicos
         const message = "<?php echo $message; ?>";
+        const duplicates = <?php echo json_encode($duplicates); ?>;
+
         if (message === 'success') {
-            Swal.fire('Empleado', 'Empleado creado correctamente', 'success');
+            Swal.fire({
+                title: '¡Éxito!',
+                text: 'El empleado ha sido registrado correctamente en el sistema',
+                icon: 'success',
+                iconColor: '#1cbb8c',
+                confirmButtonColor: '#3b7ddd',
+                confirmButtonText: 'Aceptar'
+            });
         } else if (message === 'error') {
-            Swal.fire('Empleado', 'Ya existe un empleado con ese número de DUI o Correo ya registrado', 'error');
+            let errorMessage = 'No se pudo completar el registro. ';
+
+            if (duplicates.length > 0) {
+                errorMessage += 'Los siguientes datos ya están registrados:\n\n';
+
+                if (duplicates.includes('DUI')) errorMessage += '• Número de DUI\n';
+                if (duplicates.includes('correo')) errorMessage += '• Correo electrónico\n';
+                if (duplicates.includes('teléfono')) errorMessage += '• Número de teléfono\n';
+
+                errorMessage += '\nPor favor, verifique la información.';
+            } else {
+                errorMessage += 'Ocurrió un error inesperado.';
+            }
+
+            Swal.fire({
+                title: 'Error de registro',
+                text: errorMessage,
+                icon: 'error',
+                iconColor: '#f06548',
+                confirmButtonColor: '#3b7ddd',
+                confirmButtonText: 'Entendido'
+            });
         }
 
         $(document).ready(function () {
