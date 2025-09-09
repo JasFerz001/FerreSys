@@ -35,7 +35,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
             </button>
         </div>
         <div class="menu">
-            <div class="menu-item active">
+            <div class="menu-item active" onclick="location.href='Dashboard.php'" style="cursor:pointer;">
                 <i class="fas fa-home"></i>
                 <span>Dashboard</span>
             </div>

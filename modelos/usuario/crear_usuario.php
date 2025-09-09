@@ -38,14 +38,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
-
     if ($editUser) {
         // Modo actualizar
         $usuario->id_Usuario = $editUser['id_Usuario'];
         $usuario->rol = $rol;
         $usuario->estado = (int)$estadoSeleccionado;
 
-        // Verificar duplicado como en crear
+        // Verificar duplicado
         $stmtCheck = $db->prepare("SELECT COUNT(*) as total FROM usuarios WHERE rol = :rol AND id_Usuario != :id");
         $stmtCheck->bindParam(':rol', $rol);
         $stmtCheck->bindParam(':id', $editUser['id_Usuario']);
@@ -89,116 +88,124 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     exit();
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $editUser ? 'Actualizar Usuario' : 'Registro de Usuario'; ?></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gestión de Usuarios</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="../../css/usuario.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
-    <div class="container-box">
-        <?php if (isset($_GET['message'])): ?>
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    <?php if ($_GET['message'] == 'success'): ?>
-                        Swal.fire('Éxito', 'Usuario creado correctamente.', 'success');
-                    <?php elseif ($_GET['message'] == 'update_success'): ?>
-                        Swal.fire('Éxito', 'Usuario actualizado correctamente.', 'success');
-                    <?php elseif ($_GET['message'] == 'error'): ?>
-                        Swal.fire('Error', 'Error al procesar el usuario.', 'error');
-                    <?php elseif ($_GET['message'] == 'rol_duplicado'): ?>
-                        Swal.fire('Atención', 'El rol "<?php echo htmlspecialchars($_SESSION['old_rol'] ?? ''); ?>" ya existe.', 'warning');
-                    <?php elseif ($_GET['message'] == 'estado_baja'): ?>
-                        Swal.fire('Atención', 'No se puede guardar usuario con estado de Baja.', 'warning');
-                    <?php endif; ?>
-                });
-            </script>
-        <?php endif; ?>
+    <?php if (isset($_GET['message'])): ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                <?php if ($_GET['message'] == 'success'): ?>
+                    Swal.fire('Éxito', 'Usuario creado correctamente.', 'success');
+                <?php elseif ($_GET['message'] == 'update_success'): ?>
+                    Swal.fire('Éxito', 'Usuario actualizado correctamente.', 'success');
+                <?php elseif ($_GET['message'] == 'error'): ?>
+                    Swal.fire('Error', 'Error al procesar el usuario.', 'error');
+                <?php elseif ($_GET['message'] == 'rol_duplicado' ): ?>
+                    Swal.fire('Atención', 'El rol "<?php echo htmlspecialchars($_SESSION['old_rol'] ?? ''); ?>" ya existe.', 'warning');
+                <?php elseif ($_GET['message'] == 'estado_baja'): ?>
+                    Swal.fire('Atención', 'No se puede guardar usuario con estado de Baja.', 'warning');
+                <?php endif; ?>
+            });
+        </script>
+    <?php endif; ?>
 
-        <div class="row">
-            <!-- Formulario -->
-            <div class="col-md-4">
-                <div class="card-title"><?php echo $editUser ? 'Actualizar Usuario' : 'Registro de Usuario'; ?></div>
-                <form id="usuarioForm" method="post" action="crear_usuario.php<?php echo $editUser ? '?id=' . $editUser['id_Usuario'] : ''; ?>">
-                    <div class="mb-3">
-                        <label class="form-label"><i class="bi bi-person-gear"></i> Rol</label>
-                        <input type="text" class="form-control" name="rol" id="rol"
-                            value="<?php echo htmlspecialchars($_SESSION['old_rol'] ?? $editUser['rol'] ?? ''); ?>"
-                            placeholder="Ingrese el rol" autocomplete="off" required>
-                        <small id="rol-error" class="text-danger" style="display:none;">Solo se permiten letras y espacios</small>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label"><i class="bi bi-toggle-on"></i> Estado</label>
-                        <div>
-                            <?php $estado = $_SESSION['old_estado'] ?? $editUser['estado'] ?? 1; ?>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="estado" value="1" <?php echo ($estado == 1 ? 'checked' : ''); ?> required>
-                                <label class="form-check-label">Alta</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="estado" value="0" <?php echo ($estado == 0 ? 'checked' : ''); ?> required>
-                                <label class="form-check-label">Baja</label>
-                            </div>
+    <div class="container-box">
+        <!-- Formulario -->
+        <div class="card-form">
+            <div class="card-title"><?php echo $editUser ? 'Actualizar Usuario' : 'Registro de Usuario'; ?></div>
+            <form id="usuarioForm" method="post" action="crear_usuario.php<?php echo $editUser ? '?id=' . $editUser['id_Usuario'] : ''; ?>">
+                <div class="mb-3">
+                    <label class="form-label"><i class="bi bi-person-gear"></i> Rol</label>
+                    <input type="text" class="form-control" name="rol" id="rol"
+                        value="<?php echo htmlspecialchars($_SESSION['old_rol'] ?? $editUser['rol'] ?? ''); ?>"
+                        placeholder="Ingrese el rol" autocomplete="off" required>
+                    <small id="rol-error" class="text-danger" style="display:none;">Solo se permiten letras y espacios</small>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label"><i class="bi bi-toggle-on"></i> Estado</label>
+                    <div>
+                        <?php $estado = $_SESSION['old_estado'] ?? $editUser['estado'] ?? 1; ?>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="estado" value="1" <?php echo ($estado == 1 ? 'checked' : ''); ?> required>
+                            <label class="form-check-label">Alta</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="estado" value="0" <?php echo ($estado == 0 ? 'checked' : ''); ?> required>
+                            <label class="form-check-label">Baja</label>
                         </div>
                     </div>
-                    <div class="text-center">
-                        <button type="submit" class="btn btn-gradient px-5 py-2"><?php echo $editUser ? 'Actualizar' : 'Guardar'; ?></button>
-                        <?php if ($editUser): ?>
-                            <a href="crear_usuario.php" class="btn btn-secondary">Cancelar</a>
-                        <?php endif; ?>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Tabla -->
-            <div class="col-md-8 mt-4 mt-md-0">
-                <div class="card-title">Usuarios Registrados</div>
-                <div class="table-responsive">
-                    <table class="table table-bordered text-center align-middle" id="tablaUsuarios">
-                        <thead>
-                            <tr>
-                                <th>Rol</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            $stmt = $db->prepare("SELECT * FROM usuarios ORDER BY rol ASC");
-                            $stmt->execute();
-                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)):
-                            ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($row['rol']); ?></td>
-                                    <td><?php echo strtoupper($row['estado'] ? 'Alta' : 'Baja'); ?></td>
-                                    <td>
-                                        <a href="crear_usuario.php?id=<?php echo $row['id_Usuario']; ?>" class="btn btn-warning btn-sm">
-                                            <i class="bi bi-pencil-square"></i> Actualizar
-                                        </a>
-                                    </td>
-                                </tr>
-                            <?php endwhile; ?>
-                        </tbody>
-                    </table>
                 </div>
+
+                <!-- Botones -->
+                <div class="text-center mt-3">
+                    <?php if ($editUser): ?>
+                        <!-- En modo actualizar, cancelar recarga la página y limpia input -->
+                        <a href="crear_usuario.php" class="btn btn-warning px-4">Cancelar</a>
+                    <?php else: ?>
+                        <!-- En modo crear, usar reset normal -->
+                        <button type="reset" class="btn btn-warning px-4">Cancelar</button>
+                    <?php endif; ?>
+
+                    <button type="submit" class="btn btn-success px-4"><?php echo $editUser ? 'Actualizar' : 'Guardar'; ?></button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-container">
+            <div class="card-title">Lista de Usuarios</div>
+            <div class="table-responsive">
+                <table id="tablaUsuarios" class="table text-center align-middle">
+                    <thead>
+                        <tr>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $stmt = $db->prepare("SELECT * FROM usuarios ORDER BY rol ASC");
+                        $stmt->execute();
+                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)):
+                        ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($row['rol']); ?></td>
+                                <td>
+                                    <span class="badge <?php echo ($row['estado'] == 1 ? 'badge-success' : 'badge-danger'); ?>">
+                                        <?php echo ($row['estado'] == 1 ? 'ALTA' : 'BAJA'); ?>
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <a href="crear_usuario.php?id=<?php echo $row['id_Usuario']; ?>"
+                                        class="btn btn-sm btn-outline-warning btn-cuadrado me-1">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Validación en tiempo real SOLO letras y espacios -->
+    <!-- Validación en tiempo real -->
     <script>
         const inputRol = document.getElementById('rol');
         const errorRol = document.getElementById('rol-error');
@@ -223,32 +230,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         document.addEventListener('DOMContentLoaded', validarRol);
     </script>
 
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
-        let tabla = new DataTable('#tablaUsuarios', {
-            pageLength: 5,
-            lengthMenu: [
-                [5, 10, 25, -1],
-                [5, 10, 25, "Todos"]
-            ],
-            language: {
-                emptyTable: "No hay usuarios registrados aún",
-                info: "Total: _TOTAL_ usuarios",
-                infoEmpty: "No hay usuarios para mostrar",
-                infoFiltered: "(filtrado de _MAX_ usuarios en total)",
-                lengthMenu: "Mostrar _MENU_ usuarios",
-                loadingRecords: "Cargando...",
-                processing: "Procesando...",
-                search: " Buscar:",
-                zeroRecords: "No se encontraron coincidencias",
-                paginate: {
-                    first: "Primero",
-                    last: "Último",
-                    next: "Siguiente",
-                    previous: "Anterior"
-                }
-            }
+        $(document).ready(function() {
+            $('#tablaUsuarios').DataTable({
+                "language": {
+                    "url": "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+                },
+                "pageLength": 5,
+                "lengthMenu": [5, 10, 25],
+                "searching": false,
+                "info": false
+            });
         });
     </script>
+    
 </body>
 
 </html>
