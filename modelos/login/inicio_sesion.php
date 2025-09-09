@@ -1,5 +1,4 @@
 <?php
-
 class Inicio_sesion
 {
     private $conn;  
@@ -9,31 +8,30 @@ class Inicio_sesion
     public string $clave;
     public string $correo;
     public int $id_Usuario;
+    public int $id_Empleado;
+    public string $nombre;
+    public string $apellido;
 
     public function __construct($db)
     {
         $this->conn = $db;
     }
 
-    /**
-     * Verifica las credenciales de inicio de sesión (correo + clave),
-     * y además que tanto el empleado como el rol (usuario) estén activos.
-     */
-
     public function existeAlgunUsuario(): bool
-{
-    $query = "SELECT COUNT(*) as total FROM " . $this->table;
-    $stmt = $this->conn->prepare($query);
-    $stmt->execute();
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    {
+        $query = "SELECT COUNT(*) as total FROM " . $this->table;
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    return $row['total'] > 0; // true si ya hay usuarios, false si está vacío
-}
-
+        return $row['total'] > 0;
+    }
 
     public function verificarCredenciales(): bool
     {
+        // CONSULTA CORREGIDA: Sin comentarios dentro del SQL
         $query = "SELECT u.id_Usuario, u.rol, u.estado AS estado_usuario, 
+                         e.id_Empleado, e.nombre, e.apellido, 
                          e.estado AS estado_empleado, e.correo, e.clave
                   FROM empleados e 
                   INNER JOIN usuarios u ON e.id_Usuario = u.id_Usuario 
@@ -55,16 +53,19 @@ class Inicio_sesion
         if ($stmt->rowCount() > 0) {
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            // Verificar que la clave coincida (puede ser encriptada con password_verify)
+            // Verificar que la clave coincida
             if (password_verify($this->clave, $row['clave'])) {
+                // GUARDAR TODOS LOS DATOS EN LAS PROPIEDADES
                 $this->id_Usuario = (int) $row['id_Usuario'];
+                $this->id_Empleado = (int) $row['id_Empleado'];
+                $this->nombre = $row['nombre'];
+                $this->apellido = $row['apellido'];
                 $this->rol = $row['rol'];
                 return true;
             }
         }
 
-        return false; // Si no pasó las validaciones
+        return false;
     }
 }
-
 ?>
