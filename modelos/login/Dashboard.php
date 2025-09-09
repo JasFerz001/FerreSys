@@ -28,7 +28,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
     <div class="sidebar">
         <div class="logo">
             <div class="logo-content">
-                <h2>Michapa <span>Ferretería</span></h2>
+                <h2>Ferretería <span>Michapa</span></h2>
             </div>
             <button class="toggle-btn" id="toggle-sidebar">
                 <i class="fas fa-bars"></i>

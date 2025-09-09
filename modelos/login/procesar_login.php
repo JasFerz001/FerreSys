@@ -60,20 +60,6 @@ if ($login->verificarCredenciales()) {
     $_SESSION['correo'] = $login->correo;
     $_SESSION['rol'] = $login->rol;
 
-    /* */
-    $query_nombre = "SELECT nombre, apellido FROM empleados WHERE id_Usuario = :id_Usuario";
-    $stmt_nombre = $db->prepare($query_nombre);
-    $stmt_nombre->bindParam(':id_Usuario', $login->id_Usuario);
-    $stmt_nombre->execute();
-    $row_nombre = $stmt_nombre->fetch(PDO::FETCH_ASSOC);
-
-    // Guardar ambos en la sesión
-    $_SESSION['nombre'] = $row_nombre['nombre'] ?? '';
-    $_SESSION['apellido'] = $row_nombre['apellido'] ?? '';
-
-
-
-
     header("Location: ../login/dashboard.php");
     exit();
 } else {

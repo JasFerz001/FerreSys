@@ -108,19 +108,55 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 <?php if ($_GET['message'] == 'success'): ?>
-                    Swal.fire('Éxito', 'Usuario creado correctamente.', 'success');
+                    Swal.fire({
+                        title: '¡Éxito!',
+                        text: 'Usuario creado correctamente.',
+                        icon: 'success',
+                        iconColor: '#1cbb8c',
+                        confirmButtonColor: '#3b7ddd',
+                        confirmButtonText: 'Aceptar'
+                    });
                 <?php elseif ($_GET['message'] == 'update_success'): ?>
-                    Swal.fire('Éxito', 'Usuario actualizado correctamente.', 'success');
+                    Swal.fire({
+                        title: '¡Éxito!',
+                        text: 'Usuario actualizado correctamente.',
+                        icon: 'success',
+                        iconColor: '#1cbb8c',
+                        confirmButtonColor: '#3b7ddd',
+                        confirmButtonText: 'Aceptar'
+                    });
                 <?php elseif ($_GET['message'] == 'error'): ?>
-                    Swal.fire('Error', 'Error al procesar el usuario.', 'error');
-                <?php elseif ($_GET['message'] == 'rol_duplicado' ): ?>
-                    Swal.fire('Atención', 'El rol "<?php echo htmlspecialchars($_SESSION['old_rol'] ?? ''); ?>" ya existe.', 'warning');
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Error al procesar el usuario.',
+                        icon: 'error',
+                        iconColor: '#f06548',
+                        confirmButtonColor: '#3b7ddd',
+                        confirmButtonText: 'Aceptar'
+                    });
+                <?php elseif ($_GET['message'] == 'rol_duplicado'): ?>
+                    Swal.fire({
+                        title: 'Atención',
+                        text: 'El rol "<?php echo htmlspecialchars($_SESSION['old_rol'] ?? ''); ?>" ya existe.',
+                        icon: 'warning',
+                        iconColor: '#f1c40f',
+                        confirmButtonColor: '#3b7ddd',
+                        confirmButtonText: 'Aceptar'
+                    });
                 <?php elseif ($_GET['message'] == 'estado_baja'): ?>
-                    Swal.fire('Atención', 'No se puede guardar usuario con estado de Baja.', 'warning');
+                    Swal.fire({
+                        title: 'Atención',
+                        text: 'No se puede guardar usuario con estado de Baja.',
+                        icon: 'warning',
+                        iconColor: '#f1c40f',
+                        confirmButtonColor: '#3b7ddd',
+                        confirmButtonText: 'Aceptar'
+                    });
                 <?php endif; ?>
             });
         </script>
     <?php endif; ?>
+
 
     <div class="container-box">
         <!-- Formulario -->
@@ -246,7 +282,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             });
         });
     </script>
-    
+
 </body>
 
 </html>
