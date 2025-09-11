@@ -6,7 +6,7 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     header("Location: login.php");
     exit();
 }
- 
+
 include_once '../../conexion/conexion.php';
 include_once '../login/inicio_sesion.php';
 
@@ -33,7 +33,7 @@ if ($_SESSION['login_attempts'][$correo] >= 5) {
     $stmt_check_status = $db->prepare($query_check_status);
     $stmt_check_status->bindParam(':correo', $correo);
     $stmt_check_status->execute();
-    
+
     $empleado = $stmt_check_status->fetch(PDO::FETCH_ASSOC);
 
     // Si el empleado existe y ha sido reactivado (estado = 1), reiniciamos el contador de intentos.
@@ -55,12 +55,12 @@ $login->clave = $clave;
 if ($login->verificarCredenciales()) {
 
     unset($_SESSION['login_attempts'][$correo]);
-    
+
     $_SESSION['id_Usuario'] = $login->id_Usuario;
     $_SESSION['correo'] = $login->correo;
     $_SESSION['rol'] = $login->rol;
 
-    header("Location: ../login/dashboard.html"); 
+    header("Location: ../login/dashboard.php");
     exit();
 } else {
     // Si son incorrectas, incrementar el contador
@@ -73,7 +73,7 @@ if ($login->verificarCredenciales()) {
         $stmt = $db->prepare($query);
         $stmt->bindParam(':correo', $correo);
         $stmt->execute();
-        
+
         header("Location: login.php?error=locked");
         exit();
     } else {
@@ -83,4 +83,3 @@ if ($login->verificarCredenciales()) {
         exit();
     }
 }
-?>
