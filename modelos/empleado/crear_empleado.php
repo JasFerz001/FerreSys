@@ -96,28 +96,28 @@ $stmt1 = $empleado->leerUsuariosActivos();
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label form-icon"><i class="bi bi-person-fill"></i>Nombre</label>
-                                <input type="text" name="nombre" class="form-control" placeholder="Ingresar Nombre"
+                                <input autocomplete="off" type="text" name="nombre" class="form-control" placeholder="Ingresar Nombre"
                                     required maxlength="25" value="<?php echo htmlspecialchars($nombre); ?>"
                                     oninput="this.value = this.value.replace(/[^A-Za-zñÑáéíóúÁÉÍÓÚ\s]/g, '')">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label form-icon"><i
                                         class="bi bi-person-vcard-fill"></i>Apellido</label>
-                                <input type="text" name="apellido" class="form-control" placeholder="Ingresar Apellido"
+                                <input autocomplete="off" type="text" name="apellido" class="form-control" placeholder="Ingresar Apellido"
                                     required maxlength="25" value="<?php echo htmlspecialchars($apellido); ?>"
                                     oninput="this.value = this.value.replace(/[^A-Za-zñÑáéíóúÁÉÍÓÚ\s]/g, '')">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label form-icon"><i
                                         class="bi bi-credit-card-2-front-fill"></i>DUI</label>
-                                <input type="text" name="DUI" class="form-control" placeholder="Ingrese número de DUI"
+                                <input autocomplete="off" type="text" name="DUI" class="form-control" placeholder="Ingrese número de DUI"
                                     required maxlength="10" value="<?php echo htmlspecialchars($DUI); ?>"
                                     pattern="\d{8}-\d{1}" title="Formato válido: 12345678-9"
                                     oninput="this.value = this.value.replace(/\D/g,'').slice(0,9); if(this.value.length>8){this.value=this.value.slice(0,8)+'-'+this.value.slice(8)}">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label form-icon"><i class="bi bi-telephone-fill"></i>Teléfono</label>
-                                <input type="text" name="telefono" class="form-control"
+                                <input autocomplete="off" type="text" name="telefono" class="form-control"
                                     placeholder="Ingresar número de teléfono" required maxlength="9"
                                     value="<?php echo htmlspecialchars($telefono); ?>" pattern="\d{4}-\d{4}"
                                     title="Formato válido: 1234-5678"
@@ -125,19 +125,19 @@ $stmt1 = $empleado->leerUsuariosActivos();
                             </div>
                             <div class="col-12">
                                 <label class="form-label form-icon"><i class="bi bi-house-fill"></i>Dirección</label>
-                                <input type="text" name="direccion" class="form-control"
+                                <input autocomplete="off" type="text" name="direccion" class="form-control"
                                     placeholder="Ingresar Dirección" required
                                     value="<?php echo htmlspecialchars($direccion); ?>">
                             </div>
                             <div class="col-12">
                                 <label class="form-label form-icon"><i class="bi bi-envelope-fill"></i>Correo</label>
-                                <input type="email" name="correo" class="form-control"
+                                <input autocomplete="off" type="email" name="correo" class="form-control"
                                     placeholder="Ingresar correo electrónico" required
                                     value="<?php echo htmlspecialchars($correo); ?>">
                             </div>
                             <div class="col-12">
                                 <label class="form-label form-icon"><i class="bi bi-key-fill"></i>Clave</label>
-                                <input type="password" name="clave" class="form-control"
+                                <input autocomplete="off" type="password" name="clave" class="form-control"
                                     placeholder="Ingresar clave de acceso" required minlength="8" required
                                     maxlength="12" value="<?php echo htmlspecialchars($clave); ?>">
                             </div>
@@ -189,7 +189,7 @@ $stmt1 = $empleado->leerUsuariosActivos();
                                     <th>Correo</th>
                                     <th>Usuario</th>
                                     <th>Estado</th>
-                                    <th>Acciones</th>
+                                    <th>Accion</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -214,11 +214,13 @@ $stmt1 = $empleado->leerUsuariosActivos();
                                                 onclick="location.href='actualizar_empleado.php?id=<?php echo $row['id_Empleado']; ?>'">
                                                 <i class="bi bi-pencil" style="font-size: 1.2rem;"></i>
                                             </button>
+                                           <!-- 
                                             <button class="btn btn-sm btn-outline-danger p-1"
                                                 style="width: 40px; height: 40px;"
                                                 onclick="location.href='dar_baja_empleado.php?id=<?php echo $row['id_Empleado']; ?>'">
                                                 <i class="bi bi-trash" style="font-size: 1.2rem;"></i>
                                             </button>
+                                            -->
                                         </td>
                                     </tr>
                                 <?php endwhile; ?>
