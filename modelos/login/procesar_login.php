@@ -1,5 +1,4 @@
 <?php
-
 session_start();
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
@@ -25,8 +24,6 @@ if (!isset($_SESSION['login_attempts'][$correo])) {
     $_SESSION['login_attempts'][$correo] = 0;
 }
 
-// --- INICIO DEL CAMBIO ---
-
 // Si el contador de sesión indica un bloqueo, verificar el estado real en la BD
 if ($_SESSION['login_attempts'][$correo] >= 5) {
     $query_check_status = "SELECT estado FROM empleados WHERE correo = :correo";
@@ -36,31 +33,30 @@ if ($_SESSION['login_attempts'][$correo] >= 5) {
 
     $empleado = $stmt_check_status->fetch(PDO::FETCH_ASSOC);
 
-    // Si el empleado existe y ha sido reactivado (estado = 1), reiniciamos el contador de intentos.
     if ($empleado && $empleado['estado'] == 1) {
         $_SESSION['login_attempts'][$correo] = 0;
     } else {
-        // Si sigue bloqueado en la BD (o no existe), lo redirigimos.
         header("Location: login.php?error=locked");
         exit();
     }
 }
-
-// --- FIN DEL CAMBIO ---
 
 $login->correo = $correo;
 $login->clave = $clave;
 
 // Verificar credenciales
 if ($login->verificarCredenciales()) {
-
     unset($_SESSION['login_attempts'][$correo]);
 
+    // GUARDAR TODOS LOS DATOS EN LA SESIÓN ← ESTO ES LO MÁS IMPORTANTE
     $_SESSION['id_Usuario'] = $login->id_Usuario;
+    $_SESSION['id_Empleado'] = $login->id_Empleado; // ← AGREGAR
     $_SESSION['correo'] = $login->correo;
     $_SESSION['rol'] = $login->rol;
+    $_SESSION['nombre'] = $login->nombre;    // ← AGREGAR
+    $_SESSION['apellido'] = $login->apellido; // ← AGREGAR
 
-    header("Location: ../login/dashboard.php");
+    header("Location: ../login/Dashboard.php"); // ← Cambié esta ruta
     exit();
 } else {
     // Si son incorrectas, incrementar el contador
@@ -83,3 +79,4 @@ if ($login->verificarCredenciales()) {
         exit();
     }
 }
+?>

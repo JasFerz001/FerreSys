@@ -11,7 +11,11 @@ if (!isset($_SESSION['id_Usuario'])) {
 $nombre_usuario = $_SESSION['nombre'] ?? "";
 $apellido = $_SESSION['apellido'] ?? '';
 $rol_usuario = $_SESSION['rol'] ?? "";
+
+// DEBUG: Verificar datos en sesión
+// echo "<!-- DEBUG: " . $_SESSION['id_Empleado'] . " - " . $_SESSION['nombre'] . " " . $_SESSION['apellido'] . " -->";
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -72,7 +76,6 @@ $rol_usuario = $_SESSION['rol'] ?? "";
 
     <!-- Barra superior -->
     <div class="top-bar">
-        <!-- Nombre completo y rol con guion -->
         <span class="user-name">
             <?php
             $nombre = $_SESSION['nombre'] ?? '';
@@ -84,7 +87,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
         <i class="fas fa-user-circle" id="userTopIcon"></i>
 
         <div class="dropdown-top" id="dropdownTop">
-            <a href="../login/login.php">Cerrar Sesión</a>
+            <a href="../login/logout.php">Cerrar Sesión</a>
         </div>
     </div>
 

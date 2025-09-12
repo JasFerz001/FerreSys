@@ -10,8 +10,9 @@ $usuario = new Usuario($db);
 
 // Revisar si estamos editando
 $editUser = null;
-if (isset($_GET['id'])) {
-    $id_Usuario = intval($_GET['id']);
+$id_Usuario = isset($_GET['id']) ? intval($_GET['id']) : 0;
+
+if ($id_Usuario > 0) {
     $stmt = $db->prepare("SELECT * FROM usuarios WHERE id_Usuario = :id");
     $stmt->bindParam(':id', $id_Usuario);
     $stmt->execute();
@@ -25,45 +26,49 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST" && !isset($_GET['message'])) {
 
 // Procesar formulario
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
-    $rol = strtoupper(trim($_POST['rol'])); // Convertir a mayúsculas
+    $rol = strtoupper(trim($_POST['rol']));
     $estadoSeleccionado = trim($_POST['estado']);
 
     $_SESSION['old_rol'] = $rol;
     $_SESSION['old_estado'] = $estadoSeleccionado;
 
-    if (!$editUser && $estadoSeleccionado == "0") {
-        // Solo al crear, no permitir estado Baja
-        header("Location: crear_usuario.php?message=estado_baja");
-        exit();
-    }
-
+    // Validar si estamos editando o creando
     if ($editUser) {
-        // Modo actualizar
-        $usuario->id_Usuario = $editUser['id_Usuario'];
-        $usuario->rol = $rol;
-        $usuario->estado = (int)$estadoSeleccionado;
-
-        // Verificar duplicado
+        // MODO ACTUALIZACIÓN
+        // Verificar duplicado (excluyendo el usuario actual)
         $stmtCheck = $db->prepare("SELECT COUNT(*) as total FROM usuarios WHERE rol = :rol AND id_Usuario != :id");
         $stmtCheck->bindParam(':rol', $rol);
-        $stmtCheck->bindParam(':id', $editUser['id_Usuario']);
+        $stmtCheck->bindParam(':id', $id_Usuario);
         $stmtCheck->execute();
         $rowCheck = $stmtCheck->fetch(PDO::FETCH_ASSOC);
 
         if ($rowCheck['total'] > 0) {
-            header("Location: crear_usuario.php?message=rol_duplicado&id=" . $editUser['id_Usuario']);
+            header("Location: crear_usuario.php?message=rol_duplicado&id=" . $id_Usuario);
             exit();
         }
 
-        // Si no hay duplicado, actualizar
+        // Actualizar usuario
+        $usuario->id_Usuario = $id_Usuario;
+        $usuario->rol = $rol;
+        $usuario->estado = (int)$estadoSeleccionado;
+
         if ($usuario->actualizar()) {
             unset($_SESSION['old_rol'], $_SESSION['old_estado']);
             header("Location: crear_usuario.php?message=update_success");
             exit();
+        } else {
+            header("Location: crear_usuario.php?message=error&id=" . $id_Usuario);
+            exit();
         }
+        
     } else {
-        // Modo crear
+        // MODO CREACIÓN
+        if ($estadoSeleccionado == "0") {
+            header("Location: crear_usuario.php?message=estado_baja");
+            exit();
+        }
+
+        // Verificar duplicado
         $stmt = $db->prepare("SELECT COUNT(*) as total FROM usuarios WHERE rol = :rol");
         $stmt->bindParam(':rol', $rol);
         $stmt->execute();
@@ -74,24 +79,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit();
         }
 
+        // Crear usuario
         $usuario->rol = $rol;
         $usuario->estado = 1;
 
         if ($usuario->crear()) {
             unset($_SESSION['old_rol'], $_SESSION['old_estado']);
-            header("Location: crear_usuario.php?message=success");
+            
+            if ($rol === "administrador" || $rol==="Administrador" || $rol==="ADMINISTRADOR") { // Asegúrate que coincida con mayúsculas
+                header("Location: ../empleado/crear_empleado.php?primera_vez=1");
+                exit();
+            } else {
+                header("Location: crear_usuario.php?message=success");
+                exit();
+            }
+        } else {
+            header("Location: crear_usuario.php?message=error");
             exit();
         }
     }
-
-    header("Location: crear_usuario.php?message=error&id=" . ($editUser['id_Usuario'] ?? ''));
-    exit();
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -115,6 +126,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         iconColor: '#1cbb8c',
                         confirmButtonColor: '#3b7ddd',
                         confirmButtonText: 'Aceptar'
+                    }).then(() => {
+                        window.location.href = 'crear_usuario.php';
                     });
                 <?php elseif ($_GET['message'] == 'update_success'): ?>
                     Swal.fire({
@@ -124,6 +137,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         iconColor: '#1cbb8c',
                         confirmButtonColor: '#3b7ddd',
                         confirmButtonText: 'Aceptar'
+                    }).then(() => {
+                        window.location.href = 'crear_usuario.php';
                     });
                 <?php elseif ($_GET['message'] == 'error'): ?>
                     Swal.fire({
@@ -146,7 +161,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <?php elseif ($_GET['message'] == 'estado_baja'): ?>
                     Swal.fire({
                         title: 'Atención',
-                        text: 'No se puede guardar usuario con estado de Baja.',
+                        text: 'No se puede crear usuario con estado de Baja.',
                         icon: 'warning',
                         iconColor: '#f1c40f',
                         confirmButtonColor: '#3b7ddd',
@@ -157,44 +172,45 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </script>
     <?php endif; ?>
 
-
     <div class="container-box">
         <!-- Formulario -->
         <div class="card-form">
             <div class="card-title"><?php echo $editUser ? 'Actualizar Usuario' : 'Registro de Usuario'; ?></div>
-            <form id="usuarioForm" method="post" action="crear_usuario.php<?php echo $editUser ? '?id=' . $editUser['id_Usuario'] : ''; ?>">
+            <form id="usuarioForm" method="post" action="crear_usuario.php<?php echo $editUser ? '?id=' . $id_Usuario : ''; ?>">
                 <div class="mb-3">
                     <label class="form-label"><i class="bi bi-person-gear"></i> Rol</label>
                     <input type="text" class="form-control" name="rol" id="rol"
                         value="<?php echo htmlspecialchars($_SESSION['old_rol'] ?? $editUser['rol'] ?? ''); ?>"
-                        placeholder="Ingrese el rol" autocomplete="off" required>
-                    <small id="rol-error" class="text-danger" style="display:none;">Solo se permiten letras y espacios</small>
+                        placeholder="Ingrese el rol" autocomplete="off" required 
+                        pattern="[A-Za-z\s]+" title="Solo se permiten letras y espacios">
                 </div>
                 <div class="mb-3">
                     <label class="form-label"><i class="bi bi-toggle-on"></i> Estado</label>
                     <div>
-                        <?php $estado = $_SESSION['old_estado'] ?? $editUser['estado'] ?? 1; ?>
+                        <?php 
+                        $estado = $_SESSION['old_estado'] ?? ($editUser ? $editUser['estado'] : 1);
+                        ?>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="estado" value="1" <?php echo ($estado == 1 ? 'checked' : ''); ?> required>
+                            <input class="form-check-input" type="radio" name="estado" value="1" 
+                                <?php echo ($estado == 1 ? 'checked' : ''); ?> 
+                                <?php echo (!$editUser ? 'required' : ''); ?>>
                             <label class="form-check-label">Alta</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="estado" value="0" <?php echo ($estado == 0 ? 'checked' : ''); ?> required>
+                            <input class="form-check-input" type="radio" name="estado" value="0" 
+                                <?php echo ($estado == 0 ? 'checked' : ''); ?>
+                                <?php echo (!$editUser ? 'required' : ''); ?>>
                             <label class="form-check-label">Baja</label>
                         </div>
                     </div>
                 </div>
 
-                <!-- Botones -->
                 <div class="text-center mt-3">
                     <?php if ($editUser): ?>
-                        <!-- En modo actualizar, cancelar recarga la página y limpia input -->
                         <a href="crear_usuario.php" class="btn btn-warning px-4">Cancelar</a>
                     <?php else: ?>
-                        <!-- En modo crear, usar reset normal -->
                         <button type="reset" class="btn btn-warning px-4">Cancelar</button>
                     <?php endif; ?>
-
                     <button type="submit" class="btn btn-success px-4"><?php echo $editUser ? 'Actualizar' : 'Guardar'; ?></button>
                 </div>
             </form>
@@ -225,13 +241,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <?php echo ($row['estado'] == 1 ? 'ALTA' : 'BAJA'); ?>
                                     </span>
                                 </td>
-
                                 <td>
                                     <a href="crear_usuario.php?id=<?php echo $row['id_Usuario']; ?>"
                                         class="btn btn-sm btn-outline-warning btn-cuadrado me-1">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-
                                 </td>
                             </tr>
                         <?php endwhile; ?>
@@ -240,31 +254,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </div>
     </div>
-
-    <!-- Validación en tiempo real -->
-    <script>
-        const inputRol = document.getElementById('rol');
-        const errorRol = document.getElementById('rol-error');
-        const btnGuardar = document.querySelector('button[type="submit"]');
-
-        function validarRol() {
-            const valor = inputRol.value;
-            const esValido = /^[a-zA-Z\s]*$/.test(valor);
-
-            if (!esValido) {
-                errorRol.style.display = 'inline';
-                inputRol.classList.add('is-invalid');
-                btnGuardar.disabled = true;
-            } else {
-                errorRol.style.display = 'none';
-                inputRol.classList.remove('is-invalid');
-                btnGuardar.disabled = false;
-            }
-        }
-
-        inputRol.addEventListener('input', validarRol);
-        document.addEventListener('DOMContentLoaded', validarRol);
-    </script>
 
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -277,12 +266,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 },
                 "pageLength": 5,
                 "lengthMenu": [5, 10, 25],
-                "searching": false,
-                "info": false
+                "searching": true,
+                "info": true
             });
         });
     </script>
-
 </body>
-
 </html>
