@@ -12,6 +12,16 @@ $duplicates = [];
 $nombre = $apellido = $DUI = $telefono = $direccion = $correo = $clave = "";
 $id_Usuario = $estado = "";
 
+// Función para formatear texto con primera letra mayúscula y el resto minúsculas
+function formatearTexto($texto)
+{
+    // Convertir todo a minúsculas primero y eliminar espacios en blanco
+    $texto = strtolower(trim($texto));
+    // Convertir la primera letra de cada palabra a mayúscula
+    return ucwords($texto);
+}
+
+
 // Verificar si es la configuración inicial
 $primera_vez = isset($_GET['primera_vez']) && $_GET['primera_vez'] == '1';
 
@@ -19,11 +29,11 @@ $primera_vez = isset($_GET['primera_vez']) && $_GET['primera_vez'] == '1';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Guardamos los valores para mantenerlos en caso de error
-    $nombre = strtoupper(trim($_POST['nombre']));
-    $apellido = strtoupper(trim($_POST['apellido']));
+    $nombre = formatearTexto(trim($_POST['nombre']));  // Aplicar formato
+    $apellido = formatearTexto(trim($_POST['apellido']));  // Aplicar formato
     $DUI = trim($_POST['DUI']);
     $telefono = trim($_POST['telefono']);
-    $direccion = strtoupper(trim($_POST['direccion']));
+    $direccion = formatearTexto(trim($_POST['direccion']));  // Aplicar formato
     $correo = strtolower(trim($_POST['correo']));
     $clave = trim($_POST['clave']);
     $id_Usuario = intval($_POST['id_Usuario']);
@@ -96,23 +106,26 @@ $stmt1 = $empleado->leerUsuariosActivos();
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label form-icon"><i class="bi bi-person-fill"></i>Nombre</label>
-                                <input autocomplete="off" type="text" name="nombre" class="form-control" placeholder="Ingresar Nombre"
-                                    required maxlength="25" value="<?php echo htmlspecialchars($nombre); ?>"
+                                <input autocomplete="off" type="text" name="nombre" class="form-control"
+                                    placeholder="Ingresar Nombre" required maxlength="25"
+                                    value="<?php echo htmlspecialchars($nombre); ?>"
                                     oninput="this.value = this.value.replace(/[^A-Za-zñÑáéíóúÁÉÍÓÚ\s]/g, '')">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label form-icon"><i
                                         class="bi bi-person-vcard-fill"></i>Apellido</label>
-                                <input autocomplete="off" type="text" name="apellido" class="form-control" placeholder="Ingresar Apellido"
-                                    required maxlength="25" value="<?php echo htmlspecialchars($apellido); ?>"
+                                <input autocomplete="off" type="text" name="apellido" class="form-control"
+                                    placeholder="Ingresar Apellido" required maxlength="25"
+                                    value="<?php echo htmlspecialchars($apellido); ?>"
                                     oninput="this.value = this.value.replace(/[^A-Za-zñÑáéíóúÁÉÍÓÚ\s]/g, '')">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label form-icon"><i
                                         class="bi bi-credit-card-2-front-fill"></i>DUI</label>
-                                <input autocomplete="off" type="text" name="DUI" class="form-control" placeholder="Ingrese número de DUI"
-                                    required maxlength="10" value="<?php echo htmlspecialchars($DUI); ?>"
-                                    pattern="\d{8}-\d{1}" title="Formato válido: 12345678-9"
+                                <input autocomplete="off" type="text" name="DUI" class="form-control"
+                                    placeholder="Ingrese número de DUI" required maxlength="10"
+                                    value="<?php echo htmlspecialchars($DUI); ?>" pattern="\d{8}-\d{1}"
+                                    title="Formato válido: 12345678-9"
                                     oninput="this.value = this.value.replace(/\D/g,'').slice(0,9); if(this.value.length>8){this.value=this.value.slice(0,8)+'-'+this.value.slice(8)}">
                             </div>
                             <div class="col-md-6">
@@ -205,7 +218,7 @@ $stmt1 = $empleado->leerUsuariosActivos();
                                         <td>
                                             <span
                                                 class="badge <?php echo ($row['estado'] == 1 ? 'badge-success' : 'badge-danger'); ?>">
-                                                <?php echo ($row['estado'] == 1 ? 'ALTA' : 'BAJA'); ?>
+                                                <?php echo ($row['estado'] == 1 ? 'Alta' : 'Baja'); ?>
                                             </span>
                                         </td>
                                         <td class="actions-column">
@@ -214,7 +227,7 @@ $stmt1 = $empleado->leerUsuariosActivos();
                                                 onclick="location.href='actualizar_empleado.php?id=<?php echo $row['id_Empleado']; ?>'">
                                                 <i class="bi bi-pencil" style="font-size: 1.2rem;"></i>
                                             </button>
-                                           <!-- 
+                                            <!-- 
                                             <button class="btn btn-sm btn-outline-danger p-1"
                                                 style="width: 40px; height: 40px;"
                                                 onclick="location.href='dar_baja_empleado.php?id=<?php echo $row['id_Empleado']; ?>'">
