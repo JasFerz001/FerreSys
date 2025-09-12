@@ -12,6 +12,15 @@ $duplicates = [];
 $id_Empleado = $nombre = $apellido = $DUI = $telefono = $direccion = $correo = $clave = "";
 $id_Usuario = $estado = "";
 
+// Función para formatear texto con primera letra mayúscula y el resto minúsculas
+function formatearTexto($texto)
+{
+    // Convertir todo a minúsculas primero y eliminar espacios en blanco
+    $texto = strtolower(trim($texto));
+    // Convertir la primera letra de cada palabra a mayúscula
+    return ucwords($texto);
+}
+
 // Obtener el ID del empleado a actualizar
 if (isset($_GET['id'])) {
     $id_Empleado = (int) $_GET['id'];
@@ -36,11 +45,11 @@ if (isset($_GET['id'])) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Guardamos los valores para mantenerlos en caso de error
     $id_Empleado = (int) $_POST['id_Empleado'];
-    $nombre = strtoupper(trim($_POST['nombre']));
-    $apellido = strtoupper(trim($_POST['apellido']));
+    $nombre = formatearTexto(trim($_POST['nombre']));  // Aplicar formato
+    $apellido = formatearTexto(trim($_POST['apellido']));  // Aplicar formato
     $DUI = trim($_POST['DUI']);
     $telefono = trim($_POST['telefono']);
-    $direccion = strtoupper(trim($_POST['direccion']));
+     $direccion = formatearTexto(trim($_POST['direccion']));  // Aplicar formato
     $correo = strtolower(trim($_POST['correo']));
     $clave = trim($_POST['clave']);
     $id_Usuario = intval($_POST['id_Usuario']);
@@ -222,7 +231,7 @@ $stmt1 = $empleado->leerUsuariosActivos();
                                         <td>
                                             <span
                                                 class="badge <?php echo ($row['estado'] == 1 ? 'badge-success' : 'badge-danger'); ?>">
-                                                <?php echo ($row['estado'] == 1 ? 'ALTA' : 'BAJA'); ?>
+                                                <?php echo ($row['estado'] == 1 ? 'Alta' : 'Baja'); ?>
                                             </span>
                                         </td>
                                         <td class="actions-column">
