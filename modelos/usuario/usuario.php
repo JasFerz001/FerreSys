@@ -20,7 +20,7 @@ class Usuario
                   SET rol=:rol, estado=:estado";
         $stmt = $this->conn->prepare($query);
 
-        $this->rol = strtoupper(htmlspecialchars(strip_tags($this->rol)));
+        $this->rol = htmlspecialchars(strip_tags($this->rol));
         $this->estado = (int)$this->estado;
 
         $stmt->bindParam(":rol", $this->rol);
@@ -71,7 +71,7 @@ class Usuario
 
         $this->id_Usuario = (int)$this->id_Usuario;
         $this->estado = (int)$this->estado;
-         $this->rol = strtoupper(trim($this->rol));
+         $this->rol = (trim($this->rol));
 
         $stmt->bindParam(":id_Usuario", $this->id_Usuario, PDO::PARAM_INT);
         $stmt->bindParam(":estado", $this->estado, PDO::PARAM_BOOL);
