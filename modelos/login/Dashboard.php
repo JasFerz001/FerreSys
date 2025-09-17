@@ -78,10 +78,11 @@ $rol_usuario = $_SESSION['rol'] ?? "";
     <div class="top-bar">
         <span class="user-name">
             <?php
-            $nombre = $_SESSION['nombre'] ?? '';
-            $apellido = $_SESSION['apellido'] ?? '';
-            $rol = $_SESSION['rol'] ?? '';
-            echo htmlspecialchars(trim("$nombre $apellido - $rol"));
+            echo htmlspecialchars(
+                (explode(' ', trim($_SESSION['nombre'] ?? ''))[0] ?? '') . ' ' .
+                    (explode(' ', trim($_SESSION['apellido'] ?? ''))[0] ?? '') . ' - ' .
+                    ($_SESSION['rol'] ?? '')
+            );
             ?>
         </span>
         <i class="fas fa-user-circle" id="userTopIcon"></i>
