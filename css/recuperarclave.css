@@ -1,0 +1,73 @@
+body {
+    background: white;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Card (contenedor principal) */
+.card {
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Encabezado del formulario */
+.card h3 {
+    background: #2c3e50;
+    color: white;
+    padding: 15px;
+    margin: -25px -25px 25px -25px; /* Para que ocupe todo el ancho */
+    border-radius: 10px 10px 0 0;
+    text-align: center;
+}
+
+/* Cuerpo del formulario */
+.card .form-label {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.form-control {
+    padding: 12px 15px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    transition: all 0.3s;
+}
+
+.form-control:focus {
+    border-color: #2c3e50;
+    box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.25);
+}
+
+/* Botón de enviar */
+.btn-primary {
+    background-color: #2c3e50;
+    border: none;
+    padding: 12px;
+    font-weight: 600;
+    transition: all 0.3s;
+    color: white;
+    border-radius: 5px;
+}
+
+.btn-primary:hover {
+    background-color: #1a252f;
+}
+
+/* Botón de enlace (volver a login) */
+.btn-link {
+    color: #2c3e50 !important;
+    text-decoration: none !important;
+    font-weight: 600;
+}
+
+.btn-link:hover,
+.btn-link:focus,
+.btn-link:active {
+    color: #2c3e50 !important;
+    text-decoration: underline !important; /* opcional */
+}

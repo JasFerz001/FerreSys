@@ -1,11 +1,12 @@
 <?php
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
 // Asegúrate de que el autoloader de Composer esté incluido.
 // La ruta puede variar dependiendo de la estructura de tu proyecto.
-require '../../vendor/autoload.php'; 
+require '../../vendor/autoload.php';
 
 // Incluir archivos necesarios
 include_once '../../conexion/conexion.php';
@@ -46,11 +47,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt_reset->bindParam(':id_Empleado', $id_Empleado);
             $stmt_reset->bindParam(':token', $token);
             $stmt_reset->bindParam(':expires_at', $expires_at);
-            
+
             if ($stmt_reset->execute()) {
                 // 5. Enviar el correo electrónico con PHPMailer
                 $reset_link = "http://localhost/FerreSys/modelos/login/restablecer_clave.php?token=" . $token;
-                
+
                 $mail = new PHPMailer(true);
 
                 try {
@@ -87,7 +88,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $mail->send();
                     $message = 'Si una cuenta con ese correo existe, hemos enviado las instrucciones para restablecer la contraseña.';
                     $message_type = 'success';
-
                 } catch (Exception $e) {
                     // En caso de error, no reveles detalles al usuario. Regístralo en un log.
                     // error_log("Error al enviar correo: " . $mail->ErrorInfo);
@@ -105,20 +105,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 }
-?> 
+?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Recuperar Contraseña</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../css/recuperarclave.css" rel="stylesheet">
 </head>
+
 <body class="bg-light">
     <div class="container vh-100 d-flex justify-content-center align-items-center">
         <div class="card shadow p-4" style="width: 25rem;">
             <h3 class="text-center mb-4">Recuperar Contraseña</h3>
-            
-            <?php if (!empty($_POST)): // Mostrar el mensaje solo después de enviar el formulario ?>
+
+            <?php if (!empty($_POST)): // Mostrar el mensaje solo después de enviar el formulario 
+            ?>
                 <div class="alert alert-<?php echo $message_type; ?>">
                     <?php echo $message; ?>
                 </div>
@@ -131,7 +135,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <form method="post" action="recuperar_clave.php" class="mt-2">
                 <div class="mb-3">
                     <label for="correo" class="form-label">Correo Electrónico</label>
-                    <input type="email" name="correo" id="correo" class="form-control" required>
+                    <input type="email"
+                        name="correo"
+                        id="correo"
+                        class="form-control"
+                        required
+                        autocomplete="off">
+                    <small class="text-muted">Solo se permiten letras, números, @, puntos, guiones y guion bajo.</small>
                 </div>
                 <div class="d-grid">
                     <button type="submit" class="btn btn-primary">Enviar Instrucciones</button>
@@ -143,4 +153,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </div>
 </body>
+<script>
+    const correoInput = document.getElementById('correo');
+
+    correoInput.addEventListener('input', function() {
+        // Reemplazamos caracteres no permitidos
+        this.value = this.value.replace(/[^a-zA-Z0-9@._-]/g, '');
+    });
+</script>
+
 </html>
