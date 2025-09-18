@@ -98,6 +98,7 @@ $stmt1 = $empleado->leerUsuariosActivos();
             <div class="col-md-4">
                 <div class="card-form h-100">
                     <div class="card-title">Registro de Empleado</div>
+                    <div class="text-muted small mb-3">*Todos los campos son obligatorios</div>
                     <form id="empleadoForm" method="post" action="crear_empleado.php">
                         <?php if ($primera_vez): ?>
                             <input type="hidden" name="primera_vez" value="1">
@@ -170,11 +171,10 @@ $stmt1 = $empleado->leerUsuariosActivos();
 
                             <div class="col-md-6">
                                 <label class="form-label form-icon"><i class="bi bi-toggle-on"></i>Estado</label>
-                                <select class="form-select" name="estado" required>
-                                    <option value="">Seleccione</option>
-                                    <option value="1" <?php echo ($estado == 1 ? 'selected' : ''); ?>>Alta</option>
-                                    <!-- <option value="0" <?php echo ($estado == 0 ? 'selected' : ''); ?>>Baja</option> -->
+                                <select class="form-select" name="estado" required disabled>
+                                    <option value="1" selected>Alta</option>
                                 </select>
+                                <input type="hidden" name="estado" value="1">
                             </div>
                             <div class="col-12 text-center mt-4">
                                 <button id="btnCancelar" type="button"

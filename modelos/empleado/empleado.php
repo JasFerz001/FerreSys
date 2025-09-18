@@ -88,7 +88,7 @@ class Empleado
     }
 
     // Leer todos los empleados
-    public function leer(): PDOStatement
+   public function leer(): PDOStatement
     {
         $query = "
         SELECT e.*, u.rol AS nombre_usuario
@@ -109,7 +109,7 @@ class Empleado
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt;
-    }
+    } 
 
     // Leer un empleado por ID
     public function leerPorId(): bool
