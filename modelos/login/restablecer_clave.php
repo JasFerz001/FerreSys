@@ -45,7 +45,7 @@ if (!empty($token)) {
                 // Actualizar la contraseña en la base de datos
                 $clave_encriptada = password_hash($nueva_clave, PASSWORD_DEFAULT);
                 
-                $update_query = "UPDATE empleados SET clave = :clave WHERE id_Empleado = :id_Empleado";
+                $update_query = "UPDATE empleados SET clave = :clave, estado=:1 WHERE id_Empleado = :id_Empleado";
                 $update_stmt = $db->prepare($update_query);
                 $update_stmt->bindParam(':clave', $clave_encriptada);
                 $update_stmt->bindParam(':id_Empleado', $id_Empleado, PDO::PARAM_INT);
