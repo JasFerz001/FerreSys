@@ -43,34 +43,40 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                 <i class="fas fa-home"></i>
                 <span>Dashboard</span>
             </div>
-            <div class="menu-item">
-                <i class="fas fa-users"></i>
-                <a href="../../modelos/empleado/crear_empleado.php" onclick="abrirFormularios(event)">Empleados</a>
-            </div>
-            <div class="menu-item">
-                <i class="fas fa-user-friends"></i>
-                <a href="../../modelos/usuario/crear_usuario.php" onclick="abrirFormularios(event)">Usuarios</a>
-            </div>
-            <div class="menu-item">
-                <i class="fas fa-box"></i>
-                <span>Inventario</span>
-            </div>
-            <div class="menu-item">
-                <i class="fas fa-shopping-cart"></i>
-                <span>Ventas</span>
-            </div>
-            <div class="menu-item">
-                <i class="fas fa-file-invoice-dollar"></i>
-                <span>Facturación</span>
-            </div>
-            <div class="menu-item">
-                <i class="fas fa-chart-bar"></i>
-                <span>Reportes</span>
-            </div>
-            <div class="menu-item">
-                <i class="fas fa-cog"></i>
-                <span>Configuración</span>
-            </div>
+
+            <?php if($rol_usuario === 'Administrador') : ?>
+                <div class="menu-item">
+                    <i class="fas fa-users"></i>
+                    <a href="../../modelos/empleado/crear_empleado.php" onclick="abrirFormularios(event)">Empleados</a>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-user-friends"></i>
+                    <a href="../../modelos/usuario/crear_usuario.php" onclick="abrirFormularios(event)">Usuarios</a>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>Facturación</span>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Reportes</span>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Configuración</span>
+                </div>
+            <?php endif; ?>
+
+            <?php if($rol_usuario === 'Administrador' || $rol_usuario === 'Vendedor') : ?>
+                <div class="menu-item">
+                    <i class="fas fa-box"></i>
+                    <span>Inventario</span>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Ventas</span>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -78,10 +84,11 @@ $rol_usuario = $_SESSION['rol'] ?? "";
     <div class="top-bar">
         <span class="user-name">
             <?php
-            $nombre = $_SESSION['nombre'] ?? '';
-            $apellido = $_SESSION['apellido'] ?? '';
-            $rol = $_SESSION['rol'] ?? '';
-            echo htmlspecialchars(trim("$nombre $apellido - $rol"));
+            echo htmlspecialchars(
+                (explode(' ', trim($_SESSION['nombre'] ?? ''))[0] ?? '') . ' ' .
+                    (explode(' ', trim($_SESSION['apellido'] ?? ''))[0] ?? '') . ' - ' .
+                    ($_SESSION['rol'] ?? '')
+            );
             ?>
         </span>
         <i class="fas fa-user-circle" id="userTopIcon"></i>

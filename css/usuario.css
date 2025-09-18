@@ -41,7 +41,7 @@ body {
     margin-bottom: 20px;
     color: var(--primary-color);
     border-bottom: 2px solid #eaeef5;
-    padding-bottom: 10px;
+    padding-bottom: 20px;
 }
 
 /* ===== Table Container ===== */
@@ -51,8 +51,17 @@ body {
     max-width: 400px;
     /* ancho máximo controlado */
     width: 100%;
-    margin: 20px auto 0 auto;
+   
 }
+
+.table-box {
+    background-color: white; /* fondo blanco */
+    border: none;            /* sin bordes */
+    border-radius: 12px;     /* bordes redondeados */
+    padding: 25px;           /* espacio interno */
+}
+
+
 
 #tablaUsuarios {
     width: 100%;

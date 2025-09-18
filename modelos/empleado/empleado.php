@@ -166,7 +166,7 @@ class Empleado
 
         return false;
     }
-
+ 
     // Actualizar un empleado existente (valida DUI/correo/teléfono únicos excluyendo el actual)
     public function actualizar(): array
     {

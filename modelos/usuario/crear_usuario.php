@@ -24,10 +24,19 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST" && !isset($_GET['message'])) {
     unset($_SESSION['old_rol'], $_SESSION['old_estado']);
 }
 
+// Función para formatear texto con primera letra mayúscula y el resto minúsculas
+function formatearTexto($texto)
+{
+    // Convertir todo a minúsculas primero y eliminar espacios en blanco
+    $texto = strtolower(trim($texto));
+    // Convertir la primera letra de cada palabra a mayúscula
+    return ucwords($texto);
+}
+
 // Procesar formulario
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $rol = strtoupper(trim($_POST['rol']));
-    $estadoSeleccionado = trim($_POST['estado']);
+    $rol = formatearTexto(trim($_POST['rol']));
+    $estadoSeleccionado = formatearTexto(trim($_POST['estado']));
 
     $_SESSION['old_rol'] = $rol;
     $_SESSION['old_estado'] = $estadoSeleccionado;
@@ -60,7 +69,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: crear_usuario.php?message=error&id=" . $id_Usuario);
             exit();
         }
-        
     } else {
         // MODO CREACIÓN
         if ($estadoSeleccionado == "0") {
@@ -85,8 +93,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($usuario->crear()) {
             unset($_SESSION['old_rol'], $_SESSION['old_estado']);
-            
-            if ($rol === "administrador" || $rol==="Administrador" || $rol==="ADMINISTRADOR") { // Asegúrate que coincida con mayúsculas
+
+            if ($rol === "administrador" || $rol === "Administrador" || $rol === "ADMINISTRADOR") { // Asegúrate que coincida con mayúsculas
                 header("Location: ../empleado/crear_empleado.php?primera_vez=1");
                 exit();
             } else {
@@ -103,6 +111,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -181,23 +190,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <label class="form-label"><i class="bi bi-person-gear"></i> Rol</label>
                     <input type="text" class="form-control" name="rol" id="rol"
                         value="<?php echo htmlspecialchars($_SESSION['old_rol'] ?? $editUser['rol'] ?? ''); ?>"
-                        placeholder="Ingrese el rol" autocomplete="off" required 
-                        pattern="[A-Za-z\s]+" title="Solo se permiten letras y espacios">
+                        placeholder="Ingrese el rol" autocomplete="off" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label"><i class="bi bi-toggle-on"></i> Estado</label>
                     <div>
-                        <?php 
+                        <?php
                         $estado = $_SESSION['old_estado'] ?? ($editUser ? $editUser['estado'] : 1);
                         ?>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="estado" value="1" 
-                                <?php echo ($estado == 1 ? 'checked' : ''); ?> 
+                            <input class="form-check-input" type="radio" name="estado" value="1"
+                                <?php echo ($estado == 1 ? 'checked' : ''); ?>
                                 <?php echo (!$editUser ? 'required' : ''); ?>>
                             <label class="form-check-label">Alta</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="estado" value="0" 
+                            <input class="form-check-input" type="radio" name="estado" value="0"
                                 <?php echo ($estado == 0 ? 'checked' : ''); ?>
                                 <?php echo (!$editUser ? 'required' : ''); ?>>
                             <label class="form-check-label">Baja</label>
@@ -218,39 +226,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <!-- Tabla -->
         <div class="table-container">
+            <div class="table-box">
             <div class="card-title">Lista de Usuarios</div>
-            <div class="table-responsive">
-                <table id="tablaUsuarios" class="table text-center align-middle">
-                    <thead>
-                        <tr>
-                            <th>Rol</th>
-                            <th>Estado</th>
-                            <th>Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        $stmt = $db->prepare("SELECT * FROM usuarios ORDER BY rol ASC");
-                        $stmt->execute();
-                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)):
-                        ?>
+                <div class="table-responsive">
+                    <table id="tablaUsuarios" class="table text-center align-middle">
+                        <thead>
                             <tr>
-                                <td><?php echo htmlspecialchars($row['rol']); ?></td>
-                                <td>
-                                    <span class="badge <?php echo ($row['estado'] == 1 ? 'badge-success' : 'badge-danger'); ?>">
-                                        <?php echo ($row['estado'] == 1 ? 'ALTA' : 'BAJA'); ?>
-                                    </span>
-                                </td>
-                                <td>
-                                    <a href="crear_usuario.php?id=<?php echo $row['id_Usuario']; ?>"
-                                        class="btn btn-sm btn-outline-warning btn-cuadrado me-1">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                </td>
+                                <th>Rol</th>
+                                <th>Estado</th>
+                                <th>Acción</th>
                             </tr>
-                        <?php endwhile; ?>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $stmt = $db->prepare("SELECT * FROM usuarios ORDER BY rol ASC");
+                            $stmt->execute();
+                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)):
+                            ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($row['rol']); ?></td>
+                                    <td>
+                                        <span class="badge <?php echo ($row['estado'] == 1 ? 'badge-success' : 'badge-danger'); ?>">
+                                            <?php echo ($row['estado'] == 1 ? 'Alta' : 'Baja'); ?>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="crear_usuario.php?id=<?php echo $row['id_Usuario']; ?>"
+                                            class="btn btn-sm btn-outline-warning btn-cuadrado me-1">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -264,12 +274,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 "language": {
                     "url": "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
                 },
-                "pageLength": 5,
-                "lengthMenu": [5, 10, 25],
+                "pageLength": 3,
+                "lengthMenu": [3,4,5],
                 "searching": true,
                 "info": true
             });
         });
     </script>
+    <script>
+        const rolInput = document.getElementById('rol');
+
+        rolInput.addEventListener('input', function() {
+            // Permite solo letras y espacios
+            this.value = this.value.replace(/[^a-zA-Z\s]/g, '');
+        });
+    </script>
 </body>
+
 </html>
