@@ -38,6 +38,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Crear el cliente
     $result = $cliente->crear();
+    if ($result['success']) {
+        $message = 'success';
+    } else {
+        $message = 'error';
+        $duplicates = $result['duplicates'] ?? [];
+    }
 }
 // Leer todos los cliente
 $stmt = $cliente->leer();
@@ -201,7 +207,7 @@ $stmt = $cliente->leer();
             if (duplicates.length > 0) {
                 errorMessage += 'Los siguientes datos ya están registrados:\n\n';
 
-                if (duplicates.includes('dui')) errorMessage += '• Número de DUI\n';
+                if (duplicates.includes('DUI')) errorMessage += '• Número de DUI\n';
                 if (duplicates.includes('correo')) errorMessage += '• Correo electrónico\n';
 
                 errorMessage += '\nPor favor, verifique la información.';
