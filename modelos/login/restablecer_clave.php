@@ -16,7 +16,7 @@ if (!empty($token)) {
     $query = "SELECT rc.*, e.nombre, e.correo 
               FROM recuperacion_clave rc 
               INNER JOIN empleados e ON rc.id_Empleado = e.id_Empleado 
-              WHERE rc.token = :token AND rc.expires_at > NOW() AND e.estado = 1";
+              WHERE rc.token = :token AND rc.expires_at > NOW()";
     $stmt = $db->prepare($query);
     $stmt->bindParam(':token', $token);
     $stmt->execute();
@@ -45,7 +45,7 @@ if (!empty($token)) {
                 // Actualizar la contraseña en la base de datos
                 $clave_encriptada = password_hash($nueva_clave, PASSWORD_DEFAULT);
                 
-                $update_query = "UPDATE empleados SET clave = :clave, estado=:1 WHERE id_Empleado = :id_Empleado";
+                $update_query = "UPDATE empleados SET clave = :clave, estado = 1 WHERE id_Empleado = :id_Empleado";
                 $update_stmt = $db->prepare($update_query);
                 $update_stmt->bindParam(':clave', $clave_encriptada);
                 $update_stmt->bindParam(':id_Empleado', $id_Empleado, PDO::PARAM_INT);

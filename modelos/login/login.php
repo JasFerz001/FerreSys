@@ -165,7 +165,7 @@ $attempts_left = isset($_GET['attempts_left']) ? (int) $_GET['attempts_left'] : 
             showCustomAlert(
                 'warning', 
                 'Cuenta Bloqueada', 
-                'Ha superado el número máximo de intentos de inicio de sesión. Su cuenta ha sido desactivada por seguridad. Contacte al administrador del sistema para restablecer su acceso.'
+                'Cuenta desactivada por seguridad tras varios intentos fallidos. Use Recuperar contraseña para restablecer acceso.'
             );
         }
     </script>
