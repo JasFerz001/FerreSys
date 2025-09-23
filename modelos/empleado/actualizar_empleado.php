@@ -203,7 +203,7 @@ $stmt1 = $empleado->leerUsuariosActivos();
                                     <button id="btnCancelar" type="button"
                                         class="btn btn-warning flex-grow-1 flex-sm-grow-0"
                                         style="max-width: 200px;">Cancelar</button>
-                                
+
                                 </div>
                             </div>
                         </form>
@@ -276,8 +276,7 @@ $stmt1 = $empleado->leerUsuariosActivos();
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script>
-        document.getElementById('btnCancelar').addEventListener('click', () => {
+    <script>document.getElementById('btnCancelar').addEventListener('click', () => {
             window.location.href = 'crear_empleado.php';
         });
 
@@ -290,6 +289,11 @@ $stmt1 = $empleado->leerUsuariosActivos();
 
             // Función para validar si la contraseña cumple todos los requisitos
             function validarContrasenaCompleta(pass) {
+                // Si la contraseña está vacía, es válida (no se cambia)
+                if (pass === '') {
+                    return true;
+                }
+
                 const hasUpper = /[A-Z]/.test(pass);
                 const hasLower = /[a-z]/.test(pass);
                 const hasNumber = /[0-9]/.test(pass);
@@ -302,6 +306,13 @@ $stmt1 = $empleado->leerUsuariosActivos();
             // Validación en tiempo real
             passInput.addEventListener('input', function () {
                 const pass = this.value;
+
+                // Si está vacío, ocultar el feedback
+                if (pass === '') {
+                    passFeedback.innerHTML = '';
+                    return;
+                }
+
                 const hasUpper = /[A-Z]/.test(pass);
                 const hasLower = /[a-z]/.test(pass);
                 const hasNumber = /[0-9]/.test(pass);
@@ -309,15 +320,13 @@ $stmt1 = $empleado->leerUsuariosActivos();
                 const hasLength = pass.length >= 8 && pass.length <= 12;
 
                 let message = '';
-                if (pass.length > 0) {
-                    message = `
-                <div class="text-${hasLength ? 'success' : 'danger'}">✓ 8-12 caracteres</div>
-                <div class="text-${hasUpper ? 'success' : 'danger'}">✓ Mayúscula</div>
-                <div class="text-${hasLower ? 'success' : 'danger'}">✓ Minúscula</div>
-                <div class="text-${hasNumber ? 'success' : 'danger'}">✓ Número</div>
-                <div class="text-${hasSpecial ? 'success' : 'danger'}">✓ Carácter especial</div>
-            `;
-                }
+                message = `
+            <div class="text-${hasLength ? 'success' : 'danger'}">✓ 8-12 caracteres</div>
+            <div class="text-${hasUpper ? 'success' : 'danger'}">✓ Mayúscula</div>
+            <div class="text-${hasLower ? 'success' : 'danger'}">✓ Minúscula</div>
+            <div class="text-${hasNumber ? 'success' : 'danger'}">✓ Número</div>
+            <div class="text-${hasSpecial ? 'success' : 'danger'}">✓ Carácter especial</div>
+        `;
                 passFeedback.innerHTML = message;
             });
 
@@ -325,7 +334,8 @@ $stmt1 = $empleado->leerUsuariosActivos();
             form.addEventListener('submit', function (e) {
                 const pass = passInput.value;
 
-                if (!validarContrasenaCompleta(pass)) {
+                // Solo validar si se ingresó una contraseña (no está vacía)
+                if (pass !== '' && !validarContrasenaCompleta(pass)) {
                     e.preventDefault();
                     Swal.fire({
                         icon: 'error',
@@ -390,7 +400,6 @@ $stmt1 = $empleado->leerUsuariosActivos();
                 "lengthMenu": [5, 10, 25, 50],
             });
         });
-
 
         // Toggle form
         const tablaTitle = document.getElementById('tablaTitle');
