@@ -62,7 +62,7 @@ $stmt = $cliente->leer();
             <!-- Formulario -->
             <div class="col-md-4">
                 <div class="card-form h-100">
-                    <div class="card-title">Registro de Clientes</div>
+                    <div class="card-title">Registro de Cliente</div>
                     <form id="clienteForm" method="post" action="crear_cliente.php">
                         <input type="hidden" name="id_Cliente" id="id_Cliente">
                         <div class="row g-3">
