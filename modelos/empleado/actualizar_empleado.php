@@ -49,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $apellido = formatearTexto(trim($_POST['apellido']));  // Aplicar formato
     $DUI = trim($_POST['DUI']);
     $telefono = trim($_POST['telefono']);
-     $direccion = formatearTexto(trim($_POST['direccion']));  // Aplicar formato
+    $direccion = formatearTexto(trim($_POST['direccion']));  // Aplicar formato
     $correo = strtolower(trim($_POST['correo']));
     $clave = trim($_POST['clave']);
     $id_Usuario = intval($_POST['id_Usuario']);
@@ -115,28 +115,32 @@ $stmt1 = $empleado->leerUsuariosActivos();
                             <input type="hidden" name="id_Empleado" id="id_Empleado" value="<?php echo $id_Empleado; ?>">
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label class="form-label form-icon"><i class="bi bi-person-fill"></i>Nombre</label>
-                                    <input autocomplete="off" type="text" name="nombre" class="form-control" placeholder="Ingresar Nombre"
-                                        required maxlength="25" value="<?php echo htmlspecialchars($nombre); ?>"
+                                    <label class="form-label form-icon"><i class="bi bi-person-fill"></i> Nombre</label>
+                                    <input autocomplete="off" type="text" name="nombre" class="form-control"
+                                        placeholder="Ingresar Nombre" required maxlength="25"
+                                        value="<?php echo htmlspecialchars($nombre); ?>"
                                         oninput="this.value = this.value.replace(/[^A-Za-zñÑáéíóúÁÉÍÓÚ\s]/g, '')">
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label form-icon"><i
-                                            class="bi bi-person-vcard-fill"></i>Apellido</label>
-                                    <input autocomplete="off" type="text" name="apellido" class="form-control" placeholder="Ingresar Apellido"
-                                        required maxlength="25" value="<?php echo htmlspecialchars($apellido); ?>"
+                                    <label class="form-label form-icon"><i class="bi bi-person-vcard-fill"></i>
+                                        Apellido</label>
+                                    <input autocomplete="off" type="text" name="apellido" class="form-control"
+                                        placeholder="Ingresar Apellido" required maxlength="25"
+                                        value="<?php echo htmlspecialchars($apellido); ?>"
                                         oninput="this.value = this.value.replace(/[^A-Za-zñÑáéíóúÁÉÍÓÚ\s]/g, '')">
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label form-icon"><i
-                                            class="bi bi-credit-card-2-front-fill"></i>DUI</label>
-                                    <input autocomplete="off" type="text" name="DUI" class="form-control" placeholder="Ingrese número de DUI"
-                                        required maxlength="10" value="<?php echo htmlspecialchars($DUI); ?>"
-                                        pattern="\d{8}-\d{1}" title="Formato válido: 12345678-9"
+                                    <label class="form-label form-icon"><i class="bi bi-credit-card-2-front-fill"></i>
+                                        DUI</label>
+                                    <input autocomplete="off" type="text" name="DUI" class="form-control"
+                                        placeholder="Ingrese número de DUI" required maxlength="10"
+                                        value="<?php echo htmlspecialchars($DUI); ?>" pattern="\d{8}-\d{1}"
+                                        title="Formato válido: 12345678-9"
                                         oninput="this.value = this.value.replace(/\D/g,'').slice(0,9); if(this.value.length>8){this.value=this.value.slice(0,8)+'-'+this.value.slice(8)}">
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label form-icon"><i class="bi bi-telephone-fill"></i>Teléfono</label>
+                                    <label class="form-label form-icon"><i class="bi bi-telephone-fill"></i>
+                                        Teléfono</label>
                                     <input autocomplete="off" type="text" name="telefono" class="form-control"
                                         placeholder="Ingresar número de teléfono" required maxlength="9"
                                         value="<?php echo htmlspecialchars($telefono); ?>" pattern="\d{4}-\d{4}"
@@ -144,26 +148,28 @@ $stmt1 = $empleado->leerUsuariosActivos();
                                         oninput="this.value=this.value.replace(/\D/g,'').slice(0,8); if(this.value.length>4){this.value=this.value.slice(0,4)+'-'+this.value.slice(4)}">
                                 </div>
                                 <div class="col-12">
-                                    <label class="form-label form-icon"><i class="bi bi-house-fill"></i>Dirección</label>
+                                    <label class="form-label form-icon"><i class="bi bi-house-fill"></i> Dirección</label>
                                     <input autocomplete="off" type="text" name="direccion" class="form-control"
                                         placeholder="Ingresar Dirección" required
-                                        value="<?php echo htmlspecialchars($direccion); ?>">
+                                        value="<?php echo htmlspecialchars($direccion); ?>"
+                                        oninput="this.value = this.value.replace(/[^A-Za-zÀ-ÿ0-9\s]/g, '')">
                                 </div>
+
                                 <div class="col-12">
-                                    <label class="form-label form-icon"><i class="bi bi-envelope-fill"></i>Correo</label>
+                                    <label class="form-label form-icon"><i class="bi bi-envelope-fill"></i> Correo</label>
                                     <input autocomplete="off" type="email" name="correo" class="form-control"
                                         placeholder="Ingresar correo electrónico" required
                                         value="<?php echo htmlspecialchars($correo); ?>">
                                 </div>
                                 <div class="col-12">
-                                    <label class="form-label form-icon"><i class="bi bi-key-fill"></i>Clave</label>
+                                    <label class="form-label form-icon"><i class="bi bi-key-fill"></i> Clave</label>
                                     <input autocomplete="off" type="password" name="clave" class="form-control"
                                         placeholder="Dejar en blanco para mantener la actual" minlength="8" maxlength="12"
                                         value="">
                                     <small class="form-text text-muted">Dejar en blanco si no desea cambiar la clave</small>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label form-icon"><i class="bi bi-person-gear"></i>Usuario</label>
+                                    <label class="form-label form-icon"><i class="bi bi-person-gear"></i> Usuario</label>
                                     <select class="form-select" name="id_Usuario" required>
                                         <option value="">Seleccione</option>
                                         <?php
@@ -178,17 +184,26 @@ $stmt1 = $empleado->leerUsuariosActivos();
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label form-icon"><i class="bi bi-toggle-on"></i>Estado</label>
+                                    <label class="form-label form-icon"><i class="bi bi-toggle-on"></i> Estado</label>
                                     <select class="form-select" name="estado" required>
                                         <option value="">Seleccione</option>
                                         <option value="1" <?php echo ($estado == 1 ? 'selected' : ''); ?>>Alta</option>
                                         <option value="0" <?php echo ($estado == 0 ? 'selected' : ''); ?>>Baja</option>
                                     </select>
                                 </div>
+                                <!--
                                 <div class="col-12 text-center mt-4">
                                     <button id="btnCancelar" type="button"
                                         class="btn btn-warning px-5 py-2">Cancelar</button>
                                     <button type="submit" class="btn btn-success px-5 py-2">Actualizar</button>
+                                </div>-->
+                                <div class="col-12 text-center mt-4 d-flex justify-content-center gap-3 flex-wrap">
+                                    <button type="submit" class="btn btn-success flex-grow-1 flex-sm-grow-0"
+                                        style="max-width: 200px;">Guardar</button>
+                                    <button id="btnCancelar" type="button"
+                                        class="btn btn-warning flex-grow-1 flex-sm-grow-0"
+                                        style="max-width: 200px;">Cancelar</button>
+                                
                                 </div>
                             </div>
                         </form>
@@ -199,7 +214,7 @@ $stmt1 = $empleado->leerUsuariosActivos();
             <!-- Tabla -->
             <div class="col-md-8" id="tablaCol">
                 <div class="table-section">
-                    <div class="card-title" id="tablaTitle" style="cursor: pointer;">LISTA DE EMPLEADOS</div>
+                    <div class="card-title" id="tablaTitle" style="cursor: pointer;">Lista de Empleados</div>
                     <div class="table-responsive">
                         <table id="tablaEmpleados" class="table table-bordered text-center align-middle">
                             <thead>
