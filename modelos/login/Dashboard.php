@@ -75,7 +75,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                 </div>
                 <div class="menu-item">
                     <i class="fas fa-users"></i>
-                    <span>Clientes</span>
+                    <a href="../../modelos/cliente/crear_cliente.php" onclick="abrirFormularios(event)">Clientes</a>
                 </div>
                 <div class="menu-item">
                     <i class="fas fa-receipt"></i>
