@@ -46,7 +46,7 @@ body {
     transition: all 0.3s ease;
     box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
     z-index: 1000;
-    overflow-x: hidden;
+    overflow: hidden; /* Evita scroll del contenedor padre */
 }
 
 .sidebar.collapsed {
@@ -106,10 +106,47 @@ body {
     background: rgba(255, 255, 255, 0.1);
 }
 
+/* Menú lateral */
 .menu {
     padding: 15px 0;
 }
 
+
+.sidebar .menu {
+    height: calc(100vh - 70px - 10px);
+    overflow-y: auto;         
+    overflow-x: hidden;         
+    scrollbar-width: thin; 
+    scrollbar-color: #888 transparent; 
+     padding-bottom: 30px;
+}
+
+/* Chrome, Edge, Safari */
+.sidebar .menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar .menu::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar .menu::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    transition: background-color 0.3s ease;
+}
+
+/* Efecto hover: scroll más visible al pasar el mouse */
+.sidebar:hover .menu::-webkit-scrollbar-thumb {
+    background-color: #555;
+}
+
+.sidebar .menu::-webkit-scrollbar-thumb:hover {
+    background-color: #333;
+}
+
+/* Items del menú */
 .menu-item {
     padding: 12px 20px;
     display: flex;
@@ -168,7 +205,6 @@ body {
     flex: 1;
     margin-left: var(--sidebar-width);
     padding-top: 50px;
-    /* espacio debajo del top-bar */
     display: flex;
     flex-direction: column;
     height: 100vh;
@@ -179,8 +215,6 @@ body {
     margin-left: var(--sidebar-collapsed-width);
 }
 
-
-
 /* Iframe ocupa todo el espacio */
 #myFrame {
     width: 100%;
@@ -190,14 +224,11 @@ body {
     flex: 1;
 }
 
-/* Contenedor de cards para separar del top-bar y sidebar */
+/* Contenedor de cards */
 .dashboard-cards-container {
     padding-top: 20px;
-    /* espacio desde el top-bar */
     padding-left: 20px;
-    /* espacio desde el sidebar */
     padding-right: 20px;
-    /* margen derecho */
     flex: 1;
 }
 
@@ -281,32 +312,24 @@ footer {
     position: fixed;
     top: 0;
     left: var(--sidebar-width);
-    /* Mantiene el desplazamiento del sidebar */
     right: 0;
     height: 50px;
     background-color: var(--primary);
-    /* Puedes cambiarlo a #2c3e50 si quieres */
     display: flex;
     align-items: center;
     justify-content: flex-end;
     padding: 0 20px;
-    /* Espaciado interno horizontal */
     z-index: 999;
     transition: all 0.3s ease;
 }
 
 .top-bar .user-name {
     color: #ffffff;
-    /* Texto blanco */
     margin-right: 10px;
-    /* Separación entre texto e ícono */
     font-weight: 500;
     white-space: nowrap;
-    /* Evita que el texto se rompa en varias líneas */
 }
 
-
-/* Ajuste cuando el sidebar está colapsado */
 .main-content.expanded+.top-bar {
     left: var(--sidebar-collapsed-width);
 }

@@ -41,40 +41,80 @@ $rol_usuario = $_SESSION['rol'] ?? "";
         <div class="menu">
             <div class="menu-item active" onclick="location.href='Dashboard.php'" style="cursor:pointer;">
                 <i class="fas fa-home"></i>
-                <span>Dashboard</span>
+                <span>Inicio</span>
             </div>
 
-            <?php if($rol_usuario === 'Administrador') : ?>
-                <div class="menu-item">
-                    <i class="fas fa-users"></i>
-                    <a href="../../modelos/empleado/crear_empleado.php" onclick="abrirFormularios(event)">Empleados</a>
-                </div>
+            <?php if ($rol_usuario === 'Administrador') : ?>
                 <div class="menu-item">
                     <i class="fas fa-user-friends"></i>
                     <a href="../../modelos/usuario/crear_usuario.php" onclick="abrirFormularios(event)">Usuarios</a>
                 </div>
                 <div class="menu-item">
-                    <i class="fas fa-file-invoice-dollar"></i>
-                    <span>Facturación</span>
+                    <i class="fas fa-users"></i>
+                    <a href="../../modelos/empleado/crear_empleado.php" onclick="abrirFormularios(event)">Empleados</a>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-th-large"></i>
+                    <span>Categorías</span>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-ruler-combined"></i>
+                    <span>Unidad de Medida</span>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-boxes"></i>
+                    <span>Productos</span>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-handshake"></i>
+                    <span>Proveedores</span>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Compras</span>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-users"></i>
+                    <a href="../../modelos/cliente/crear_cliente.php" onclick="abrirFormularios(event)">Clientes</a>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-receipt"></i>
+                    <span>Ventas</span>
                 </div>
                 <div class="menu-item">
                     <i class="fas fa-chart-bar"></i>
                     <span>Reportes</span>
                 </div>
                 <div class="menu-item">
-                    <i class="fas fa-cog"></i>
-                    <span>Configuración</span>
+                    <i class="fas fa-file-export"></i>
+                    <span>Generar Bakup</span>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-circle-question"></i>
+                    <span>Ayuda</span>
                 </div>
             <?php endif; ?>
 
-            <?php if($rol_usuario === 'Administrador' || $rol_usuario === 'Vendedor') : ?>
+            <?php if ($rol_usuario === 'Vendedor') : ?>
                 <div class="menu-item">
-                    <i class="fas fa-box"></i>
-                    <span>Inventario</span>
+                    <i class="fas fa-users"></i>
+                    <span>Clientes</span>
                 </div>
                 <div class="menu-item">
-                    <i class="fas fa-shopping-cart"></i>
+                    <i class="fas fa-boxes"></i>
+                    <span>Productos</span>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-receipt"></i>
                     <span>Ventas</span>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Reportes</span>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-circle-question"></i>
+                    <span>Ayuda</span>
                 </div>
             <?php endif; ?>
         </div>
@@ -106,42 +146,118 @@ $rol_usuario = $_SESSION['rol'] ?? "";
         <!-- Contenedor de dashboard cards -->
         <div class="dashboard-cards-container" id="dashboardCardsContainer">
             <div class="dashboard-cards" id="dashboardCards">
-                <div class="card stat-card">
-                    <div class="icon blue">
-                        <i class="fas fa-shopping-cart"></i>
+                <?php if ($rol_usuario === 'Administrador') : ?>
+                    <div class="card stat-card">
+                        <div class="icon blue">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="info">
+                            <h3>152</h3>
+                            <p>Ventas Hoy</p>
+                        </div>
                     </div>
-                    <div class="info">
-                        <h3>152</h3>
-                        <p>Ventas Hoy</p>
+
+                    <div class="card stat-card">
+                        <div class="icon green">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="info">
+                            <h3>1,258</h3>
+                            <p>Productos en Stock</p>
+                        </div>
                     </div>
-                </div>
-                <div class="card stat-card">
-                    <div class="icon green">
-                        <i class="fas fa-box"></i>
+
+                    <div class="card stat-card">
+                        <div class="icon purple">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="info">
+                            <h3>24</h3>
+                            <p>Productos Bajo Stock</p>
+                        </div>
                     </div>
-                    <div class="info">
-                        <h3>1,258</h3>
-                        <p>Productos en Stock</p>
+
+                    <div class="card stat-card">
+                        <div class="icon orange">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <div class="info">
+                            <h3>15</h3>
+                            <p>Compras </p>
+                        </div>
                     </div>
-                </div>
-                <div class="card stat-card">
-                    <div class="icon red">
-                        <i class="fas fa-users"></i>
+
+                    <div class="card stat-card">
+                        <div class="icon teal">
+                            <i class="fas fa-cubes"></i>
+                        </div>
+                        <div class="info">
+                            <h3>5</h3>
+                            <p>Productos Más Vendidos</p>
+                        </div>
                     </div>
-                    <div class="info">
-                        <h3>15</h3>
-                        <p>Empleados</p>
+
+                    <div class="card stat-card">
+                        <div class="icon red">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="info">
+                            <h3>12</h3>
+                            <p>Clientes</p>
+                        </div>
                     </div>
-                </div>
-                <div class="card stat-card">
-                    <div class="icon orange">
-                        <i class="fas fa-dollar-sign"></i>
+                <?php endif; ?>
+                <?php if ($rol_usuario === 'Vendedor') : ?>
+                    <div class="card stat-card">
+                        <div class="icon blue">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="info">
+                            <h3>152</h3>
+                            <p>Ventas Hoy</p>
+                        </div>
                     </div>
-                    <div class="info">
-                        <h3>$8,542</h3>
-                        <p>Ganancias Hoy</p>
+
+                    <div class="card stat-card">
+                        <div class="icon green">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="info">
+                            <h3>1,258</h3>
+                            <p>Productos en Stock</p>
+                        </div>
                     </div>
-                </div>
+
+                    <div class="card stat-card">
+                        <div class="icon purple">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="info">
+                            <h3>24</h3>
+                            <p>Productos Bajo Stock</p>
+                        </div>
+                    </div>
+
+                    <div class="card stat-card">
+                        <div class="icon teal">
+                            <i class="fas fa-cubes"></i>
+                        </div>
+                        <div class="info">
+                            <h3>5</h3>
+                            <p>Productos Más Vendidos</p>
+                        </div>
+                    </div>
+
+                    <div class="card stat-card">
+                        <div class="icon red">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="info">
+                            <h3>12</h3>
+                            <p>Clientes</p>
+                        </div>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -201,5 +317,4 @@ $rol_usuario = $_SESSION['rol'] ?? "";
         });
     </script>
 </body>
-
 </html>
