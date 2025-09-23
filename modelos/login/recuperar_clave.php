@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $db = $conexion->getConnection();
 
         // 1. Verificar si el correo electrónico existe en la tabla de empleados y está activo
-        $query_empleado = "SELECT id_Empleado, nombre FROM empleados WHERE correo = :correo AND estado = 1 LIMIT 1";
+        $query_empleado = "SELECT id_Empleado, nombre FROM empleados WHERE correo = :correo LIMIT 1";
         $stmt_empleado = $db->prepare($query_empleado);
         $stmt_empleado->bindParam(':correo', $correo);
         $stmt_empleado->execute();

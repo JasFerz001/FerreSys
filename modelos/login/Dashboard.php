@@ -98,7 +98,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
             <?php if ($rol_usuario === 'Vendedor') : ?>
                 <div class="menu-item">
                     <i class="fas fa-users"></i>
-                    <span>Clientes</span>
+                    <a href="../../modelos/cliente/crear_cliente.php" onclick="abrirFormularios(event)">Clientes</a>
                 </div>
                 <div class="menu-item">
                     <i class="fas fa-boxes"></i>
@@ -134,7 +134,9 @@ $rol_usuario = $_SESSION['rol'] ?? "";
         <i class="fas fa-user-circle" id="userTopIcon"></i>
 
         <div class="dropdown-top" id="dropdownTop">
-            <a href="../login/logout.php">Cerrar Sesión</a>
+            <a href="../login/logout.php">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </a>
         </div>
     </div>
 
