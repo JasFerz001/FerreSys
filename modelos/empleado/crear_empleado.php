@@ -139,12 +139,15 @@ $stmt1 = $empleado->leerUsuariosActivos();
                                     oninput="this.value=this.value.replace(/\D/g,'').slice(0,8); if(this.value.length>4){this.value=this.value.slice(0,4)+'-'+this.value.slice(4)}">
                             </div>
                             <div class="col-12">
-                                <label class="form-label form-icon"><i class="bi bi-house-fill"></i> Dirección</label>
+                                <label class="form-label form-icon">
+                                    <i class="bi bi-house-fill"></i> Dirección
+                                </label>
                                 <input autocomplete="off" type="text" name="direccion" class="form-control"
                                     placeholder="Ingresar Dirección" required
                                     value="<?php echo htmlspecialchars($direccion); ?>"
-                                    oninput="this.value = this.value.replace(/[^A-Za-zÀ-ÿ0-9\s]/g, '')">
+                                    oninput="this.value = this.value.replace(/[^A-Za-zÀ-ÿ0-9\s,\.#\-\/ºª]/g, '')">
                             </div>
+
 
                             <div class="col-12">
                                 <label class="form-label form-icon"><i class="bi bi-envelope-fill"></i> Correo</label>
