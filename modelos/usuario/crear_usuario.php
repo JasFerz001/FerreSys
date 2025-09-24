@@ -130,7 +130,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <?php if ($_GET['message'] == 'success'): ?>
                     Swal.fire({
                         title: '¡Éxito!',
-                        text: 'Usuario creado correctamente.',
+                        text: 'El Usuario ha sido registrado correctamente en el sistema',
                         icon: 'success',
                         iconColor: '#1cbb8c',
                         confirmButtonColor: '#3b7ddd',
