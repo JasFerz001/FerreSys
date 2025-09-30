@@ -55,7 +55,7 @@ CREATE TABLE `clientes` (
   `correo` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id_Cliente`),
   UNIQUE KEY `dui` (`dui`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -64,7 +64,7 @@ CREATE TABLE `clientes` (
 
 LOCK TABLES `clientes` WRITE;
 /*!40000 ALTER TABLE `clientes` DISABLE KEYS */;
-INSERT INTO `clientes` VALUES (1,'Pedro Mario','Guardado Melendez','00265265-5','San Salvador, San Jacinto, Calle, San Martin','pm2025@gmail.com');
+INSERT INTO `clientes` VALUES (1,'Pedro Mario','Guardado Melendez','00265265-5','San Salvador, San Jacinto, Calle, San Martin','pm2025@gmail.com'),(2,'Kevin','Santos','16921692-6','Sssd','kevin@gmail.com');
 /*!40000 ALTER TABLE `clientes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -369,4 +369,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-09-25 15:29:59
+-- Dump completed on 2025-09-30 13:29:57

@@ -86,8 +86,12 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                     <span>Reportes</span>
                 </div>
                 <div class="menu-item">
-                    <i class="fas fa-users"></i>
+                    <i class="fas fa-database"></i><i class="fas fa-download"></i>
                     <a href="../../backup/backup.php" onclick="abrirFormularios(event)">Generar Backup</a>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-database"></i><i  class="fas fa-upload"></i>
+                    <a href="../../backup/restaurar_backup.php" onclick="abrirFormularios(event)">Restaurar Backup</a>
                 </div>
                 <div class="menu-item">
                     <i class="fas fa-circle-question"></i>
