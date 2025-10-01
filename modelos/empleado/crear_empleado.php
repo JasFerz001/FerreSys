@@ -196,7 +196,6 @@ $stmt1 = $empleado->leerUsuariosActivos();
                                 <button id="btnCancelar" type="button"
                                     class="btn btn-warning flex-grow-1 flex-sm-grow-0"
                                     style="max-width: 200px;">Cancelar</button>
-
                             </div>
 
                         </div>
