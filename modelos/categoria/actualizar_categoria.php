@@ -86,8 +86,9 @@ $stmt = $categoria->leer();
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label form-icon"><i class="bi bi-tags-fill"></i>Nombre</label>
-                                <input autocomplete="off" type="text" name="nombre" class="form-control" placeholder="Ingresar Nombre"
-                                    required maxlength="25" value="<?php echo htmlspecialchars($nombre); ?>"
+                                <input autocomplete="off" type="text" name="nombre" class="form-control"
+                                    placeholder="Ingresar Nombre" required maxlength="25"
+                                    value="<?php echo htmlspecialchars($nombre); ?>"
                                     oninput="this.value = this.value.replace(/[^A-Za-zñÑáéíóúÁÉÍÓÚ\s]/g, '')">
                             </div>
                             <div class="col-md-6">
@@ -97,10 +98,12 @@ $stmt = $categoria->leer();
                                     placeholder="Ingresar Descripcion" required maxlength="75"
                                     value="<?php echo htmlspecialchars($descripcion); ?>">
                             </div>
-                            <div class="col-12 text-center mt-4">
-                                <button id="btnCancelar" type="button" onclick="location.href='crear_categoria.php'"
-                                    class="btn btn-warning px-5 py-2">Cancelar</button>
-                                <button type="submit" class="btn btn-success px-5 py-2">Actualizar</button>
+                            <div class="col-12 text-center mt-4 d-flex justify-content-center gap-3 flex-wrap">
+                                <button type="submit" class="btn btn-success flex-grow-1 flex-sm-grow-0"
+                                    style="max-width: 200px;">Guardar</button>
+                                <button id="btnCancelar" type="button"
+                                    class="btn btn-warning flex-grow-1 flex-sm-grow-0"
+                                    style="max-width: 200px;">Cancelar</button>
                             </div>
                         </div>
                     </form>

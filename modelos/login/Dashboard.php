@@ -55,15 +55,15 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                 </div>
                 <div class="menu-item">
                     <i class="fas fa-th-large"></i>
-                    <span>Categorías</span>
+                    <a href="../../modelos/categoria/crear_categoria.php" onclick="abrirFormularios(event)">Categorias</a>
                 </div>
                 <div class="menu-item">
                     <i class="fas fa-ruler-combined"></i>
-                    <span>Unidad de Medida</span>
+                   <a href="../../modelos/unidad de medida/crear_unidad.php" onclick="abrirFormularios(event)">Unidad de Medida</a>
                 </div>
                 <div class="menu-item">
                     <i class="fas fa-boxes"></i>
-                    <span>Productos</span>
+                    <a href="../../modelos/productos/crear_producto.php" onclick="abrirFormularios(event)">Productos</a>
                 </div>
                 <div class="menu-item">
                     <i class="fas fa-handshake"></i>

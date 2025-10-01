@@ -141,10 +141,12 @@ $productosList = $producto->leer();
                                     <option value="0">Baja</option>
                                 </select>
                             </div>
-                            <div class="col-12 text-center mt-4">
+                            <div class="col-12 text-center mt-4 d-flex justify-content-center gap-3 flex-wrap">
+                                <button type="submit" class="btn btn-success flex-grow-1 flex-sm-grow-0"
+                                    style="max-width: 200px;">Guardar</button>
                                 <button id="btnCancelar" type="button"
-                                    class="btn btn-warning px-5 py-2">Cancelar</button>
-                                <button type="submit" class="btn btn-success px-5 py-2">Guardar</button>
+                                    class="btn btn-warning flex-grow-1 flex-sm-grow-0"
+                                    style="max-width: 200px;">Cancelar</button>
                             </div>
                         </div>
                     </form>
