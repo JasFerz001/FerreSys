@@ -88,6 +88,42 @@ Class Proveedor
             return $stmt;
         }
 
+        public function leerUno(): bool
+        {
+            $query = "SELECT id_Proveedor, nombre, contac_referencia, telefono, correo, estado 
+                      FROM " . $this->table_name . " 
+                      WHERE id_Proveedor = :id_Proveedor LIMIT 1";
+            $stmt = $this->conn->prepare($query);
+            // Sanitizar entrada
+            $this->id_Proveedor = (int) $this->id_Proveedor;
+            // Vincular parámetro
+            $stmt->bindParam(":id_Proveedor", $this->id_Proveedor, PDO::PARAM_INT);
+            // Ejecutar consulta
+            $stmt->execute();
+
+            if ($stmt->rowCount() > 0) {
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                // Asignar valores a los atributos del objeto
+                $this->nombre = $row['nombre'];
+                $this->contac_referencia = $row['contac_referencia'];
+                $this->telefono = $row['telefono'];
+                $this->correo = $row['correo'];
+                $this->estado = (int) $row['estado'];
+
+                return true;
+            }
+            return false;
+        }
+
+        public function leerActivos(): PDOStatement
+        {
+            $query = "SELECT * FROM proveedores WHERE estado = 1 ORDER BY id_Proveedor ASC";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+
+            return $stmt;
+        }
+
         public function actualizar(): array
         {
             // Verificar duplicados
@@ -99,6 +135,7 @@ Class Proveedor
             $checkStmt->bindParam(":contac_referencia", $this->contac_referencia);
             $checkStmt->bindParam(":telefono", $this->telefono);    
             $checkStmt->bindParam(":correo", $this->correo);
+            $checkStmt->bindParam(":id_Proveedor", $this->id_Proveedor, PDO::PARAM_INT);
             $checkStmt->execute();
 
             if ($checkStmt->rowCount() > 0) {
