@@ -1,0 +1,181 @@
+:root {
+    --primary-color: #2c3e50  ;
+    --secondary-color: #6c757d;
+    --success-color: #1cbb8c;
+    --warning-color: #f7b84b;
+    --danger-color: #f06548;
+    --light-bg: #f5f8ff;
+}
+
+/* ===== Global ===== */
+body {
+    background-color:white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
+}
+
+.btn {
+    border-radius: 8px;
+    padding: 10px 25px;
+    font-weight: 500;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-warning {
+    background-color: var(--warning-color);
+    border-color: var(--warning-color);
+}
+
+.btn-success {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+}
+
+.btn-warning:hover {
+    background-color: #e9ab39;
+    border-color: #e9ab39;
+}
+
+.btn-success:hover {
+    background-color: #19a87d;
+    border-color: #19a87d;
+}
+
+/* ===== Form Cards ===== */
+.card-form {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    padding: 0px 25px 25px 25px; 
+    height: 100%;
+}
+
+.card-title {
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    text-align: center;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #eaeef5;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 8px;
+}
+
+.form-icon {
+    color: var(--primary-color);
+    margin-right: 8px;
+}
+
+.form-control,
+.form-select {
+    border-radius: 8px;
+    padding: 10px 15px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s;
+}
+
+.form-control:focus,
+.form-select:focus {
+    box-shadow: 0 0 0 3px rgba(59, 125, 221, 0.15);
+    border-color: var(--primary-color);
+}
+
+/* ===== Header ===== */
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.page-title {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin: 0;
+}
+
+/* ===== Tables ===== */
+.table-container {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+}
+
+#tablaProveedores {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+}
+
+#tablaProveedores thead th {
+    background-color: white;
+    color: var(--primary-color);
+    font-weight: 600;
+    padding: 12px 15px;
+    border-bottom: 2px solid #eaeef5;
+}
+
+#tablaProveedores tbody td {
+    padding: 12px 15px;
+    vertical-align: middle;
+    border-bottom: 1px solid #eaeef5;
+}
+
+#tablaProveedores tbody tr:last-child td {
+    border-bottom: none;
+}
+
+#tablaProveedores tbody tr:hover {
+    background-color: #f8fbff;
+}
+
+/* ===== Badges ===== */
+.badge {
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.badge-success {
+    background-color: rgba(28, 187, 140, 0.15);
+    color: var(--success-color);
+}
+
+.badge-danger {
+    background-color: rgba(240, 101, 72, 0.15);
+    color: var(--danger-color);
+}
+
+.actions-column {
+    white-space: nowrap;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .table-container {
+        padding: 10px;
+    }
+
+    #tablaProveedores thead th,
+    #tablaProveedores tbody td {
+        padding: 8px 10px;
+    }
+}
