@@ -67,7 +67,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                 </div>
                 <div class="menu-item">
                     <i class="fas fa-handshake"></i>
-                    <span>Proveedores</span>
+                    <a href="../../modelos/proveedores/crear_proveedor.php"onclick="abrirFormularios(event)">Proveedores</a>
                 </div>
                 <div class="menu-item">
                     <i class="fas fa-shopping-cart"></i>
