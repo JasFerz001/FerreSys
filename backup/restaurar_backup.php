@@ -46,8 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore'])) {
             </h3>
             <p class="text-muted">
                 Selecciona el archivo <code>.sql</code> que deseas restaurar. 
-                Asegúrate de que se encuentre en 
-                <strong>C:\Backups Ferreteria Michapa</strong>.
+                Por defecto, los backups se guardan en, <code>C:\Backups Ferreteria Michapa</code>.
             </p>
 
             <!-- Botón que abre el modal -->
