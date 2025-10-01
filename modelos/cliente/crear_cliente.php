@@ -72,14 +72,14 @@ $stmt = $cliente->leer();
                     <form id="clienteForm" method="post" action="crear_cliente.php">
                         <input type="hidden" name="id_Cliente" id="id_Cliente">
                         <div class="row g-3">
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <label class="form-label form-icon"><i class="bi bi-person-fill"></i> Nombre</label>
                                 <input autocomplete="off" type="text" name="nombre" class="form-control"
                                     placeholder="Ingresar Nombre" required maxlength="25"
                                     value="<?php echo htmlspecialchars($nombre); ?>"
                                     oninput="this.value = this.value.replace(/[^A-Za-zñÑáéíóúÁÉÍÓÚ\s]/g, '')">
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <label class="form-label form-icon"><i
                                         class="bi bi-person-vcard-fill"></i> Apellido</label>
                                 <input autocomplete="off" type="text" name="apellido" class="form-control"
@@ -108,6 +108,7 @@ $stmt = $cliente->leer();
                                     placeholder="Ingresar correo electrónico" required
                                     value="<?php echo htmlspecialchars($correo); ?>">
                             </div>
+                            <div class="text-muted small mb-3">* Todos los campos son obligatorios</div>
                             <div class="col-12 text-center mt-4 d-flex justify-content-center gap-3 flex-wrap">
                                 <button type="submit" class="btn btn-success flex-grow-1 flex-sm-grow-0" style="max-width: 200px;">Guardar</button>
                                 <button id="btnCancelar" type="button" class="btn btn-warning flex-grow-1 flex-sm-grow-0" style="max-width: 200px;">Cancelar</button>

@@ -339,7 +339,7 @@ $stmt1 = $empleado->leerUsuariosActivos();
         if (message === 'success') {
             Swal.fire({
                 title: '¡Éxito!',
-                text: 'El empleado ha sido registrado correctamente en el sistema',
+                text: 'El empleado ha sido registrado correctamente en el sistema.',
                 icon: 'success',
                 iconColor: '#1cbb8c',
                 confirmButtonColor: '#3b7ddd',
