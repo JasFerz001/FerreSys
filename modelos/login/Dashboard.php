@@ -45,7 +45,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                 <span>Inicio</span>
             </div>
 
-            <?php if ($rol_usuario === 'Administrador') : ?>
+            <?php if ($rol_usuario === 'Administrador'): ?>
                 <div class="menu-item">
                     <i class="fas fa-user-friends"></i>
                     <a href="../../modelos/usuario/crear_usuario.php" onclick="abrirFormularios(event)">Usuarios</a>
@@ -60,7 +60,8 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                 </div>
                 <div class="menu-item">
                     <i class="fas fa-ruler-combined"></i>
-                   <a href="../../modelos/unidad de medida/crear_unidad.php" onclick="abrirFormularios(event)">Unidad de Medida</a>
+                    <a href="../../modelos/unidad de medida/crear_unidad.php" onclick="abrirFormularios(event)">Unidad de
+                        Medida</a>
                 </div>
                 <div class="menu-item">
                     <i class="fas fa-boxes"></i>
@@ -68,7 +69,8 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                 </div>
                 <div class="menu-item">
                     <i class="fas fa-handshake"></i>
-                    <a href="../../modelos/proveedores/crear_proveedor.php"onclick="abrirFormularios(event)">Proveedores</a>
+                    <a href="../../modelos/proveedores/crear_proveedor.php"
+                        onclick="abrirFormularios(event)">Proveedores</a>
                 </div>
                 <div class="menu-item">
                     <i class="fas fa-shopping-cart"></i>
@@ -91,7 +93,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                     <a href="../../backup/backup.php" onclick="abrirFormularios(event)">Generar Backup</a>
                 </div>
                 <div class="menu-item">
-                    <i class="fas fa-database"></i><i  class="fas fa-upload"></i>
+                    <i class="fas fa-database"></i><i class="fas fa-upload"></i>
                     <a href="../../backup/restaurar_backup.php" onclick="abrirFormularios(event)">Restaurar Backup</a>
                 </div>
                 <div class="menu-item">
@@ -100,7 +102,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                 </div>
             <?php endif; ?>
 
-            <?php if ($rol_usuario === 'Vendedor') : ?>
+            <?php if ($rol_usuario === 'Vendedor'): ?>
                 <div class="menu-item">
                     <i class="fas fa-users"></i>
                     <a href="../../modelos/cliente/crear_cliente.php" onclick="abrirFormularios(event)">Clientes</a>
@@ -131,8 +133,8 @@ $rol_usuario = $_SESSION['rol'] ?? "";
             <?php
             echo htmlspecialchars(
                 (explode(' ', trim($_SESSION['nombre'] ?? ''))[0] ?? '') . ' ' .
-                    (explode(' ', trim($_SESSION['apellido'] ?? ''))[0] ?? '') . ' - ' .
-                    ($_SESSION['rol'] ?? '')
+                (explode(' ', trim($_SESSION['apellido'] ?? ''))[0] ?? '') . ' - ' .
+                ($_SESSION['rol'] ?? '')
             );
             ?>
         </span>
@@ -153,7 +155,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
         <!-- Contenedor de dashboard cards -->
         <div class="dashboard-cards-container" id="dashboardCardsContainer">
             <div class="dashboard-cards" id="dashboardCards">
-                <?php if ($rol_usuario === 'Administrador') : ?>
+                <?php if ($rol_usuario === 'Administrador'): ?>
                     <div class="card stat-card">
                         <div class="icon blue">
                             <i class="fas fa-shopping-cart"></i>
@@ -214,7 +216,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                         </div>
                     </div>
                 <?php endif; ?>
-                <?php if ($rol_usuario === 'Vendedor') : ?>
+                <?php if ($rol_usuario === 'Vendedor'): ?>
                     <div class="card stat-card">
                         <div class="icon blue">
                             <i class="fas fa-shopping-cart"></i>
@@ -280,7 +282,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
         const mainContent = document.querySelector('.main-content');
         const topBar = document.querySelector('.top-bar');
 
-        toggleButton.addEventListener('click', function() {
+        toggleButton.addEventListener('click', function () {
             sidebar.classList.toggle('collapsed');
             mainContent.classList.toggle('expanded');
 
@@ -291,7 +293,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
 
         // Menu items active
         document.querySelectorAll('.menu-item').forEach(item => {
-            item.addEventListener('click', function() {
+            item.addEventListener('click', function () {
                 document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
                 this.classList.add('active');
             });
@@ -317,34 +319,35 @@ $rol_usuario = $_SESSION['rol'] ?? "";
             dropdownTop.style.display = dropdownTop.style.display === 'block' ? 'none' : 'block';
         });
 
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             if (!userTopIcon.contains(event.target) && !dropdownTop.contains(event.target)) {
                 dropdownTop.style.display = 'none';
             }
         });
     </script>
     <script>
-setInterval(() => {
-    fetch("check_estado.php")
-        .then(res => res.json())
-        .then(data => {
-            console.log("Respuesta del servidor:", data); 
-            if (!data.activo) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Sesión terminada',
-                    text: 'Tu cuenta ha sido desactivada. Serás redirigido al login.',
-                    confirmButtonText: 'Aceptar',
-                    allowOutsideClick: false,
-                    allowEscapeKey: false
-                }).then(() => {
-                    window.location.href = "../login/logout.php"; 
-                });
-            }
-        })
-        .catch(err => console.error("Error verificando estado:", err));
-}, 15000); 
-</script>
+        setInterval(() => {
+            fetch("check_estado.php")
+                .then(res => res.json())
+                .then(data => {
+                    console.log("Respuesta del servidor:", data);
+                    if (!data.activo) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Sesión terminada',
+                            text: 'Tu cuenta ha sido desactivada. Serás redirigido al login.',
+                            confirmButtonText: 'Aceptar',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false
+                        }).then(() => {
+                            window.location.href = "../login/logout.php";
+                        });
+                    }
+                })
+                .catch(err => console.error("Error verificando estado:", err));
+        }, 15000);
+    </script>
 
 </body>
+
 </html>
