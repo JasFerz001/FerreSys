@@ -57,26 +57,29 @@ $stmt = $unidadMedida->leer();
             <div class="col-md-4">
                 <div class="card-form h-100">
                     <div class="card-title">Registro De Unidades de Medida</div>
-                     <div class="text-muted small mb-3">*Todos los campos son obligatorios</div>
+                    <div class="text-muted small mb-3">*Todos los campos son obligatorios</div>
                     <form id="unidadMedidaForm" method="post" action="crear_unidad.php">
                         <input type="hidden" name="id_Medida" id="id_Medida">
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label form-icon"><i class="bi bi-rulers"></i>Nombre</label>
-                                <input autocomplete="off" type="text" name="nombre" class="form-control" placeholder="Ingresar Nombre"
-                                    required maxlength="25" value="<?php echo isset($nombre) ? $nombre : ''; ?>"
+                                <input autocomplete="off" type="text" name="nombre" class="form-control"
+                                    placeholder="Ingresar Nombre" required maxlength="25"
+                                    value="<?php echo isset($nombre) ? $nombre : ''; ?>"
                                     oninput="this.value = this.value.replace(/[^A-Za-zñÑáéíóúÁÉÍÓÚ\s]/g, '')">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label form-icon"><i class="bi bi-type"></i>Símbolo</label>
-                                <input autocomplete="off" type="text" name="simbolo" class="form-control" placeholder="Ingresar Símbolo"
-                                    required maxlength="10" value="<?php echo isset($simbolo) ? $simbolo : ''; ?>"
-                                    oninput="this.value = this.value.replace(/[^A-Za-z0-9%°]/g, '')">
+                                <input autocomplete="off" type="text" name="simbolo" class="form-control"
+                                    placeholder="Ingresar Símbolo" required maxlength="10"
+                                    value="<?php echo isset($simbolo) ? $simbolo : ''; ?>">
                             </div>
-                            <div class="col-12 text-center mt-4">
+                            <div class="col-12 text-center mt-4 d-flex justify-content-center gap-3 flex-wrap">
+                                <button type="submit" class="btn btn-success flex-grow-1 flex-sm-grow-0"
+                                    style="max-width: 200px;">Guardar</button>
                                 <button id="btnCancelar" type="button"
-                                    class="btn btn-warning px-5 py-2">Cancelar</button>
-                                <button type="submit" class="btn btn-success px-5 py-2">Guardar</button>
+                                    class="btn btn-warning flex-grow-1 flex-sm-grow-0"
+                                    style="max-width: 200px;">Cancelar</button>
                             </div>
                         </div>
                     </form>

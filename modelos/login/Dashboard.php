@@ -55,11 +55,15 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                 </div>
                 <div class="menu-item">
                     <i class="fas fa-th-large"></i>
-                    <span>Categorías</span>
+                    <a href="../../modelos/categoria/crear_categoria.php" onclick="abrirFormularios(event)">Categorias</a>
                 </div>
                 <div class="menu-item">
                     <i class="fas fa-ruler-combined"></i>
-                    <span>Unidad de Medida</span>
+                   <a href="../../modelos/unidad de medida/crear_unidad.php" onclick="abrirFormularios(event)">Unidad de Medida</a>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-boxes"></i>
+                    <a href="../../modelos/productos/crear_producto.php" onclick="abrirFormularios(event)">Productos</a>
                 </div>
                 <div class="menu-item">
                     <i class="fas fa-handshake"></i>
@@ -82,8 +86,12 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                     <span>Reportes</span>
                 </div>
                 <div class="menu-item">
-                    <i class="fas fa-file-export"></i>
-                    <span>Generar Bakup</span>
+                    <i class="fas fa-database"></i><i class="fas fa-download"></i>
+                    <a href="../../backup/backup.php" onclick="abrirFormularios(event)">Generar Backup</a>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-database"></i><i  class="fas fa-upload"></i>
+                    <a href="../../backup/restaurar_backup.php" onclick="abrirFormularios(event)">Restaurar Backup</a>
                 </div>
                 <div class="menu-item">
                     <i class="fas fa-circle-question"></i>
