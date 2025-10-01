@@ -94,7 +94,7 @@ $stmt = $unidadMedida->leer();
                                 <label class="form-label form-icon"><i class="bi bi-type"></i>Símbolo</label>
                                 <input autocomplete="off" type="text" name="simbolo" class="form-control" placeholder="Ingresar Símbolo"
                                     required maxlength="4" value="<?php echo htmlspecialchars($simbolo); ?>"
-                                    oninput="this.value = this.value.replace(/[^A-Za-z0-9%°]/g, '')">
+                                    >
                             </div>
                             <div class="col-12 text-center mt-4">
                                 <button id="btnCancelar" type="button" onclick="location.href='crear_unidad.php'"
