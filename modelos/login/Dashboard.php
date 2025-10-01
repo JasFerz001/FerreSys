@@ -24,6 +24,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ferretería Michapa - Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="../../css/menu.css" rel="stylesheet" />
 </head>
 
@@ -322,5 +323,28 @@ $rol_usuario = $_SESSION['rol'] ?? "";
             }
         });
     </script>
+    <script>
+setInterval(() => {
+    fetch("check_estado.php")
+        .then(res => res.json())
+        .then(data => {
+            console.log("Respuesta del servidor:", data); 
+            if (!data.activo) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Sesión terminada',
+                    text: 'Tu cuenta ha sido desactivada. Serás redirigido al login.',
+                    confirmButtonText: 'Aceptar',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
+                }).then(() => {
+                    window.location.href = "../login/logout.php"; 
+                });
+            }
+        })
+        .catch(err => console.error("Error verificando estado:", err));
+}, 15000); 
+</script>
+
 </body>
 </html>
