@@ -79,38 +79,157 @@ $productosList = $producto->leer();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="../../css/productos.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .modal-imagen {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-contenido {
+            position: relative;
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+            margin-top: 5%;
+            animation: zoomIn 0.3s;
+        }
+
+        .modal-imagen img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .cerrar-modal {
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            color: #fff;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cerrar-modal:hover {
+            color: #bbb;
+            transform: scale(1.1);
+        }
+
+        .product-image {
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .product-image:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .no-image {
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .no-image:hover {
+            color: #6c757d !important;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .modal-contenido {
+                width: 95%;
+                margin-top: 10%;
+            }
+
+            .cerrar-modal {
+                top: -30px;
+                right: -10px;
+                font-size: 25px;
+                width: 40px;
+                height: 40px;
+            }
+        }
+    </style>
 </head>
 
 <body>
+    <!-- Modal para imagen ampliada -->
+    <div id="modalImagen" class="modal-imagen">
+        <span class="cerrar-modal">&times;</span>
+        <div class="modal-contenido">
+            <img id="imagenAmpliada" src="" alt="Imagen ampliada del producto">
+        </div>
+    </div>
+
     <div class="container-fluid px-3">
         <div class="row form-table-container d-flex">
             <!-- Formulario -->
             <div class="col-md-4">
                 <div class="card-form h-100">
                     <div class="card-title">Registro de Producto</div>
-                    <div class="text-muted small mb-3">*Todos los campos son obligatorios</div>
+                    
                     <form id="productoForm" method="post" action="crear_producto.php" enctype="multipart/form-data">
                         <input type="hidden" name="id_Producto" id="id_Producto">
                         <div class="row g-3">
                             <div class="col-12">
-                                <label class="form-label form-icon"><i class="bi bi-box-seam"></i>Nombre</label>
+                                <label class="form-label form-icon"><i class="bi bi-box-seam"></i> Nombre</label>
                                 <input autocomplete="off" type="text" name="nombre" class="form-control"
                                     placeholder="Ingresar Nombre del Producto" required maxlength="75"
                                     value="<?php echo isset($nombre) ? $nombre : ''; ?>">
                             </div>
                             <div class="col-12">
-                                <label class="form-label form-icon"><i class="bi bi-card-text"></i>Descripción</label>
+                                <label class="form-label form-icon"><i class="bi bi-card-text"></i> Descripción</label>
                                 <textarea autocomplete="off" name="descripcion" class="form-control"
                                     placeholder="Ingresar Descripción" required maxlength="100"
                                     rows="3"><?php echo isset($descripcion) ? $descripcion : ''; ?></textarea>
                             </div>
                             <div class="col-12">
-                                <label class="form-label form-icon"><i class="bi bi-image"></i>Imagen</label>
+                                <label class="form-label form-icon"><i class="bi bi-image"></i> Imagen</label>
                                 <input type="file" name="imagen" class="form-control" accept="image/*">
                                 <div id="imagenPreview" class="mt-2"></div>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label form-icon"><i class="bi bi-tags"></i>Categoría</label>
+                                <label class="form-label form-icon"><i class="bi bi-tags"></i> Categoría</label>
                                 <select class="form-select" name="id_Categoria" required>
                                     <option value="">Seleccione</option>
                                     <?php
@@ -122,7 +241,7 @@ $productosList = $producto->leer();
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label form-icon"><i class="bi bi-rulers"></i>Medida</label>
+                                <label class="form-label form-icon"><i class="bi bi-rulers"></i> Medida</label>
                                 <select class="form-select" name="id_Medida" required>
                                     <option value="">Seleccione</option>
                                     <?php
@@ -134,13 +253,14 @@ $productosList = $producto->leer();
                                 </select>
                             </div>
                             <div class="col-md-6" style="display: none;">
-                                <label class="form-label form-icon"><i class="bi bi-toggle-on"></i>Estado</label>
+                                <label class="form-label form-icon"><i class="bi bi-toggle-on"></i> Estado</label>
                                 <select class="form-select" name="estado" required>
                                     <option value="">Seleccione</option>
                                     <option value="1" selected>Alta</option>
                                     <option value="0">Baja</option>
                                 </select>
                             </div>
+                            <div class="text-muted small mb-3">*Todos los campos son obligatorios</div>
                             <div class="col-12 text-center mt-4 d-flex justify-content-center gap-3 flex-wrap">
                                 <button type="submit" class="btn btn-success flex-grow-1 flex-sm-grow-0"
                                     style="max-width: 200px;">Guardar</button>
@@ -156,7 +276,7 @@ $productosList = $producto->leer();
             <!-- Tabla -->
             <div class="col-md-8" id="tablaCol">
                 <div class="table-section">
-                    <div class="card-title" id="tablaTitle">LISTA DE PRODUCTOS</div>
+                    <div class="card-title" id="tablaTitle" style="cursor: pointer;">Lista de Productos</div>
                     <div class="table-responsive">
                         <table id="tablaProductos" class="table table-bordered text-center align-middle">
                             <thead>
@@ -171,14 +291,18 @@ $productosList = $producto->leer();
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php while ($row = $productosList->fetch(PDO::FETCH_ASSOC)): ?>
+                                <?php
+                                $productosList = $producto->leer();
+                                while ($row = $productosList->fetch(PDO::FETCH_ASSOC)): ?>
                                     <tr>
                                         <td>
                                             <?php if (!empty($row['imagen'])): ?>
                                                 <img src="../../img/productos/<?php echo htmlspecialchars($row['imagen']); ?>"
-                                                    alt="Imagen producto" class="product-image">
+                                                    alt="Imagen producto" class="product-image"
+                                                    onclick="mostrarImagen('../../img/productos/<?php echo htmlspecialchars($row['imagen']); ?>')">
                                             <?php else: ?>
-                                                <i class="bi bi-image text-muted" style="font-size: 1.5rem;"></i>
+                                                <i class="bi bi-image text-muted no-image" style="font-size: 1.5rem;"
+                                                    onclick="mostrarSinImagen()"></i>
                                             <?php endif; ?>
                                         </td>
                                         <td><?php echo htmlspecialchars($row['nombre']); ?></td>
@@ -211,6 +335,46 @@ $productosList = $producto->leer();
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
+        // Función para mostrar imagen ampliada
+        function mostrarImagen(rutaImagen) {
+            const modal = document.getElementById('modalImagen');
+            const imagenAmpliada = document.getElementById('imagenAmpliada');
+
+            imagenAmpliada.src = rutaImagen;
+            modal.style.display = 'block';
+        }
+
+        // Función para mostrar mensaje cuando no hay imagen
+        function mostrarSinImagen() {
+            Swal.fire({
+                title: 'Sin imagen',
+                text: 'Este producto no tiene imagen disponible',
+                icon: 'info',
+                iconColor: '#17a2b8',
+                confirmButtonColor: '#3b7ddd',
+                confirmButtonText: 'Aceptar'
+            });
+        }
+
+        // Cerrar modal al hacer clic en la X
+        document.querySelector('.cerrar-modal').addEventListener('click', function () {
+            document.getElementById('modalImagen').style.display = 'none';
+        });
+
+        // Cerrar modal al hacer clic fuera de la imagen
+        document.getElementById('modalImagen').addEventListener('click', function (e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
+
+        // Cerrar modal con tecla ESC
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                document.getElementById('modalImagen').style.display = 'none';
+            }
+        });
+
         // Limpiar formulario al hacer clic en Cancelar
         document.getElementById('btnCancelar').addEventListener('click', () => {
             document.querySelectorAll('#productoForm input, #productoForm textarea, #productoForm select').forEach(element => {
@@ -272,6 +436,26 @@ $productosList = $producto->leer();
                 "pageLength": 5,
                 "lengthMenu": [5, 10, 25, 50],
             });
+        });
+        // Toggle form
+        const tablaTitle = document.getElementById('tablaTitle');
+        const formCard = document.querySelector('.card-form');
+        const tablaCol = document.getElementById('tablaCol');
+        window.addEventListener('load', () => {
+            formCard.style.display = 'block';
+            tablaCol.classList.remove('col-12');
+            tablaCol.classList.add('col-md-8');
+        });
+        tablaTitle.addEventListener('click', () => {
+            if (formCard.style.display === 'none') {
+                formCard.style.display = 'block';
+                tablaCol.classList.remove('col-12');
+                tablaCol.classList.add('col-md-8');
+            } else {
+                formCard.style.display = 'none';
+                tablaCol.classList.remove('col-md-8');
+                tablaCol.classList.add('col-12');
+            }
         });
     </script>
 </body>

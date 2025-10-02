@@ -98,7 +98,7 @@ $stmt1 = $empleado->leerUsuariosActivos();
             <div class="col-md-4">
                 <div class="card-form h-100">
                     <div class="card-title">Registro de Empleado</div>
-                    <div class="text-muted small mb-3">*Todos los campos son obligatorios</div>
+                    
                     <form id="empleadoForm" method="post" action="crear_empleado.php">
                         <?php if ($primera_vez): ?>
                             <input type="hidden" name="primera_vez" value="1">
@@ -190,6 +190,7 @@ $stmt1 = $empleado->leerUsuariosActivos();
                                 <button type="submit" class="btn btn-success px-5 py-2">Guardar</button>
                             </div>
                                 -->
+                            <div class="text-muted small mb-3">*Todos los campos son obligatorios</div>
                             <div class="col-12 text-center mt-4 d-flex justify-content-center gap-3 flex-wrap">
                                 <button type="submit" class="btn btn-success flex-grow-1 flex-sm-grow-0"
                                     style="max-width: 200px;">Guardar</button>

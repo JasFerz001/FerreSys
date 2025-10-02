@@ -200,6 +200,7 @@ $stmt1 = $empleado->leerUsuariosActivos();
                                         class="btn btn-warning px-5 py-2">Cancelar</button>
                                     <button type="submit" class="btn btn-success px-5 py-2">Actualizar</button>
                                 </div>-->
+                                <div class="text-muted small mb-3">*Todos los campos son obligatorios</div>
                                 <div class="col-12 text-center mt-4 d-flex justify-content-center gap-3 flex-wrap">
                                     <button type="submit" class="btn btn-success flex-grow-1 flex-sm-grow-0"
                                         style="max-width: 200px;">Guardar</button>
@@ -279,7 +280,8 @@ $stmt1 = $empleado->leerUsuariosActivos();
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script>document.getElementById('btnCancelar').addEventListener('click', () => {
+    <script>
+    document.getElementById('btnCancelar').addEventListener('click', () => {
             window.location.href = 'crear_empleado.php';
         });
 

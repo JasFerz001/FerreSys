@@ -85,18 +85,19 @@ $stmt = $unidadMedida->leer();
                         <input type="hidden" name="id_Unidad" id="id_Unidad" value="<?php echo $id_Unidad; ?>">
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label form-icon"><i class="bi bi-rulers"></i>Nombre</label>
+                                <label class="form-label form-icon"><i class="bi bi-rulers"></i> Nombre</label>
                                 <input autocomplete="off" type="text" name="nombre" class="form-control"
                                     placeholder="Ingresar Nombre" required maxlength="25"
                                     value="<?php echo htmlspecialchars($nombre); ?>"
                                     oninput="this.value = this.value.replace(/[^A-Za-zñÑáéíóúÁÉÍÓÚ\s]/g, '')">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label form-icon"><i class="bi bi-type"></i>Símbolo</label>
+                                <label class="form-label form-icon"><i class="bi bi-type"></i> Símbolo</label>
                                 <input autocomplete="off" type="text" name="simbolo" class="form-control"
                                     placeholder="Ingresar Símbolo" required maxlength="4"
                                     value="<?php echo htmlspecialchars($simbolo); ?>">
                             </div>
+                            <div class="text-muted small mb-3">*Todos los campos son obligatorios</div>
                             <div class="col-12 text-center mt-4 d-flex justify-content-center gap-3 flex-wrap">
                                 <button type="submit" class="btn btn-success flex-grow-1 flex-sm-grow-0"
                                     style="max-width: 200px;">Guardar</button>
