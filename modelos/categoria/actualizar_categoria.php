@@ -84,19 +84,23 @@ $stmt = $categoria->leer();
                         action="actualizar_categoria.php?id=<?php echo $id_Categoria; ?>">
                         <input type="hidden" name="id_Categoria" id="id_Categoria" value="<?php echo $id_Categoria; ?>">
                         <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label form-icon"><i class="bi bi-tags-fill"></i>Nombre</label>
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label form-icon">
+                                    <i class="bi bi-tags-fill"></i> Nombre
+                                </label>
                                 <input autocomplete="off" type="text" name="nombre" class="form-control"
                                     placeholder="Ingresar Nombre" required maxlength="25"
-                                    value="<?php echo htmlspecialchars($nombre); ?>"
+                                    value="<?php echo isset($nombre) ? $nombre : ''; ?>"
                                     oninput="this.value = this.value.replace(/[^A-Za-zñÑáéíóúÁÉÍÓÚ\s]/g, '')">
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label form-icon"><i
-                                        class="bi bi-chat-left-dots-fill"></i>Descripcion</label>
-                                <input autocomplete="off" type="text" name="descripcion" class="form-control"
-                                    placeholder="Ingresar Descripcion" required maxlength="75"
-                                    value="<?php echo htmlspecialchars($descripcion); ?>">
+
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label form-icon">
+                                    <i class="bi bi-chat-left-dots-fill"></i> Descripción
+                                </label>
+                                <textarea name="descripcion" class="form-control" rows="3"
+                                    placeholder="Ingresar Descripción" required
+                                    maxlength="75"><?php echo isset($descripcion) ? $descripcion : ''; ?></textarea>
                             </div>
                             <div class="col-12 text-center mt-4 d-flex justify-content-center gap-3 flex-wrap">
                                 <button type="submit" class="btn btn-success flex-grow-1 flex-sm-grow-0"
