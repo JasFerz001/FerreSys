@@ -40,6 +40,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = $cliente->crear();
     if ($result['success']) {
         $message = 'success';
+        // Limpiar los campos solo si fue exitoso
+        $nombre = $apellido = $dui = $direccion = $correo =  "";
     } else {
         $message = 'error';
         $duplicates = $result['duplicates'] ?? [];
