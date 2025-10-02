@@ -38,12 +38,25 @@ function generarBackup($centralDir)
 
 // Manejo del POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['confirm_backup'])) {
-        $confirmText = trim($_POST['confirm_backup']);
-        if ($confirmText === 'CREAR') {
+    if (isset($_POST['admin_password'])) {
+        $passwordIngresada = $_POST['admin_password'];
+
+        // Buscar contraseña del administrador
+        $sql = "SELECT e.clave
+                FROM empleados e
+                JOIN usuarios u ON e.id_Usuario = u.id_Usuario
+                WHERE u.rol = 'Administrador' AND u.estado = 1 AND e.estado = 1
+                LIMIT 1";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+        $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($admin && password_verify($passwordIngresada, $admin['clave'])) {
+            // Contraseña válida → generar backup
             $backupFile = generarBackup($centralDir);
             $message = $backupFile ? 'success' : 'error';
         } else {
+            // Contraseña incorrecta
             $message = 'invalid';
         }
     }
@@ -67,6 +80,12 @@ usort($backups, function ($a, $b) use ($centralDir) {
     <title>Generar Backup - Ferretería Michapa</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        /* Input más pequeño y ancho fijo */
+        .small-input {
+            width: 200px;      /* ancho del input */
+        }
+    </style>
 </head>
 
 <body class="bg-light">
@@ -78,22 +97,22 @@ usort($backups, function ($a, $b) use ($centralDir) {
                     <i class="bi bi-database-down"></i> Generar Backup
                 </h3>
                 <p class="text-muted">
-                    Escribe la palabra <strong>CREAR</strong> en el campo de texto y presiona el botón
-                    para generar un respaldo de la base de datos en:
+                    Ingresa la <strong>contraseña del Administrador</strong> para generar un respaldo de la base de datos en:
                     <code>C:\Backups Ferreteria Michapa</code>
                 </p>
 
                 <!-- Formulario -->
-                <form method="post" id="backupForm" class="mb-4">
-                    <div class="mb-3">
-                        <label for="confirm_backup" class="form-label">Confirmación</label>
-                        <input type="text" class="form-control" id="confirm_backup"
-                            name="confirm_backup" placeholder="Escribe CREAR" maxlength="6"
-                            autocomplete="off" required>
+                <form method="post" id="backupForm" class="mb-4 row g-2 align-items-end">
+                    <div class="mb-3 col-auto">
+                        <label for="admin_password" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control form-control-sm small-input" 
+                               id="admin_password" name="admin_password" placeholder="Escribe tu contraseña" required>
                     </div>
-                    <button type="submit" id="backupBtn" class="btn btn-success btn-sm px-3" disabled>
-                        <i class="bi bi-cloud-arrow-down"></i> Generar Backup
-                    </button>
+                    <div class="mb-3 col-auto">
+                        <button type="submit" id="backupBtn" class="btn btn-success btn-sm px-3">
+                            <i class="bi bi-cloud-arrow-down"></i> Generar Backup
+                        </button>
+                    </div>
                 </form>
 
                 <hr>
@@ -140,28 +159,15 @@ usort($backups, function ($a, $b) use ($centralDir) {
         } else if (message === 'invalid') {
             Swal.fire({
                 icon: 'warning',
-                title: 'Palabra incorrecta',
-                text: 'Debes escribir exactamente la palabra CREAR en mayúsculas para generar el backup.',
+                title: 'Contraseña incorrecta',
+                text: 'No es posible generar el backup.',
                 confirmButtonColor: '#f7b84b'
             });
         }
-
-        // Validar input y habilitar botón
-        const input = document.getElementById('confirm_backup');
-        const backupBtn = document.getElementById('backupBtn');
-
-        input.addEventListener('input', function() {
-            // Solo letras (quita números y símbolos en vivo)
-            this.value = this.value.replace(/[^a-zA-Z]/g, '');
-
-            // Habilitar el botón si hay al menos una letra
-            backupBtn.disabled = this.value.trim() === '';
-        });
     </script>
 
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
 </body>
-
 </html>
