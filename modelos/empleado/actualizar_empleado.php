@@ -200,6 +200,7 @@ $stmt1 = $empleado->leerUsuariosActivos();
                                         class="btn btn-warning px-5 py-2">Cancelar</button>
                                     <button type="submit" class="btn btn-success px-5 py-2">Actualizar</button>
                                 </div>-->
+                                <div class="text-muted small mb-3">*Todos los campos son obligatorios</div>
                                 <div class="col-12 text-center mt-4 d-flex justify-content-center gap-3 flex-wrap">
                                     <button type="submit" class="btn btn-success flex-grow-1 flex-sm-grow-0"
                                         style="max-width: 200px;">Guardar</button>

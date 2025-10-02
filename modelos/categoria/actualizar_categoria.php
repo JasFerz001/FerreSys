@@ -102,6 +102,7 @@ $stmt = $categoria->leer();
                                     placeholder="Ingresar Descripción" required
                                     maxlength="75"><?php echo isset($descripcion) ? $descripcion : ''; ?></textarea>
                             </div>
+                            <div class="text-muted small mb-3">*Todos los campos son obligatorios</div>
                             <div class="col-12 text-center mt-4 d-flex justify-content-center gap-3 flex-wrap">
                                 <button type="submit" class="btn btn-success flex-grow-1 flex-sm-grow-0"
                                     style="max-width: 200px;">Guardar</button>

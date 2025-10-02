@@ -59,7 +59,7 @@ $stmt = $categoria->leer();
             <div class="col-md-4">
                 <div class="card-form h-100">
                     <div class="card-title">Registro De Categorias</div>
-                    <div class="text-muted small mb-3">*Todos los campos son obligatorios</div>
+
                     <form id="categoriaForm" method="post" action="crear_categoria.php">
                         <input type="hidden" name="id_Categoria" id="id_Categoria">
                         <div class="row g-3">
@@ -81,7 +81,7 @@ $stmt = $categoria->leer();
                                     placeholder="Ingresar Descripción" required
                                     maxlength="75"><?php echo isset($descripcion) ? $descripcion : ''; ?></textarea>
                             </div>
-
+                            <div class="text-muted small mb-3">*Todos los campos son obligatorios</div>
                             <div class="col-12 text-center mt-4 d-flex justify-content-center gap-3 flex-wrap">
                                 <button type="submit" class="btn btn-success flex-grow-1 flex-sm-grow-0"
                                     style="max-width: 200px;">Guardar</button>

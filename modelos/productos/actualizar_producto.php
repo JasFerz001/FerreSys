@@ -247,7 +247,7 @@ $productosList = $producto->leer();
             <div class="col-md-4">
                 <div class="card-form h-100">
                     <div class="card-title">Actualización De Productos</div>
-                    <div class="text-muted small mb-3">*Todos los campos son obligatorios</div>
+
                     <form id="productoForm" method="post"
                         action="actualizar_producto.php?id=<?php echo $id_Producto; ?>" enctype="multipart/form-data">
                         <input type="hidden" name="id_Producto" id="id_Producto" value="<?php echo $id_Producto; ?>">
@@ -310,6 +310,7 @@ $productosList = $producto->leer();
                                     <option value="0" <?php echo $estado == 0 ? 'selected' : ''; ?>>Inactivo</option>
                                 </select>
                             </div>
+                            <div class="text-muted small mb-3">*Todos los campos son obligatorios</div>
                             <div class="col-12 text-center mt-4 d-flex justify-content-center gap-3 flex-wrap">
                                 <button type="submit" class="btn btn-success flex-grow-1 flex-sm-grow-0"
                                     style="max-width: 200px;">Guardar</button>
