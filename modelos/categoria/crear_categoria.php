@@ -58,7 +58,7 @@ $stmt = $categoria->leer();
             <!-- Formulario -->
             <div class="col-md-4">
                 <div class="card-form h-100">
-                    <div class="card-title">Registro De Categorias</div>
+                    <div class="card-title">Registro de Categorias</div>
 
                     <form id="categoriaForm" method="post" action="crear_categoria.php">
                         <input type="hidden" name="id_Categoria" id="id_Categoria">
@@ -97,7 +97,7 @@ $stmt = $categoria->leer();
             <!-- Tabla -->
             <div class="col-md-8" id="tablaCol">
                 <div class="table-section">
-                    <div class="card-title" id="tablaTitle" style="cursor: pointer;">Lista De Categorias</div>
+                    <div class="card-title" id="tablaTitle" style="cursor: pointer;">Lista de Categorias</div>
                     <div class="table-responsive">
                         <table id="tablaCategorias" class="table table-bordered text-center align-middle">
                             <thead>

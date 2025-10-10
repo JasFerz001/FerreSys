@@ -80,8 +80,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 // Leer todos los empleados
 $stmt = $empleado->leer();
-// Leer todos los usuarios activos para el select
-$stmt1 = $empleado->leerUsuariosActivos();
+$idAdmin = $empleado->obtenerIdAdministrador();
+$esAdministrador = ($id_Usuario == $idAdmin);
+if ($id_Usuario === $idAdmin) {
+    // Leer todos los usuarios activos para el select
+    $stmt1 = $empleado->leerUsuariosActivosTodos();
+} else {
+    $stmt1 = $empleado->leerUsuariosActivos();
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -173,33 +180,31 @@ $stmt1 = $empleado->leerUsuariosActivos();
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label form-icon"><i class="bi bi-person-gear"></i> Usuario</label>
-                                    <select class="form-select" name="id_Usuario" required>
+                                    <select class="form-select" name="id_Usuario" required <?php echo ($id_Usuario == $empleado->obtenerIdAdministrador()) ? 'disabled' : ''; ?>>
                                         <option value="">Seleccione</option>
                                         <?php
-                                        // Reiniciar el puntero del resultado
-                                        $stmt1->execute();
                                         while ($row = $stmt1->fetch(PDO::FETCH_ASSOC)) {
                                             $selected = ($id_Usuario == $row['id_Usuario']) ? 'selected' : '';
                                             echo "<option value='{$row['id_Usuario']}' $selected>{$row['rol']}</option>";
                                         }
                                         ?>
                                     </select>
+                                    <?php if ($id_Usuario == $empleado->obtenerIdAdministrador()): ?>
+                                        <input type="hidden" name="id_Usuario" value="<?php echo $id_Usuario; ?>">
+                                    <?php endif; ?>
                                 </div>
 
                                 <div class="col-md-6">
                                     <label class="form-label form-icon"><i class="bi bi-toggle-on"></i> Estado</label>
-                                    <select class="form-select" name="estado" required>
+                                    <select class="form-select" name="estado" required <?php echo ($id_Usuario == $empleado->obtenerIdAdministrador()) ? 'disabled' : ''; ?>>
                                         <option value="">Seleccione</option>
                                         <option value="1" <?php echo ($estado == 1 ? 'selected' : ''); ?>>Alta</option>
                                         <option value="0" <?php echo ($estado == 0 ? 'selected' : ''); ?>>Baja</option>
                                     </select>
+                                    <?php if ($id_Usuario == $empleado->obtenerIdAdministrador()): ?>
+                                        <input type="hidden" name="estado" value="<?php echo $estado; ?>">
+                                    <?php endif; ?>
                                 </div>
-                                <!--
-                                <div class="col-12 text-center mt-4">
-                                    <button id="btnCancelar" type="button"
-                                        class="btn btn-warning px-5 py-2">Cancelar</button>
-                                    <button type="submit" class="btn btn-success px-5 py-2">Actualizar</button>
-                                </div>-->
                                 <div class="text-muted small mb-3">*Todos los campos son obligatorios</div>
                                 <div class="col-12 text-center mt-4 d-flex justify-content-center gap-3 flex-wrap">
                                     <button type="submit" class="btn btn-success flex-grow-1 flex-sm-grow-0"
@@ -259,13 +264,6 @@ $stmt1 = $empleado->leerUsuariosActivos();
                                                 onclick="location.href='actualizar_empleado.php?id=<?php echo $row['id_Empleado']; ?>'">
                                                 <i class="bi bi-pencil" style="font-size: 1.2rem;"></i>
                                             </button>
-                                            <!--
-                                            <button class="btn btn-sm btn-outline-danger p-1"
-                                                style="width: 40px; height: 40px;"
-                                                onclick="location.href='dar_baja_empleado.php?id=<?php echo $row['id_Empleado']; ?>'">
-                                                <i class="bi bi-trash" style="font-size: 1.2rem;"></i>
-                                            </button>
-                                            -->
                                         </td>
                                     </tr>
                                 <?php endwhile; ?>
@@ -281,7 +279,7 @@ $stmt1 = $empleado->leerUsuariosActivos();
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
-    document.getElementById('btnCancelar').addEventListener('click', () => {
+        document.getElementById('btnCancelar').addEventListener('click', () => {
             window.location.href = 'crear_empleado.php';
         });
 

@@ -56,7 +56,7 @@ $stmt = $unidadMedida->leer();
             <!-- Formulario -->
             <div class="col-md-4">
                 <div class="card-form h-100">
-                    <div class="card-title">Registro De Unidades de Medida</div>
+                    <div class="card-title">Registro de Unidades de Medida</div>
                     
                     <form id="unidadMedidaForm" method="post" action="crear_unidad.php">
                         <input type="hidden" name="id_Medida" id="id_Medida">
@@ -90,7 +90,7 @@ $stmt = $unidadMedida->leer();
             <!-- Tabla -->
             <div class="col-md-8" id="tablaCol">
                 <div class="table-section">
-                    <div class="card-title" id="tablaTitle" style="cursor: pointer;">Lista De Unidades de Medida</div>
+                    <div class="card-title" id="tablaTitle" style="cursor: pointer;">Lista de Unidades de Medida</div>
                     <div class="table-responsive">
                         <table id="tablaUnidadesMedida" class="table table-bordered text-center align-middle">
                             <thead>

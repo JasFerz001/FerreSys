@@ -74,7 +74,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                 </div>
                 <div class="menu-item">
                     <i class="fas fa-shopping-cart"></i>
-                    <span>Compras</span>
+                  <a href="../../modelos/compras/realizar_compra.php" onclick="abrirFormularios(event)">Compras</a>
                 </div>
                 <div class="menu-item">
                     <i class="fas fa-users"></i>
