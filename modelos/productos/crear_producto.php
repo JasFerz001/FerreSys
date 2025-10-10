@@ -96,23 +96,35 @@ $productosList = $producto->leer();
             position: relative;
             margin: auto;
             display: block;
-            width: 80%;
-            max-width: 700px;
+            width: auto;
+            /* Cambiado de 80% a auto */
+            max-width: none;
+            /* Eliminado el max-width */
             margin-top: 5%;
             animation: zoomIn 0.3s;
+            text-align: center;
+            /* Centrar la imagen */
         }
 
         .modal-imagen img {
-            width: 100%;
-            height: auto;
+            width: 300px !important;
+            /* Tamaño fijo 90px */
+            height: 300px !important;
+            /* Tamaño fijo 90px */
             border-radius: 8px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            object-fit: cover;
+            /* Mantener proporción */
         }
 
         .cerrar-modal {
             position: absolute;
-            top: -40px;
-            right: -40px;
+            top: -50px;
+            /* Ajustado para la nueva posición */
+            right: 50%;
+            /* Centrado horizontalmente */
+            transform: translateX(50%);
+            /* Centrado preciso */
             color: #fff;
             font-size: 35px;
             font-weight: bold;
@@ -129,13 +141,18 @@ $productosList = $producto->leer();
 
         .cerrar-modal:hover {
             color: #bbb;
-            transform: scale(1.1);
+            transform: translateX(50%) scale(1.1);
+            /* Mantener centrado al hacer hover */
         }
 
+        /* IMÁGENES EN LA TABLA - TAMAÑO PEQUEÑO */
         .product-image {
             cursor: pointer;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             border-radius: 4px;
+            width: 60px !important;
+            height: 60px !important;
+            object-fit: cover !important;
         }
 
         .product-image:hover {
@@ -146,10 +163,20 @@ $productosList = $producto->leer();
         .no-image {
             cursor: pointer;
             transition: color 0.3s ease;
+            font-size: 2rem !important;
         }
 
         .no-image:hover {
             color: #6c757d !important;
+        }
+
+        /* PREVIEW EN FORMULARIO */
+        #imagenPreview img {
+            width: 80px !important;
+            height: 80px !important;
+            object-fit: cover !important;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
         }
 
         @keyframes fadeIn {
@@ -177,16 +204,19 @@ $productosList = $producto->leer();
         /* Responsive */
         @media (max-width: 768px) {
             .modal-contenido {
-                width: 95%;
-                margin-top: 10%;
+                margin-top: 20%;
             }
 
             .cerrar-modal {
-                top: -30px;
-                right: -10px;
+                top: -40px;
                 font-size: 25px;
                 width: 40px;
                 height: 40px;
+            }
+
+            .product-image {
+                width: 50px !important;
+                height: 50px !important;
             }
         }
     </style>
@@ -207,7 +237,7 @@ $productosList = $producto->leer();
             <div class="col-md-4">
                 <div class="card-form h-100">
                     <div class="card-title">Registro de Producto</div>
-                    
+
                     <form id="productoForm" method="post" action="crear_producto.php" enctype="multipart/form-data">
                         <input type="hidden" name="id_Producto" id="id_Producto">
                         <div class="row g-3">

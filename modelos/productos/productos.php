@@ -71,6 +71,26 @@ class Productos
         return $stmt;
     }
 
+    public function leerActivos(): PDOStatement
+    {
+        $query = "
+    SELECT p.id_Producto, p.nombre, p.imagen, p.descripcion, p.estado,
+           c.nombre as categoria_nombre, 
+           m.nombre as medida_nombre, m.simbolo
+    FROM " . $this->table_name . " p
+    LEFT JOIN categoria c ON p.id_Categoria = c.id_Categoria
+    LEFT JOIN unidad_medida m ON p.id_Medida = m.id_Medida
+    WHERE p.estado = 1
+    ORDER BY p.id_Producto ASC
+    ";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt;
+    }
+
+
+
     public function actualizar(): array
     {
         // Primero verificamos si ya existe otro producto con el mismo nombre (excluyendo el actual)

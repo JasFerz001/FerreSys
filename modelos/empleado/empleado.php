@@ -5,7 +5,7 @@ class Empleado
     private $table_name = "empleados";
 
     // Atributos de la tabla empleados
-    public int $id_Empleado; 
+    public int $id_Empleado;
     public string $nombre;
     public string $apellido;
     public string $DUI;
@@ -88,7 +88,7 @@ class Empleado
     }
 
     // Leer todos los empleados
-   public function leer(): PDOStatement
+    public function leer(): PDOStatement
     {
         $query = "
         SELECT e.*, u.rol AS nombre_usuario
@@ -102,15 +102,44 @@ class Empleado
         return $stmt;
     }
 
-    // Leer usuarios activos
+    // Leer usuarios activos y que sea solo un administrador
     public function leerUsuariosActivos(): PDOStatement
     {
-        $query = "SELECT * FROM usuarios WHERE estado = 1 ORDER BY id_Usuario ASC";
+        //$query = "SELECT * FROM usuarios WHERE estado = 1 ORDER BY id_Usuario ASC";
+        $query = "SELECT DISTINCT u.*
+                  FROM usuarios u
+                  WHERE estado = 1 
+                  AND rol NOT IN (
+                  SELECT u.rol 
+                 FROM usuarios u 
+                 INNER JOIN empleados e ON u.id_Usuario = e.id_Usuario 
+                  WHERE u.rol = 'Administrador')";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt;
-    } 
+    }
 
+    // Leer usuarios activos 
+    public function leerUsuariosActivosTodos(): PDOStatement
+    {
+        $query = "SELECT DISTINCT u.*
+                  FROM usuarios u
+                  WHERE estado = 1 ";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt;
+    }
+
+    // Obtener el ID del usuario administrador (si existe)
+    public function obtenerIdAdministrador(): int
+    {
+        $query = "SELECT id_Usuario FROM usuarios WHERE rol = 'administrador' AND estado = 1 LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ? (int) $result['id_Usuario'] : 0;
+    }
     // Leer un empleado por ID
     public function leerPorId(): bool
     {
@@ -166,7 +195,7 @@ class Empleado
 
         return false;
     }
- 
+
     // Actualizar un empleado existente (valida DUI/correo/teléfono únicos excluyendo el actual)
     public function actualizar(): array
     {
