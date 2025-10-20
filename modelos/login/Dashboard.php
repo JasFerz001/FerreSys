@@ -40,89 +40,107 @@ $rol_usuario = $_SESSION['rol'] ?? "";
             </button>
         </div>
         <div class="menu">
-            <div class="menu-item active" onclick="location.href='Dashboard.php'" style="cursor:pointer;">
+            <!-- Inicio -->
+            <a class="menu-item active" title="Inicio" href="Dashboard.php">
                 <i class="fas fa-home"></i>
                 <span>Inicio</span>
-            </div>
+            </a>
 
             <?php if ($rol_usuario === 'Administrador'): ?>
-                <div class="menu-item">
+                <a class="menu-item" title="Usuarios" href="../../modelos/usuario/crear_usuario.php" onclick="abrirFormularios(event)">
                     <i class="fas fa-user-friends"></i>
-                    <a href="../../modelos/usuario/crear_usuario.php" onclick="abrirFormularios(event)">Usuarios</a>
-                </div>
-                <div class="menu-item">
+                    <span>Usuarios</span>
+                </a>
+
+                <a class="menu-item" title="Empleados" href="../../modelos/empleado/crear_empleado.php" onclick="abrirFormularios(event)">
                     <i class="fas fa-users"></i>
-                    <a href="../../modelos/empleado/crear_empleado.php" onclick="abrirFormularios(event)">Empleados</a>
-                </div>
-                <div class="menu-item">
+                    <span>Empleados</span>
+                </a>
+
+                <a class="menu-item" title="Categorías" href="../../modelos/categoria/crear_categoria.php" onclick="abrirFormularios(event)">
                     <i class="fas fa-th-large"></i>
-                    <a href="../../modelos/categoria/crear_categoria.php" onclick="abrirFormularios(event)">Categorias</a>
-                </div>
-                <div class="menu-item">
+                    <span>Categorías</span>
+                </a>
+
+                <a class="menu-item" title="Unidad de Medida" href="../../modelos/unidad de medida/crear_unidad.php" onclick="abrirFormularios(event)">
                     <i class="fas fa-ruler-combined"></i>
-                    <a href="../../modelos/unidad de medida/crear_unidad.php" onclick="abrirFormularios(event)">Unidad de
-                        Medida</a>
-                </div>
-                <div class="menu-item">
+                    <span>Unidad de Medida</span>
+                </a>
+
+                <a class="menu-item" title="Productos" href="../../modelos/productos/crear_producto.php" onclick="abrirFormularios(event)">
                     <i class="fas fa-boxes"></i>
-                    <a href="../../modelos/productos/crear_producto.php" onclick="abrirFormularios(event)">Productos</a>
-                </div>
-                <div class="menu-item">
+                    <span>Productos</span>
+                </a>
+
+                <a class="menu-item" title="Proveedores" href="../../modelos/proveedores/crear_proveedor.php" onclick="abrirFormularios(event)">
                     <i class="fas fa-handshake"></i>
-                    <a href="../../modelos/proveedores/crear_proveedor.php"
-                        onclick="abrirFormularios(event)">Proveedores</a>
-                </div>
-                <div class="menu-item">
+                    <span>Proveedores</span>
+                </a>
+
+                <a class="menu-item" title="Compras" href="../../modelos/compras/realizar_compra.php" onclick="abrirFormularios(event)">
                     <i class="fas fa-shopping-cart"></i>
-                  <a href="../../modelos/compras/realizar_compra.php" onclick="abrirFormularios(event)">Compras</a>
-                </div>
-                <div class="menu-item">
+                    <span>Compras</span>
+                </a>
+
+                <a class="menu-item" title="Clientes" href="../../modelos/cliente/crear_cliente.php" onclick="abrirFormularios(event)">
                     <i class="fas fa-users"></i>
-                    <a href="../../modelos/cliente/crear_cliente.php" onclick="abrirFormularios(event)">Clientes</a>
-                </div>
-                <div class="menu-item">
+                    <span>Clientes</span>
+                </a>
+
+                <a class="menu-item" title="Ventas" href="#" onclick="abrirFormularios(event)">
                     <i class="fas fa-receipt"></i>
                     <span>Ventas</span>
-                </div>
-                <div class="menu-item">
+                </a>
+
+                <a class="menu-item" title="Reportes" href="#" onclick="abrirFormularios(event)">
                     <i class="fas fa-chart-bar"></i>
                     <span>Reportes</span>
-                </div>
-                <div class="menu-item">
-                    <i class="fas fa-database"></i><i class="fas fa-download"></i>
-                    <a href="../../backup/backup.php" onclick="abrirFormularios(event)">Generar Backup</a>
-                </div>
-                <div class="menu-item">
-                    <i class="fas fa-database"></i><i class="fas fa-upload"></i>
-                    <a href="../../backup/restaurar_backup.php" onclick="abrirFormularios(event)">Restaurar Backup</a>
-                </div>
-                <div class="menu-item">
+                </a>
+
+                <a class="menu-item" title="Generar Backup" href="../../backup/backup.php" onclick="abrirFormularios(event)">
+                    <i class="fas fa-database"></i>
+                    <i class="fas fa-download"></i>
+                    <span>Generar Backup</span>
+                </a>
+
+                <a class="menu-item" title="Restaurar Backup" href="../../backup/restaurar_backup.php" onclick="abrirFormularios(event)">
+                    <i class="fas fa-database"></i>
+                    <i class="fas fa-upload"></i>
+                    <span>Restaurar Backup</span>
+                </a>
+
+                <a class="menu-item" title="Ayuda" href="#" onclick="abrirFormularios(event)">
                     <i class="fas fa-circle-question"></i>
                     <span>Ayuda</span>
-                </div>
+                </a>
             <?php endif; ?>
 
             <?php if ($rol_usuario === 'Vendedor'): ?>
-                <div class="menu-item">
+                <a class="menu-item" title="Clientes" href="../../modelos/cliente/crear_cliente.php" onclick="abrirFormularios(event)">
                     <i class="fas fa-users"></i>
-                    <a href="../../modelos/cliente/crear_cliente.php" onclick="abrirFormularios(event)">Clientes</a>
-                </div>
-                <div class="menu-item">
+                    <span>Clientes</span>
+                </a>
+
+                <a class="menu-item" title="Productos" href="#" onclick="abrirFormularios(event)">
                     <i class="fas fa-boxes"></i>
                     <span>Productos</span>
-                </div>
-                <div class="menu-item">
+                </a>
+
+                <a class="menu-item" title="Ventas" href="#" onclick="abrirFormularios(event)">
                     <i class="fas fa-receipt"></i>
                     <span>Ventas</span>
-                </div>
-                <div class="menu-item">
+                </a>
+
+                <a class="menu-item" title="Reportes" href="#" onclick="abrirFormularios(event)">
                     <i class="fas fa-chart-bar"></i>
                     <span>Reportes</span>
-                </div>
-                <div class="menu-item">
+                </a>
+
+                <a class="menu-item" title="Ayuda" href="#" onclick="abrirFormularios(event)">
                     <i class="fas fa-circle-question"></i>
                     <span>Ayuda</span>
-                </div>
+                </a>
+
             <?php endif; ?>
         </div>
     </div>
@@ -133,8 +151,8 @@ $rol_usuario = $_SESSION['rol'] ?? "";
             <?php
             echo htmlspecialchars(
                 (explode(' ', trim($_SESSION['nombre'] ?? ''))[0] ?? '') . ' ' .
-                (explode(' ', trim($_SESSION['apellido'] ?? ''))[0] ?? '') . ' - ' .
-                ($_SESSION['rol'] ?? '')
+                    (explode(' ', trim($_SESSION['apellido'] ?? ''))[0] ?? '') . ' - ' .
+                    ($_SESSION['rol'] ?? '')
             );
             ?>
         </span>
@@ -282,7 +300,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
         const mainContent = document.querySelector('.main-content');
         const topBar = document.querySelector('.top-bar');
 
-        toggleButton.addEventListener('click', function () {
+        toggleButton.addEventListener('click', function() {
             sidebar.classList.toggle('collapsed');
             mainContent.classList.toggle('expanded');
 
@@ -293,7 +311,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
 
         // Menu items active
         document.querySelectorAll('.menu-item').forEach(item => {
-            item.addEventListener('click', function () {
+            item.addEventListener('click', function() {
                 document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
                 this.classList.add('active');
             });
@@ -319,7 +337,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
             dropdownTop.style.display = dropdownTop.style.display === 'block' ? 'none' : 'block';
         });
 
-        document.addEventListener('click', function (event) {
+        document.addEventListener('click', function(event) {
             if (!userTopIcon.contains(event.target) && !dropdownTop.contains(event.target)) {
                 dropdownTop.style.display = 'none';
             }
