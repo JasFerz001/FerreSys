@@ -92,7 +92,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                     <span>Ventas</span>
                 </a>
 
-                <a class="menu-item" title="Reportes" href="#" onclick="abrirFormularios(event)">
+                <a class="menu-item" title="Reportes" href="../../modelos/reportes/menu_reportes.php" onclick="abrirFormularios(event)">
                     <i class="fas fa-chart-bar"></i>
                     <span>Reportes</span>
                 </a>
