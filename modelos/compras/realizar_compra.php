@@ -1,5 +1,12 @@
 <?php
 session_start();
+//verificar si el usuario ha iniciado sesión
+if (!isset($_SESSION['id_Empleado']) || empty($_SESSION['id_Empleado'])) {
+    header("Location: ../acceso/acceso_denegado.php");
+    exit();
+}
+
+
 $id_empleado = $_SESSION['id_Empleado'] ?? '';
 $nombre_empleado = $_SESSION['nombre'] ?? '';
 $apellido_empleado = $_SESSION['apellido'] ?? '';
