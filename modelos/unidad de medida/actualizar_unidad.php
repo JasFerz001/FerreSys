@@ -1,4 +1,10 @@
 <?php
+//verificar si el usuario ha iniciado sesión
+session_start();
+if (!isset($_SESSION['id_Empleado']) || empty($_SESSION['id_Empleado'])) {
+    header("Location: ../acceso/acceso_denegado.php");
+    exit();
+}
 include_once '../../conexion/conexion.php';
 include_once '../unidad de medida/unidadMedida.php';
 

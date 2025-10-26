@@ -1,4 +1,20 @@
 <?php
+// Verificar si es la configuración inicial (GET o POST)
+$primera_vez = (isset($_GET['primera_vez']) && $_GET['primera_vez'] == '1')
+    || (isset($_POST['primera_vez']) && $_POST['primera_vez'] == '1');
+
+if (!$primera_vez) {
+    // Solo verificar sesión si NO es la primera vez
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    if (empty($_SESSION['id_Empleado'])) {
+        header("Location: ../acceso/acceso_denegado.php");
+        exit();
+    }
+}
+
+// Incluir archivos necesarios
 include_once '../../conexion/conexion.php';
 include_once '../empleado/empleado.php';
 
@@ -8,11 +24,15 @@ $empleado = new Empleado($db);
 
 $message = '';
 $duplicates = [];
+
 // Variables para mantener los valores del formulario
 $nombre = $apellido = $DUI = $telefono = $direccion = $correo = $clave = "";
 $id_Usuario = $estado = "";
 
-// Función para formatear texto con primera letra mayúscula y el resto minúsculas
+//id del administrador para setearlo la primera vez
+$idAdmin = $empleado->obtenerIdAdministrador();
+
+// Función para formatear texto
 function formatearTexto($texto)
 {
     // Convertir todo a minúsculas primero y eliminar espacios en blanco
@@ -21,19 +41,14 @@ function formatearTexto($texto)
     return ucwords($texto);
 }
 
-
-// Verificar si es la configuración inicial
-$primera_vez = isset($_GET['primera_vez']) && $_GET['primera_vez'] == '1';
-
 // Manejo del POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
     // Guardamos los valores para mantenerlos en caso de error
-    $nombre = formatearTexto(trim($_POST['nombre']));  // Aplicar formato
-    $apellido = formatearTexto(trim($_POST['apellido']));  // Aplicar formato
+    $nombre = formatearTexto(trim($_POST['nombre']));
+    $apellido = formatearTexto(trim($_POST['apellido']));
     $DUI = trim($_POST['DUI']);
     $telefono = trim($_POST['telefono']);
-    $direccion = formatearTexto(trim($_POST['direccion']));  // Aplicar formato
+    $direccion = formatearTexto(trim($_POST['direccion']));
     $correo = strtolower(trim($_POST['correo']));
     $clave = trim($_POST['clave']);
     $id_Usuario = intval($_POST['id_Usuario']);
@@ -54,8 +69,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = $empleado->crear();
 
     if ($result['success']) {
-        // Si es la primera vez (configuración inicial), redirigir al login
-        if (isset($_POST['primera_vez']) && $_POST['primera_vez'] == '1') {
+        // Si es la primera vez, redirigir al login
+        if ($primera_vez) {
             header("Location: ../login/login.php");
             exit();
         }
@@ -71,11 +86,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// Leer todos los empleados
+// Leer todos los empleado
 $stmt = $empleado->leer();
+
 // Leer todos los usuarios activos para el select
 $stmt1 = $empleado->leerUsuariosActivos();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="es">
@@ -98,7 +115,7 @@ $stmt1 = $empleado->leerUsuariosActivos();
             <div class="col-md-4">
                 <div class="card-form h-100">
                     <div class="card-title">Registro de Empleado</div>
-                    
+
                     <form id="empleadoForm" method="post" action="crear_empleado.php">
                         <?php if ($primera_vez): ?>
                             <input type="hidden" name="primera_vez" value="1">
@@ -163,17 +180,28 @@ $stmt1 = $empleado->leerUsuariosActivos();
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label form-icon"><i class="bi bi-person-gear"></i> Usuario</label>
-                                <select class="form-select" name="id_Usuario" required>
-                                    <option value="">Seleccione</option>
-                                    <?php
-                                    //  $stmt1 viene de la función leerUsuariosActivos()
-                                    while ($row = $stmt1->fetch(PDO::FETCH_ASSOC)) {
-                                        $selected = ($id_Usuario == $row['id_Usuario']) ? 'selected' : '';
-                                        echo "<option value='{$row['id_Usuario']}' $selected>{$row['rol']}</option>";
-                                    }
-                                    ?>
+                                <select class="form-select" name="id_Usuario" <?php echo $primera_vez ? 'disabled' : 'required'; ?>>
+                                    <?php if ($primera_vez): ?>
+                                        <!-- Primera vez: se asigna el rol Administrador automáticamente -->
+                                        <option value="<?php echo $idAdmin; ?>" selected>Administrador</option>
+                                    <?php else: ?>
+                                        <option value="">Seleccione</option>
+                                        <?php
+                                        //  $stmt1 viene de la función leerUsuariosActivos()
+                                        while ($row = $stmt1->fetch(PDO::FETCH_ASSOC)) {
+                                            $selected = ($id_Usuario == $row['id_Usuario']) ? 'selected' : '';
+                                            echo "<option value='{$row['id_Usuario']}' $selected>{$row['rol']}</option>";
+                                        }
+                                        ?>
+                                    <?php endif; ?>
                                 </select>
+
+                                <?php if ($primera_vez): ?>
+                                    <!-- Campo oculto para enviar el valor aunque el select esté deshabilitado -->
+                                    <input type="hidden" name="id_Usuario" value="<?php echo $idAdmin; ?>">
+                                <?php endif; ?>
                             </div>
+
 
                             <div class="col-md-6">
                                 <label class="form-label form-icon"><i class="bi bi-toggle-on"></i> Estado</label>
