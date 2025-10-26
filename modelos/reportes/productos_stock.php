@@ -1,4 +1,10 @@
 <?php
+//verificar si el usuario ha iniciado sesión
+session_start();
+if (!isset($_SESSION['id_Empleado']) || empty($_SESSION['id_Empleado'])) {
+    header("Location: ../acceso/acceso_denegado.php");
+    exit();
+}
 include_once '../../conexion/conexion.php';
 include_once '../compras/detalle_compra.php';
 include_once '../categoria/categoria.php';
@@ -66,7 +72,7 @@ if (isset($_POST['id_categoria'])) {
                             </select>
                         </div>
                     </div>
-                    <!-- Botón en la misma línea, alineado a la derecha -->
+                   
                     <div class="col-md-6 text-end">
                         <button class="btn btn-primary" type="submit" id="btnCompra">
                             Realizar Compra
@@ -88,7 +94,7 @@ if (isset($_POST['id_categoria'])) {
                             <tr>
                                 <th>Imagen</th>
                                 <th>Producto</th>
-                                <th>Categoría</th>
+                                <!--<th>Categoría</th>-->
                                 <th>Unidad de Medida</th>
                                 <th>Proveedor</th>
                                 <th>Stock</th>
@@ -143,7 +149,7 @@ if (isset($_POST['id_categoria'])) {
                                 tabla.row.add([
                                     imagenHtml,
                                     producto.Producto,
-                                    producto.Categoria,
+                                   // producto.Categoria,
                                     producto.UnidadMedida,
                                     producto.Proveedor,
                                     producto.Stock
@@ -171,6 +177,11 @@ if (isset($_POST['id_categoria'])) {
         function mostrarSinImagen() {
             Swal.fire('No hay imagen disponible para este producto');
         }
+
+        btnCompra = document.getElementById('btnCompra');
+        btnCompra.addEventListener('click', function() {
+            window.location.href = '../compras/realizar_compra.php';
+        });
     </script>
 </body>
 
