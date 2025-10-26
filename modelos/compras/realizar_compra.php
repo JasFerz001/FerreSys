@@ -1,11 +1,12 @@
 <?php
 session_start();
+date_default_timezone_set('America/El_Salvador');
+
 //verificar si el usuario ha iniciado sesión
 if (!isset($_SESSION['id_Empleado']) || empty($_SESSION['id_Empleado'])) {
     header("Location: ../acceso/acceso_denegado.php");
     exit();
 }
-
 
 $id_empleado = $_SESSION['id_Empleado'] ?? '';
 $nombre_empleado = $_SESSION['nombre'] ?? '';
@@ -86,7 +87,7 @@ if ($_POST && isset($_POST['procesar_compra'])) {
                 }
             }
 
-            // Éxito - preparar mensaje para mostrar después de cargar SweetAlert
+            // Éxito - preparar mensaje
             $mensaje_exito = "Compra registrada exitosamente.";
             $mensaje_script = "
             <script>
@@ -99,18 +100,15 @@ if ($_POST && isset($_POST['procesar_compra'])) {
                     timer: 5000,
                     timerProgressBar: true
                 }).then(() => {
-                    // Limpiar el formulario
                     document.getElementById('tabla-detalle').getElementsByTagName('tbody')[0].innerHTML = '';
                     document.getElementById('proveedor').value = '';
                     calcularTotales();
                 });
             });
             </script>";
-
         } else {
             throw new Exception("Error al registrar la compra");
         }
-
     } catch (Exception $e) {
         $mensaje_error = $e->getMessage();
         $mensaje_script = "
@@ -153,6 +151,7 @@ if ($_POST && isset($_POST['procesar_compra'])) {
                     <div class="col">
                         <div class="form-group">
                             <label for="fecha">Fecha</label>
+                            <!-- ✅ Fecha corregida: ahora muestra el día actual según la hora de El Salvador -->
                             <input type="text" id="fecha" value="<?php echo date('d-m-Y'); ?>" readonly
                                 class="form-control">
                         </div>
@@ -171,7 +170,6 @@ if ($_POST && isset($_POST['procesar_compra'])) {
                             <select id="proveedor" name="id_proveedor" required>
                                 <option value="">Seleccionar proveedor</option>
                                 <?php
-                                // Reiniciar el puntero del resultset
                                 $proveedores = $proveedor->leerActivos();
                                 while ($row = $proveedores->fetch(PDO::FETCH_ASSOC)) {
                                     echo "<option value='{$row['id_Proveedor']}'>{$row['nombre']}</option>";
@@ -205,7 +203,6 @@ if ($_POST && isset($_POST['procesar_compra'])) {
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Los productos agregados aparecerán aquí -->
                 </tbody>
             </table>
 
@@ -230,7 +227,6 @@ if ($_POST && isset($_POST['procesar_compra'])) {
             <div class="modal-body">
                 <div class="search-container">
                     <input type="text" id="buscar-producto" placeholder="Buscar producto...">
-                 
                 </div>
                 <table id="tabla-productos">
                     <thead>
@@ -240,16 +236,13 @@ if ($_POST && isset($_POST['procesar_compra'])) {
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody>
-
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
         </div>
     </div>
 
     <script>
-        // Hacer la función calcularTotales global
         function calcularTotales() {
             let subtotal = 0;
             const filas = document.getElementById('tabla-detalle').getElementsByTagName('tbody')[0].getElementsByTagName('tr');
@@ -263,7 +256,7 @@ if ($_POST && isset($_POST['procesar_compra'])) {
                 subtotal += totalProducto;
             }
 
-            const iva = subtotal * 0.13; // IVA del 13%
+            const iva = subtotal * 0.13;
             const total = subtotal + iva;
 
             document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
@@ -272,14 +265,9 @@ if ($_POST && isset($_POST['procesar_compra'])) {
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            // Productos desde la base de datos
             const productos = <?php echo json_encode($productosArray); ?>;
-
-            // Mapa para buscar productos por nombre
             const productosMap = {};
-            productos.forEach(producto => {
-                productosMap[producto.nombre] = producto;
-            });
+            productos.forEach(p => productosMap[p.nombre] = p);
 
             const modalProductos = document.getElementById('modal-productos');
             const btnAgregarProducto = document.getElementById('btn-agregar-producto');
@@ -291,49 +279,34 @@ if ($_POST && isset($_POST['procesar_compra'])) {
             const formCompra = document.getElementById('form-compra');
             const productosData = document.getElementById('productos-data');
 
-            // Abrir modal
             btnAgregarProducto.addEventListener('click', function () {
                 modalProductos.style.display = 'flex';
                 cargarProductos();
             });
 
-            // Cerrar modal
             closeModal.addEventListener('click', function () {
                 modalProductos.style.display = 'none';
             });
 
-            // Cerrar modal al hacer clic fuera del contenido
             window.addEventListener('click', function (event) {
                 if (event.target === modalProductos) {
                     modalProductos.style.display = 'none';
                 }
             });
 
-            // Procesar compra
             btnProcesarCompra.addEventListener('click', function () {
                 const filas = tablaDetalle.getElementsByTagName('tr');
                 if (filas.length === 0) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Productos requeridos',
-                        text: 'Debe agregar al menos un producto a la compra',
-                        confirmButtonText: 'Aceptar'
-                    });
+                    Swal.fire({ icon: 'warning', title: 'Productos requeridos', text: 'Debe agregar al menos un producto a la compra' });
                     return;
                 }
 
                 const proveedorSelect = document.getElementById('proveedor');
                 if (!proveedorSelect.value) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Proveedor requerido',
-                        text: 'Debe seleccionar un proveedor',
-                        confirmButtonText: 'Aceptar'
-                    });
+                    Swal.fire({ icon: 'warning', title: 'Proveedor requerido', text: 'Debe seleccionar un proveedor' });
                     return;
                 }
 
-                // Validar que todos los productos tengan precio mayor a 0
                 let preciosValidos = true;
                 for (let i = 0; i < filas.length; i++) {
                     const precio = parseFloat(filas[i].querySelector('.precio').value);
@@ -344,32 +317,22 @@ if ($_POST && isset($_POST['procesar_compra'])) {
                 }
 
                 if (!preciosValidos) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Precios inválidos',
-                        text: 'Todos los productos deben tener un precio mayor a 0',
-                        confirmButtonText: 'Aceptar'
-                    });
+                    Swal.fire({ icon: 'warning', title: 'Precios inválidos', text: 'Todos los productos deben tener un precio mayor a 0' });
                     return;
                 }
 
-                // Mostrar confirmación con SweetAlert
                 Swal.fire({
                     icon: 'question',
                     title: '¿Confirmar compra?',
-                    html: `
-                        <div style="text-align: left;">
+                    html: `<div style="text-align: left;">
                             <p><strong>¿Está seguro de registrar la compra?</strong></p>
-                            <p style="color: #e74c3c; font-size: 14px;">
-                                 Al registrarla no podrá modificar ni eliminar el registro
-                            </p>
+                            <p style="color: #e74c3c; font-size: 14px;">Al registrarla no podrá modificar ni eliminar el registro</p>
                             <div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 5px;">
                                 <p style="margin: 5px 0;"><strong>Resumen:</strong></p>
                                 <p style="margin: 5px 0;">Productos: ${filas.length}</p>
                                 <p style="margin: 5px 0;">Total: ${document.getElementById('total').textContent}</p>
                             </div>
-                        </div>
-                    `,
+                        </div>`,
                     showCancelButton: true,
                     confirmButtonText: 'Sí, registrar compra',
                     cancelButtonText: 'Cancelar',
@@ -377,7 +340,6 @@ if ($_POST && isset($_POST['procesar_compra'])) {
                     cancelButtonColor: '#dc3545'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Preparar datos de productos para enviar al servidor
                         const productosEnviar = [];
                         for (let i = 0; i < filas.length; i++) {
                             const nombreProducto = filas[i].cells[0].textContent;
@@ -393,39 +355,30 @@ if ($_POST && isset($_POST['procesar_compra'])) {
                             });
                         }
 
-                        // Mostrar loading
                         Swal.fire({
                             title: 'Procesando compra...',
                             text: 'Por favor espere',
                             allowOutsideClick: false,
-                            didOpen: () => {
-                                Swal.showLoading();
-                            }
+                            didOpen: () => { Swal.showLoading(); }
                         });
 
-                        // Asignar datos al campo hidden y enviar formulario
                         productosData.value = JSON.stringify(productosEnviar);
                         formCompra.submit();
                     }
                 });
             });
 
-            // Función para cargar productos en la tabla del modal
             function cargarProductos(productosFiltrados = productos) {
                 tablaProductos.innerHTML = '';
-
                 productosFiltrados.forEach(producto => {
                     const fila = tablaProductos.insertRow();
                     fila.innerHTML = `
                         <td>${producto.nombre}</td>
                         <td>${producto.unidad}</td>
-                        <td>
-                            <button class="btn btn-primary agregar-producto" data-id="${producto.id}">Agregar</button>
-                        </td>
+                        <td><button class="btn btn-primary agregar-producto" data-id="${producto.id}">Agregar</button></td>
                     `;
                 });
 
-                // Agregar event listeners a los botones de agregar
                 document.querySelectorAll('.agregar-producto').forEach(btn => {
                     btn.addEventListener('click', function () {
                         const id = this.getAttribute('data-id');
@@ -433,7 +386,6 @@ if ($_POST && isset($_POST['procesar_compra'])) {
                         agregarProductoDetalle(producto);
                         modalProductos.style.display = 'none';
 
-                        // Mensaje de producto agregado
                         Swal.fire({
                             icon: 'success',
                             title: 'Producto agregado',
@@ -448,22 +400,14 @@ if ($_POST && isset($_POST['procesar_compra'])) {
                 });
             }
 
-            // Función para agregar producto a la tabla de detalle
             function agregarProductoDetalle(producto) {
-                // Verificar si el producto ya está en la tabla
                 const filas = tablaDetalle.getElementsByTagName('tr');
-                let productoExistente = false;
-
                 for (let i = 0; i < filas.length; i++) {
                     const nombreProducto = filas[i].cells[0].textContent;
                     if (nombreProducto === producto.nombre) {
-                        productoExistente = true;
-                        // Incrementar cantidad si ya existe
                         const inputCantidad = filas[i].querySelector('.cantidad');
                         inputCantidad.value = parseInt(inputCantidad.value) + 1;
                         calcularTotales();
-
-                        // Mensaje de cantidad actualizada
                         Swal.fire({
                             icon: 'info',
                             title: 'Cantidad actualizada',
@@ -474,12 +418,8 @@ if ($_POST && isset($_POST['procesar_compra'])) {
                             timer: 2000,
                             timerProgressBar: true
                         });
-                        break;
+                        return;
                     }
-                }
-
-                if (productoExistente) {
-                    return;
                 }
 
                 const fila = tablaDetalle.insertRow();
@@ -488,19 +428,15 @@ if ($_POST && isset($_POST['procesar_compra'])) {
                     <td><input type="number" min="1" value="1" class="cantidad" style="width: 70px;"></td>
                     <td><input type="number" min="0" step="0.01" value="0.00" class="precio" style="width: 100px;"></td>
                     <td class="total-producto">$0.00</td>
-                    <td>
-                        <button class="btn btn-danger eliminar-producto">Eliminar</button>
-                    </td>
+                    <td><button class="btn btn-danger eliminar-producto">Eliminar</button></td>
                 `;
 
-                // Agregar event listeners para los inputs de cantidad y precio
                 const inputCantidad = fila.querySelector('.cantidad');
                 const inputPrecio = fila.querySelector('.precio');
 
                 inputCantidad.addEventListener('input', calcularTotales);
                 inputPrecio.addEventListener('input', calcularTotales);
 
-                // Agregar event listener al botón eliminar
                 fila.querySelector('.eliminar-producto').addEventListener('click', function () {
                     const nombreProducto = fila.cells[0].textContent;
                     Swal.fire({
@@ -514,7 +450,6 @@ if ($_POST && isset($_POST['procesar_compra'])) {
                         if (result.isConfirmed) {
                             fila.remove();
                             calcularTotales();
-
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Producto eliminado',
@@ -532,12 +467,9 @@ if ($_POST && isset($_POST['procesar_compra'])) {
                 calcularTotales();
             }
 
-            // Función para filtrar productos
             buscarProducto.addEventListener('input', function () {
                 const texto = this.value.toLowerCase();
-                const productosFiltrados = productos.filter(producto =>
-                    producto.nombre.toLowerCase().includes(texto)
-                );
+                const productosFiltrados = productos.filter(p => p.nombre.toLowerCase().includes(texto));
                 cargarProductos(productosFiltrados);
             });
         });

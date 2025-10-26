@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -27,9 +26,21 @@
                 </div>
             </a>
         </div>
+        <div class="card stat-card">
+            <a href="../reportes/historial_compras.php">
+                <div class="icon blue">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div class="info">
+                    <h3>Historial de Compras</h3>
+                    <p>Reporte de compras realizadas</p>
+                </div>
+            </a>
+        </div>
+
 
         <div class="card stat-card">
-            <a href="reporte_productos.php">
+            <a href="../reportes/productos_stock.php">
                 <div class="icon green">
                     <i class="fas fa-box"></i>
                 </div>

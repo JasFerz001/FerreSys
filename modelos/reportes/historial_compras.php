@@ -1,5 +1,5 @@
 <?php
-//verificar si el usuario ha iniciado sesión
+// Verificar si el usuario ha iniciado sesión
 session_start();
 if (!isset($_SESSION['id_Empleado']) || empty($_SESSION['id_Empleado'])) {
     header("Location: ../acceso/acceso_denegado.php");
@@ -13,7 +13,7 @@ $conexion = new Conexion();
 $db = $conexion->getConnection();
 $detalleCompra = new DetalleCompra($db);
 
-// Obtener el listado de compras 
+// Obtener listado de compras
 $comprasResult = $detalleCompra->obtenerListadoCompras();
 $comprasArray = $comprasResult->fetchAll(PDO::FETCH_ASSOC);
 
@@ -22,6 +22,18 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1' && isset($_GET['id_compra'])) {
     $id_Compra = $_GET['id_compra'];
     $detalleResult = $detalleCompra->obtenerDetalleCompra($id_Compra);
     $detalleData = $detalleResult->fetchAll(PDO::FETCH_ASSOC);
+
+    // Formatear la fecha tal como viene de la base (solo día-mes-año)
+    for ($i = 0; $i < count($detalleData); $i++) {
+        if (!empty($detalleData[$i]['Fecha'])) {
+            try {
+                $fechaObj = new DateTime($detalleData[$i]['Fecha']);
+                $detalleData[$i]['Fecha'] = $fechaObj->format('d/m/Y'); // formato día/mes/año
+            } catch (Exception $e) {
+                // fallback: dejar la fecha cruda
+            }
+        }
+    }
 
     header('Content-Type: application/json');
     echo json_encode($detalleData);
@@ -37,13 +49,10 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1' && isset($_GET['id_compra'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Gestión de Compras</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="../../css/hCompras.css">
-  
-   
 </head>
 
 <body>
@@ -51,7 +60,6 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1' && isset($_GET['id_compra'])) {
         <div class="card">
             <div class="card-header">
                 <h2><i class="fas fa-list"></i> Historial de Compras</h2>
-
             </div>
             <div class="card-body">
                 <table id="comprasTable" class="table table-striped">
@@ -70,8 +78,17 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1' && isset($_GET['id_compra'])) {
                                     <td>CMP-<?php echo htmlspecialchars($compra['CodigoCompra']); ?></td>
                                     <td>
                                         <?php
-                                        $fecha = new DateTime($compra['Fecha']);
-                                        echo $fecha->format('d/m/Y');
+                                        // Formatear la fecha tal como viene de la base
+                                        $fechaSalida = '';
+                                        if (!empty($compra['Fecha'])) {
+                                            try {
+                                                $fechaObj = new DateTime($compra['Fecha']);
+                                                $fechaSalida = $fechaObj->format('d/m/Y'); // solo día/mes/año
+                                            } catch (Exception $e) {
+                                                $fechaSalida = htmlspecialchars($compra['Fecha']); // fallback
+                                            }
+                                        }
+                                        echo $fechaSalida;
                                         ?>
                                     </td>
                                     <td><?php echo htmlspecialchars($compra['Empleado']); ?></td>
@@ -94,7 +111,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1' && isset($_GET['id_compra'])) {
             </div>
         </div>
 
-        <!-- Modal para mostrar el detalle de compra -->
+        <!-- Modal de detalle -->
         <div id="detailModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
@@ -110,12 +127,29 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1' && isset($_GET['id_compra'])) {
         </div>
     </div>
 
-   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         $(document).ready(function () {
+            const filas = $('#comprasTable tbody tr');
+            const tieneRegistros = filas.length > 0 && filas.find('td[colspan]').length === 0;
+
+            if (!tieneRegistros) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Sin registros',
+                    text: 'Aún no se han realizado compras.',
+                    confirmButtonText: 'Entendido',
+                    confirmButtonColor: '#3085d6'
+                });
+                return;
+            }
+
             $('#comprasTable').DataTable({
                 "language": { "url": "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json" },
                 "pageLength": 5,
@@ -123,14 +157,12 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1' && isset($_GET['id_compra'])) {
             });
         });
 
-
         class CompraManager {
             constructor() {
                 this.initEventListeners();
             }
 
             initEventListeners() {
-                // Evento para ver detalles (usando delegación de eventos para DataTables)
                 document.addEventListener('click', (e) => {
                     if (e.target.classList.contains('view-detail') || e.target.closest('.view-detail')) {
                         const button = e.target.classList.contains('view-detail') ? e.target : e.target.closest('.view-detail');
@@ -139,24 +171,11 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1' && isset($_GET['id_compra'])) {
                     }
                 });
 
-                // Cerrar modal
-                document.querySelector('.close-modal').addEventListener('click', () => {
-                    this.closeModal();
-                });
-
-                // Cerrar modal al hacer clic fuera
+                document.querySelector('.close-modal').addEventListener('click', () => this.closeModal());
                 document.getElementById('detailModal').addEventListener('click', (e) => {
-                    if (e.target === document.getElementById('detailModal')) {
-                        this.closeModal();
-                    }
+                    if (e.target === document.getElementById('detailModal')) this.closeModal();
                 });
-
-                // Cerrar modal con Escape
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape') {
-                        this.closeModal();
-                    }
-                });
+                document.addEventListener('keydown', (e) => { if (e.key === 'Escape') this.closeModal(); });
             }
 
             async loadCompraDetail(idCompra) {
@@ -165,11 +184,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1' && isset($_GET['id_compra'])) {
 
                 try {
                     const response = await fetch(`?id_compra=${idCompra}&ajax=1`);
-
-                    if (!response.ok) {
-                        throw new Error('Error en la respuesta del servidor');
-                    }
-
+                    if (!response.ok) throw new Error('Error en la respuesta del servidor');
                     const data = await response.json();
                     this.displayCompraDetail(data);
                 } catch (error) {
@@ -187,49 +202,29 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1' && isset($_GET['id_compra'])) {
             }
 
             showLoading() {
-                document.getElementById('modalBody').innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Cargando detalles...</div>';
+                document.getElementById('modalBody').innerHTML =
+                    '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Cargando detalles...</div>';
             }
 
             displayCompraDetail(data) {
                 let html = '';
 
                 if (data && data.length > 0) {
-                    // Calcular el total
                     let totalCompra = 0;
-                    data.forEach(detalle => {
-                        const subtotal = detalle.Cantidad * detalle.PrecioUnitario;
-                        totalCompra += subtotal;
-                    });
+                    data.forEach(detalle => totalCompra += detalle.Cantidad * detalle.PrecioUnitario);
 
                     html = `
                         <div class="detail-info">
-                            <div class="detail-row">
-                                <div class="detail-label">Código de Compra:</div>
-                                <div class="detail-value">CMP-${data[0].CodigoCompra}</div>
-                            </div>
-                            <div class="detail-row">
-                                <div class="detail-label">Fecha:</div>
-                                <div class="detail-value">${this.formatDate(data[0].Fecha)}</div>
-                            </div>
-                            <div class="detail-row">
-                                <div class="detail-label">Proveedor:</div>
-                                <div class="detail-value">${data[0].Proveedor || 'N/A'}</div>
-                            </div>
-                            <div class="detail-row">
-                                <div class="detail-label">Empleado:</div>
-                                <div class="detail-value">${data[0].Empleado}</div>
-                            </div>
+                            <div class="detail-row"><div class="detail-label">Código de Compra:</div><div class="detail-value">CMP-${data[0].CodigoCompra}</div></div>
+                            <div class="detail-row"><div class="detail-label">Fecha:</div><div class="detail-value">${data[0].Fecha}</div></div>
+                            <div class="detail-row"><div class="detail-label">Proveedor:</div><div class="detail-value">${data[0].Proveedor || 'N/A'}</div></div>
+                            <div class="detail-row"><div class="detail-label">Empleado:</div><div class="detail-value">${data[0].Empleado}</div></div>
                         </div>
 
-                        <h4 style="margin-top: 20px; margin-bottom: 10px;">Productos Comprados:</h4>
+                        <h4 style="margin-top: 20px;">Productos Comprados:</h4>
                         <table class="products-table">
                             <thead>
-                                <tr>
-                                    <th>Producto</th>
-                                    <th>Cantidad</th>
-                                    <th>Precio Unitario</th>
-                                    <th>Subtotal</th>
-                                </tr>
+                                <tr><th>Producto</th><th>Cantidad</th><th>Precio Unitario</th><th>Subtotal</th></tr>
                             </thead>
                             <tbody>
                     `;
@@ -249,37 +244,41 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1' && isset($_GET['id_compra'])) {
                     html += `
                             </tbody>
                         </table>
-                        
                         <div class="total-section">
-                        <div>Sub-Total de la Compra: <span class="total-amount">$${totalCompra.toFixed(2)}</span></div>
-                        <div>IVA 13%: <span class="total-amount">$${(totalCompra * 0.13).toFixed(2)}</span></div>
-                        <div>Total de la Compra: <span class="total-amount">$${(totalCompra + (totalCompra * 0.13)).toFixed(2)}</span></div>
+                            <div>Sub-Total: <span class="total-amount">$${totalCompra.toFixed(2)}</span></div>
+                            <div>IVA 13%: <span class="total-amount">$${(totalCompra * 0.13).toFixed(2)}</span></div>
+                            <div>Total: <span class="total-amount">$${(totalCompra * 1.13).toFixed(2)}</span></div>
                         </div>
-
-
                     `;
                 } else {
-                    html = '<div style="text-align: center; padding: 20px;">No se encontraron detalles para esta compra.</div>';
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Sin detalles',
+                        text: 'No se encontraron detalles para esta compra.',
+                        confirmButtonText: 'Entendido',
+                        confirmButtonColor: '#3085d6'
+                    });
+                    html = '<div style="text-align:center; padding:20px;">No se encontraron detalles para esta compra.</div>';
                 }
 
                 document.getElementById('modalBody').innerHTML = html;
             }
 
             showError(message) {
-                document.getElementById('modalBody').innerHTML = `<div style="text-align: center; padding: 20px; color: #dc3545;">${message}</div>`;
-            }
-
-            formatDate(dateString) {
-                const date = new Date(dateString);
-                return date.toLocaleDateString('es-ES');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: message,
+                    confirmButtonColor: '#d33'
+                });
+                document.getElementById('modalBody').innerHTML =
+                    `<div style="text-align:center; padding:20px; color:#dc3545;">${message}</div>`;
             }
         }
 
-        // Inicializar cuando el DOM esté listo
         document.addEventListener('DOMContentLoaded', function () {
             new CompraManager();
         });
-
     </script>
 </body>
 
