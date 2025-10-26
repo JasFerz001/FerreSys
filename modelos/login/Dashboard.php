@@ -157,7 +157,11 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                         </a>
                         <a class="submenu-item" href="../../modelos/reportes/compra_proveedor.php" onclick="abrirFormularios(event)">
                             <i class="fas fa-truck-loading"></i>
-                            <span>Compra por Proveedor</span>
+                            <span>Reportes Compras</span>
+                        </a>
+                        <a class="submenu-item" href="../../modelos/reportes/compra_proveedor.php" onclick="abrirFormularios(event)">
+                            <i class="fas fa-truck-loading"></i>
+                            <span>Reportes Ventas</span>
                         </a>
                     </div>
                 </div>
