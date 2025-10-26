@@ -92,10 +92,23 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                     <span>Ventas</span>
                 </a>
 
-                <a class="menu-item" title="Reportes" href="#" onclick="abrirFormularios(event)">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Reportes</span>
-                </a>
+                <div class="menu-item has-submenu" role="group" aria-label="Reportes">
+                    <a href="#" class="submenu-toggle" title="Reportes">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Reportes</span>
+                        <i class="fas fa-chevron-down submenu-caret"></i>
+                    </a>
+                    <div class="submenu">
+                        <a class="submenu-item" href="../../modelos/reportes/menu_reportes.php" onclick="abrirFormularios(event)">
+                            <i class="fas fa-list"></i>
+                            <span>Menú de Reportes</span>
+                        </a>
+                        <a class="submenu-item" href="../../modelos/reportes/compra_proveedor.php" onclick="abrirFormularios(event)">
+                            <i class="fas fa-truck-loading"></i>
+                            <span>Compra por Proveedor</span>
+                        </a>
+                    </div>
+                </div>
 
                 <a class="menu-item" title="Generar Backup" href="../../backup/backup.php" onclick="abrirFormularios(event)">
                     <i class="fas fa-database"></i>
@@ -131,10 +144,23 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                     <span>Ventas</span>
                 </a>
 
-                <a class="menu-item" title="Reportes" href="#" onclick="abrirFormularios(event)">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Reportes</span>
-                </a>
+                <div class="menu-item has-submenu" role="group" aria-label="Reportes Vendedor">
+                    <a href="#" class="submenu-toggle" title="Reportes">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Reportes</span>
+                        <i class="fas fa-chevron-down submenu-caret"></i>
+                    </a>
+                    <div class="submenu">
+                        <a class="submenu-item" href="../../modelos/reportes/menu_reportes.php" onclick="abrirFormularios(event)">
+                            <i class="fas fa-list"></i>
+                            <span>Menú de Reportes</span>
+                        </a>
+                        <a class="submenu-item" href="../../modelos/reportes/compra_proveedor.php" onclick="abrirFormularios(event)">
+                            <i class="fas fa-truck-loading"></i>
+                            <span>Compra por Proveedor</span>
+                        </a>
+                    </div>
+                </div>
 
                 <a class="menu-item" title="Ayuda" href="#" onclick="abrirFormularios(event)">
                     <i class="fas fa-circle-question"></i>
@@ -311,7 +337,10 @@ $rol_usuario = $_SESSION['rol'] ?? "";
 
         // Menu items active
         document.querySelectorAll('.menu-item').forEach(item => {
-            item.addEventListener('click', function() {
+            item.addEventListener('click', function(e) {
+                if (e.target.closest('.has-submenu')) {
+                    return; // No cambiar active en items con submenú
+                }
                 document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
                 this.classList.add('active');
             });
@@ -328,6 +357,31 @@ $rol_usuario = $_SESSION['rol'] ?? "";
 
             dashboardCardsContainer.style.display = 'none';
         }
+         document.querySelectorAll('.has-submenu > .submenu-toggle').forEach(toggle => {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                const parent = this.parentElement;
+                parent.classList.toggle('open');
+            });
+            // permitir toggle con tecla Enter/Space para accesibilidad
+            toggle.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.parentElement.classList.toggle('open');
+                }
+            });
+        });
+
+        // cuando se abre un formulario desde submenu, marcar item correspondiente como active
+        document.querySelectorAll('.submenu-item').forEach(link => {
+            link.addEventListener('click', function() {
+                // cerrar otros submenus
+                document.querySelectorAll('.has-submenu').forEach(h => h.classList.remove('open'));
+                // marcar el padre como activo visualmente
+                document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+                this.closest('.has-submenu')?.classList.add('active');
+            });
+        });
 
         // Dropdown usuario superior derecho
         const userTopIcon = document.getElementById('userTopIcon');
@@ -340,6 +394,9 @@ $rol_usuario = $_SESSION['rol'] ?? "";
         document.addEventListener('click', function(event) {
             if (!userTopIcon.contains(event.target) && !dropdownTop.contains(event.target)) {
                 dropdownTop.style.display = 'none';
+            }
+            if(!event.target.closest('.has-submenu')) {
+                document.querySelectorAll('.has-submenu').forEach(h => h.classList.remove('open'));
             }
         });
     </script>

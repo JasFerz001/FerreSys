@@ -46,7 +46,8 @@ body {
     transition: all 0.3s ease;
     box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
     z-index: 1000;
-    overflow: hidden; /* Evita scroll del contenedor padre */
+    overflow: hidden;
+    /* Evita scroll del contenedor padre */
 }
 
 .sidebar.collapsed {
@@ -113,10 +114,10 @@ body {
 
 .sidebar .menu {
     height: calc(100vh - 70px - 10px);
-    overflow-y: auto;         
-    overflow-x: hidden;         
-    scrollbar-width: thin; 
-    scrollbar-color: #888 transparent; 
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #888 transparent;
     padding-bottom: 30px;
 }
 
@@ -193,7 +194,8 @@ body {
 .menu-item a {
     color: inherit;
     text-decoration: none;
-    display: contents; /* Hace que el clic funcione en todo el bloque */
+    display: contents;
+    /* Hace que el clic funcione en todo el bloque */
 }
 
 .sidebar.collapsed .menu-item a {
@@ -330,7 +332,7 @@ footer {
     white-space: nowrap;
 }
 
-.main-content.expanded + .top-bar {
+.main-content.expanded+.top-bar {
     left: var(--sidebar-collapsed-width);
 }
 
@@ -369,4 +371,143 @@ footer {
 
 #userTopIcon:hover {
     color: var(--accent);
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: .35rem;
+}
+
+/* --- Forzar submenú debajo del item (no a un lado) --- */
+.menu .has-submenu {
+    position: relative;
+    display: block;
+    /* Alineación y padding igual que .menu-item */
+    display: flex;
+    flex-direction: column; /* <-- Esto fuerza que el submenu esté debajo */
+    align-items: stretch;   /* Asegura que el submenu ocupe todo el ancho */
+    gap: 12px;
+    color: white;
+    text-decoration: none;
+    padding: 12px 20px;
+    border-left: 4px solid transparent;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* Igual efecto hover/active que .menu-item */
+.menu .has-submenu:hover,
+.menu .has-submenu.active {
+    background: rgba(255, 255, 255, 0.1);
+    border-left: 4px solid var(--secondary);
+}
+
+/* Iconos dentro del has-submenu */
+.menu .has-submenu i {
+    font-size: 18px;
+    min-width: 24px;
+    text-align: center;
+}
+
+/* Texto del menú */
+.menu .has-submenu span {
+    flex: 1;
+}
+
+/* Estado colapsado */
+.sidebar.collapsed .has-submenu {
+    justify-content: center;
+    padding: 15px;
+}
+
+.sidebar.collapsed .has-submenu span {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+}
+
+/* El enlace principal del submenú ocupa todo el espacio y hereda estilos */
+.menu .has-submenu > .submenu-toggle {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    width: 100%;
+    background: none;
+    border: none;
+    color: inherit;
+    text-decoration: none;
+    padding: 0;
+    cursor: pointer;
+    /* Elimina padding propio, usa el del padre */
+}
+
+/* Submenu en flujo (debajo). Se oculta con max-height para animación */
+.menu .has-submenu .submenu {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+    margin-top: .35rem;
+    padding-left: 0.4rem; /* antes: 1.1rem, ahora menos sangría */
+    width: 100%;
+    box-sizing: border-box;
+
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height .22s ease, opacity .22s ease;
+}
+
+/* Mostrar submenú (debajo) al abrir */
+.menu .has-submenu.open .submenu {
+    max-height: 400px; /* suficiente para varias entradas */
+    opacity: 1;
+    padding-bottom: .35rem;
+}
+
+/* Submenu-item ocupa toda la línea */
+.menu .submenu-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .45rem .6rem;
+    color: #cfd8dc;
+    text-decoration: none;
+    border-radius: 6px;
+}
+
+/* Hover */
+.menu .submenu-item:hover {
+    background: rgba(255,255,255,0.04);
+    color: #fff;
+}
+
+/* Caret gira cuando abierto */
+.submenu-caret {
+    margin-left: auto;
+    transition: transform .2s ease;
+}
+.has-submenu.open .submenu-caret {
+    transform: rotate(180deg);
+}
+
+/* Ajustes cuando la barra está colapsada: mantener submenú debajo y legible */
+.sidebar.collapsed .has-submenu .submenu {
+    padding-left: 0.2rem; /* antes: 0.6rem, ahora menos sangría */
+}
+
+/* Asegurar responsividad */
+@media (max-width: 768px) {
+    .menu .has-submenu .submenu {
+        padding-left: .25rem;
+        width: 100%;
+    }
 }
