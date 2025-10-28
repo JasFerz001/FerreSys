@@ -1,26 +1,26 @@
 <?php
-// filepath: c:\xampp\htdocs\FerreSys\modelos\reportes\compra_proveedor.php
 require_once '../../conexion/conexion.php';
-require_once '../compras/detalle_compra.php';
 
 $conexion = new Conexion();
 $db = $conexion->getConnection();
-$detalleCompra = new DetalleCompra($db);
 
-$resultados = [];
-
-// Consulta inicial para mostrar todas las compras
-$sql = "SELECT dc.id_Detallecompra, pr.nombre AS producto, dc.cantidad, dc.precio_unitario, p.nombre AS proveedor
-        FROM detalle_compra dc
-        JOIN producto pr ON dc.id_Producto = pr.id_Producto
-        JOIN compra AS c ON dc.id_Compra = c.id_Compra
-        JOIN proveedores AS p ON c.id_Proveedor = p.id_Proveedor";
+// Query con subtotal
+$sql = "SELECT 
+            p.id_Proveedor, p.nombre AS proveedor, 
+            c.id_Compra, c.fecha, 
+            e.nombre AS empleado, e.apellido AS apellido_empleado, 
+            pr.nombre AS producto, dc.cantidad, dc.precio_unitario, 
+            (dc.cantidad * dc.precio_unitario) AS subtotal
+        FROM compra c
+        INNER JOIN proveedores p ON c.id_Proveedor = p.id_Proveedor
+        INNER JOIN empleados e ON c.id_Empleado = e.id_Empleado
+        INNER JOIN detalle_compra dc ON c.id_Compra = dc.id_Compra
+        INNER JOIN producto pr ON dc.id_Producto = pr.id_Producto
+        ORDER BY c.id_Compra ASC, pr.nombre";
 
 $stmt = $db->prepare($sql);
 $stmt->execute();
 $resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-
 ?>
 
 <!DOCTYPE html>
@@ -30,116 +30,218 @@ $resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reporte de Compras por Proveedor</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../css/productos.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .table-responsive {
-            overflow-x: auto;
+        body {
+            background-color: #ffffff;
+            font-family: 'Segoe UI', sans-serif;
         }
 
-        th,
-        td {
+        h2 {
+            font-weight: 700;
+            margin-bottom: 5px;
             text-align: center;
+            color: #212529;
         }
 
-        .badge {
-            font-size: 0.9em;
+        .subtitle {
+            font-size: 1rem;
+            color: #495057;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .table-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 100%;
+            border: 12px;
+        }
+
+        table.dataTable thead {
+            background-color: #4dabf7;
+            color: white;
+        }
+
+        table.dataTable tbody tr:nth-child(odd) {
+            background-color: #f8f9fa;
+        }
+
+        table.dataTable tbody tr:nth-child(even) {
+            background-color: #e9ecef;
+        }
+
+        table.dataTable tbody tr:hover {
+            background-color: #cfe2ff;
+        }
+
+        /* Botón PDF verde premium alineado a la derecha */
+        .table-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 15px;
+        }
+
+        #exportPDF {
+            background-color: #0d6efd;
+            /* azul tipo bootstrap */
+            color: white;
+            border: none;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+        }
+
+        #exportPDF:hover {
+            background-color: #0b5ed7;
+            color: white;
+            transform: translateY(-2px);
         }
     </style>
 </head>
 
 <body>
-    <div class="container-fluid px-3">
-        <h2 class="text-center mb-4"><i class="fas fa-truck-loading mr-2"></i> Reporte de Compras por Proveedor</h2>
-        <div class="row justify-content-center">
-            <div class="col-md-8 mb-4">
-                <label for="proveedor" class="form-label"><i class="fas fa-search mr-2"></i> Buscar Proveedor:</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-truck"></i></span>
-                    <input type="text" id="proveedor" name="proveedor" class="form-control"
-                        placeholder="Ingrese el nombre del proveedor">
-                </div>
+    <div class="container-fluid mt-4">
+
+        <!-- Título principal centrado -->
+        <h2><i class="fas fa-file-invoice"></i> Reporte de compras por proveedor</h2>
+        <div class="subtitle"><i class="fas fa-map-marker-alt text-success"></i> Ferretería Michapa, Cuscatlán</div>
+
+        <!-- Botón PDF a la derecha -->
+        <div class="table-actions">
+            <button id="exportPDF" class="btn"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
+        </div>
+
+        <!-- Tabla detallada en caja blanca extendida -->
+        <div class="table-container">
+            <div class="table-responsive">
+                <table id="tablaComprasProveedor" class="table table-striped table-hover table-borderless table-sm align-middle text-center">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>ID Compra</th>
+                            <th>Proveedor</th>
+                            <th>Fecha</th>
+                            <th>Empleado</th>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unitario</th>
+                            <th>Subtotal</th>
+                            <th>Total con IVA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($resultados as $row) :
+                            $subtotal = $row['subtotal'];
+                            $total = $subtotal * 1.13;
+                        ?>
+                            <tr>
+                                <td><?= $row['id_Compra'] ?></td>
+                                <td><?= htmlspecialchars($row['proveedor']) ?></td>
+                                <td><?= $row['fecha'] ?></td>
+                                <td><?= htmlspecialchars($row['empleado'] . ' ' . $row['apellido_empleado']) ?></td>
+                                <td><?= htmlspecialchars($row['producto']) ?></td>
+                                <td><?= $row['cantidad'] ?></td>
+                                <td>$<?= number_format($row['precio_unitario'], 2) ?></td>
+                                <td>$<?= number_format($subtotal, 2) ?></td>
+                                <td>$<?= number_format($total, 2) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-md-12">
-                <div class="table-responsive">
-                    <table id="tablaComprasProveedor" class="table table-bordered text-center align-middle">
-                        <thead>
-                            <tr>
-                                <th><i class="fas fa-id-card mr-2"></i> ID Detalle Compra</th>
-                                <th><i class="fas fa-box mr-2"></i> Producto</th>
-                                <th><i class="fas fa-sort-numeric-up mr-2"></i> Cantidad</th>
-                                <th><i class="fas fa-dollar-sign mr-2"></i> Precio Unitario</th>
-                                <th><i class="fas fa-truck mr-2"></i> Proveedor</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Los datos se cargarán aquí mediante AJAX -->
-                        </tbody>
-                    </table>
-                </div>
-                <div id="mensajeSinDatos" class="text-center mt-3" style="display:none;">
-                    No se encontraron datos para mostrar.
-                </div>
-            </div>
-        </div>
     </div>
+
     <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <!-- jsPDF + AutoTable -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
     <script>
-        $(document).ready(function () {
-            var tabla = $('#tablaComprasProveedor').DataTable({
-                "language": {
-                    "url": "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
-                },
-                "searching": false,
-                "pageLength": 5,
-                "lengthMenu": [5, 10, 25, 50],
-                "ajax": {
-                    "url": "obtener_compras.php", // Archivo PHP para obtener los datos
-                    "type": "GET",
-                    "data": function (d) {
-                        d.proveedor = $('#proveedor').val(); // Envía el valor del proveedor
-                    },
-                    "error": function (xhr, error, thrown) {
-                        console.log("Error en la petición AJAX:", error, thrown);
-                        $('#tablaComprasProveedor').hide(); // Oculta la tabla
-                        $('#mensajeSinDatos').show(); // Muestra el mensaje
-                    }
-                },
-                "columns": [
-                    { "data": "id_Detallecompra" },
-                    { "data": "producto" },
-                    { "data": "cantidad" },
-                    { "data": "precio_unitario" },
-                    { "data": "proveedor" }
-                ],
-                "dom": 'Bfrtip', // Habilita los botones
-                "buttons": [
-                    'pdf'
-                ],
-                "emptyTable": "No se encontraron datos" // Mensaje si la tabla está vacía
+        $(document).ready(function() {
+            $('#tablaComprasProveedor').DataTable({
+                pageLength: 10,
+                lengthMenu: [10, 25, 50],
+                language: {
+                    url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+                }
             });
 
-            // Escucha los cambios en el campo de búsqueda
-            $('#proveedor').on('keyup', function () {
-                tabla.ajax.reload(); // Recarga los datos de la tabla
+            document.getElementById('exportPDF').addEventListener('click', () => {
+                const {
+                    jsPDF
+                } = window.jspdf;
+                const doc = new jsPDF('l', 'pt', 'a4');
+
+                // Título y subtítulo
+                doc.setFontSize(18);
+                doc.setTextColor(33, 37, 41);
+                doc.text("Reporte de compras por proveedor", doc.internal.pageSize.getWidth() / 2, 40, {
+                    align: 'center'
+                });
+                doc.setFontSize(12);
+                doc.setTextColor(73, 80, 87);
+                doc.text("Ferretería Michapa, Cuscatlán", doc.internal.pageSize.getWidth() / 2, 60, {
+                    align: 'center'
+                });
+
+                // Encabezado y datos
+                const headers = [
+                    ["ID Compra", "Proveedor", "Fecha", "Empleado", "Producto", "Cantidad", "Precio Unitario", "Subtotal", "Total con IVA"]
+                ];
+                const body = [];
+                <?php foreach ($resultados as $row):
+                    $subtotal = $row['subtotal'];
+                    $total = $subtotal * 1.13;
+                ?>
+                    body.push([
+                        "<?= $row['id_Compra'] ?>",
+                        "<?= htmlspecialchars($row['proveedor']) ?>",
+                        "<?= $row['fecha'] ?>",
+                        "<?= htmlspecialchars($row['empleado'] . ' ' . $row['apellido_empleado']) ?>",
+                        "<?= htmlspecialchars($row['producto']) ?>",
+                        "<?= $row['cantidad'] ?>",
+                        "$<?= number_format($row['precio_unitario'], 2) ?>",
+                        "$<?= number_format($subtotal, 2) ?>",
+                        "$<?= number_format($total, 2) ?>"
+                    ]);
+                <?php endforeach; ?>
+
+                doc.autoTable({
+                    startY: 80,
+                    head: headers,
+                    body: body,
+                    styles: {
+                        fontSize: 10,
+                        halign: 'center',
+                        valign: 'middle'
+                    },
+                    headStyles: {
+                        fillColor: [13, 110, 253],
+                        textColor: 255
+                    }, // azul bootstrap
+                    theme: 'grid',
+                    margin: {
+                        top: 80,
+                        left: 20,
+                        right: 20
+                    }
+                });
+
+                doc.save("Reporte de Compras por Proveedor.pdf");
             });
         });
     </script>
