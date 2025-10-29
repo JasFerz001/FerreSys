@@ -123,7 +123,7 @@ $resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <table id="tablaComprasProveedor" class="table table-striped table-hover align-middle text-center">
                 <thead>
                     <tr>
-                        <th>ID Compra</th>
+                        <th>Código Compra</th>
                         <th>Proveedor</th>
                         <th>Fecha</th>
                         <th>Empleado</th>
@@ -140,7 +140,7 @@ $resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         $total = $subtotal * 1.13;
                     ?>
                         <tr>
-                            <td><?= $row['id_Compra'] ?></td>
+                            <td><?= 'CMP-' . $row['id_Compra'] ?></td>
                             <td><?= htmlspecialchars($row['proveedor']) ?></td>
                             <td><?= $row['fecha'] ?></td>
                             <td><?= htmlspecialchars($row['empleado'] . ' ' . $row['apellido_empleado']) ?></td>
@@ -191,14 +191,14 @@ $(document).ready(function() {
         doc.text("Ferretería Michapa, Cuscatlán", doc.internal.pageSize.getWidth() / 2, 60, { align: 'center' });
 
         // Tabla
-        const headers = [["ID Compra", "Proveedor", "Fecha", "Empleado", "Producto", "Cantidad", "Precio Unitario", "Subtotal", "Total con IVA"]];
+        const headers = [["Código Compra", "Proveedor", "Fecha", "Empleado", "Producto", "Cantidad", "Precio Unitario", "Subtotal", "Total con IVA"]];
         const body = [];
         <?php foreach ($resultados as $row):
             $subtotal = $row['subtotal'];
             $total = $subtotal * 1.13;
         ?>
         body.push([
-            "<?= $row['id_Compra'] ?>",
+            "CMP-<?= $row['id_Compra'] ?>",
             "<?= htmlspecialchars($row['proveedor']) ?>",
             "<?= $row['fecha'] ?>",
             "<?= htmlspecialchars($row['empleado'] . ' ' . $row['apellido_empleado']) ?>",
