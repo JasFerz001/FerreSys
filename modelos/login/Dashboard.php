@@ -82,12 +82,17 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                     <span>Compras</span>
                 </a>
 
+                <a class="menu-item" title="Unidad de Conversion" href="../../modelos/unidad de medida/crear_unidadConversion.php" onclick="abrirFormularios(event)">
+                    <i class="fas fa-ruler-combined"></i>
+                    <span>Unidad de Conversion</span>
+                </a>
+
                 <a class="menu-item" title="Clientes" href="../../modelos/cliente/crear_cliente.php" onclick="abrirFormularios(event)">
                     <i class="fas fa-users"></i>
                     <span>Clientes</span>
                 </a>
 
-                <a class="menu-item" title="Ventas" href="#" onclick="abrirFormularios(event)">
+                <a class="menu-item" title="Ventas" href="../../modelos/ventas/ventitas.php" onclick="abrirFormularios(event)">
                     <i class="fas fa-receipt"></i>
                     <span>Ventas</span>
                 </a>
