@@ -14,12 +14,14 @@ $fecha_inicio = $_GET['fecha_inicio'] ?? '';
 $fecha_fin    = $_GET['fecha_fin'] ?? '';
 
 // ==========================
-// Corregir fecha de hoy correctamente
+// Fecha actual corregida
 // ==========================
-date_default_timezone_set('America/El_Salvador'); // Zona horaria
-$today = date('Y-m-d'); // Fecha actual confiable
+date_default_timezone_set('America/El_Salvador');
+$today = date('Y-m-d');
 
-// Si no hay fechas manuales, se calculan según rango
+// ==========================
+// Cálculo automático de fechas según rango
+// ==========================
 if(!$fecha_inicio || !$fecha_fin){
     switch($rango){
         case 'diario':
@@ -50,22 +52,20 @@ if(!$fecha_inicio || !$fecha_fin){
 }
 
 // ==========================
-// Consulta principal
+// Consulta modificada: total por venta con prefijo VTA-
 // ==========================
 $sql = "SELECT 
-            v.id_Venta, v.fecha, 
+            CONCAT('VTA-', v.id_Venta) AS codigo_venta,
+            v.fecha,
             CONCAT(e.nombre,' ',e.apellido) AS empleado,
             CONCAT(c.nombre,' ',c.apellido) AS cliente,
-            p.nombre AS producto,
-            dv.cantidad, dv.precio_venta,
-            (dv.cantidad * dv.precio_venta) AS total
+            SUM(dv.cantidad * dv.precio_venta) AS total_venta
         FROM ventas v
         INNER JOIN detalle_venta dv ON v.id_Venta = dv.id_Venta
-        INNER JOIN detalle_compra dc ON dv.id_Detallecompra = dc.id_Detallecompra
-        INNER JOIN producto p ON dc.id_Producto = p.id_Producto
         INNER JOIN empleados e ON v.id_Empleado = e.id_Empleado
         LEFT JOIN clientes c ON v.id_Cliente = c.id_Cliente
         WHERE DATE(v.fecha) BETWEEN :fecha_inicio AND :fecha_fin
+        GROUP BY v.id_Venta, v.fecha, empleado, cliente
         ORDER BY v.fecha ASC, v.id_Venta ASC";
 
 $stmt = $db->prepare($sql);
@@ -104,6 +104,7 @@ table.dataTable tbody tr:hover{background-color:#e2e6ea;}
         <div class="subtitle"><i class="fas fa-store text-primary"></i> Ferretería Michapa Cuscatlán</div>
     </div>
 
+    <!-- Filtros -->
     <div class="row mb-3">
         <div class="col-md-3">
             <label>Rango:</label>
@@ -147,32 +148,27 @@ table.dataTable tbody tr:hover{background-color:#e2e6ea;}
         <button id="exportPDF" class="btn btn-danger"><i class="fas fa-file-pdf me-2"></i>Exportar PDF</button>
     </div>
 
+    <!-- Tabla -->
     <div class="table-wrapper">
         <div class="table-responsive">
             <table id="tablaVentas" class="table table-striped table-hover align-middle text-center">
                 <thead>
                     <tr>
-                        <th>ID Venta</th>
+                        <th>Código de Venta</th>
                         <th>Fecha</th>
                         <th>Empleado</th>
                         <th>Cliente</th>
-                        <th>Producto</th>
-                        <th>Cantidad</th>
-                        <th>Precio Unitario</th>
-                        <th>Total</th>
+                        <th>Total de Venta</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach($resultados as $row): ?>
                     <tr>
-                        <td><?= $row['id_Venta'] ?></td>
+                        <td><?= htmlspecialchars($row['codigo_venta']) ?></td>
                         <td><?= $row['fecha'] ?></td>
                         <td><?= htmlspecialchars($row['empleado']) ?></td>
                         <td><?= htmlspecialchars($row['cliente'] ?? 'N/A') ?></td>
-                        <td><?= htmlspecialchars($row['producto']) ?></td>
-                        <td><?= $row['cantidad'] ?></td>
-                        <td>$<?= number_format($row['precio_venta'],2) ?></td>
-                        <td>$<?= number_format($row['total'],2) ?></td>
+                        <td><strong>$<?= number_format($row['total_venta'],2) ?></strong></td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -181,6 +177,7 @@ table.dataTable tbody tr:hover{background-color:#e2e6ea;}
     </div>
 </div>
 
+<!-- JS -->
 <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
@@ -192,76 +189,27 @@ table.dataTable tbody tr:hover{background-color:#e2e6ea;}
 $(document).ready(function(){
     $('#tablaVentas').DataTable({
         pageLength:10,
-        lengthMenu:[10,25,50],
         language:{ url:"https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json" }
     });
 
-    // Mostrar/ocultar select de trimestre o semestre
+    // Filtros
     $('#rango').change(function(){
         const val = $(this).val();
-        if(val=='trimestre') $('#selectorTrimestre').show(); else $('#selectorTrimestre').hide();
-        if(val=='semestre') $('#selectorSemestre').show(); else $('#selectorSemestre').hide();
-        ajustarFechas();
+        $('#selectorTrimestre').toggle(val=='trimestre');
+        $('#selectorSemestre').toggle(val=='semestre');
     });
-    $('#trimestre, #semestre').change(ajustarFechas);
 
-    // Botón filtrar
     $('#btnFiltrar').click(function(){
         const rango = $('#rango').val();
         const trimestre = $('#trimestre').val();
         const semestre = $('#semestre').val();
-        const fecha_inicio = $('#fecha_inicio').val();
-        const fecha_fin = $('#fecha_fin').val();
-        if(!fecha_inicio || !fecha_fin){
-            alert('Selecciona ambas fechas');
-            return;
-        }
-        window.location.href = '?rango='+rango+'&trimestre='+trimestre+'&semestre='+semestre+'&fecha_inicio='+fecha_inicio+'&fecha_fin='+fecha_fin;
+        const fi = $('#fecha_inicio').val();
+        const ff = $('#fecha_fin').val();
+        if(!fi || !ff){ alert('Selecciona ambas fechas'); return; }
+        window.location.href = '?rango='+rango+'&trimestre='+trimestre+'&semestre='+semestre+'&fecha_inicio='+fi+'&fecha_fin='+ff;
     });
 
-    // =============================
-    // Ajusta fechas automáticamente según rango usando la fecha local de El Salvador
-    // =============================
-    function ajustarFechas(){
-        const phpToday = '<?= $today ?>'; // PHP ya da la fecha correcta
-        const y = parseInt(phpToday.split('-')[0]);
-        const m = parseInt(phpToday.split('-')[1]) - 1;
-        const d = parseInt(phpToday.split('-')[2]);
-
-        const rango = $('#rango').val();
-        if(rango=='diario'){
-            $('#fecha_inicio').val(phpToday);
-            $('#fecha_fin').val(phpToday);
-        } else if(rango=='mes'){
-            const first = new Date(y, m,1).toISOString().split('T')[0];
-            const last = new Date(y, m+1,0).toISOString().split('T')[0];
-            $('#fecha_inicio').val(first);
-            $('#fecha_fin').val(last);
-        } else if(rango=='trimestre'){
-            const t = parseInt($('#trimestre').val());
-            const startMonth = (t-1)*3;
-            const endMonth = startMonth +2;
-            const first = new Date(y,startMonth,1).toISOString().split('T')[0];
-            const last = new Date(y,endMonth+1,0).toISOString().split('T')[0];
-            $('#fecha_inicio').val(first);
-            $('#fecha_fin').val(last);
-        } else if(rango=='semestre'){
-            const s = parseInt($('#semestre').val());
-            const startMonth = (s-1)*6;
-            const endMonth = startMonth +5;
-            const first = new Date(y,startMonth,1).toISOString().split('T')[0];
-            const last = new Date(y,endMonth+1,0).toISOString().split('T')[0];
-            $('#fecha_inicio').val(first);
-            $('#fecha_fin').val(last);
-        } else if(rango=='anual'){
-            $('#fecha_inicio').val(y+'-01-01');
-            $('#fecha_fin').val(y+'-12-31');
-        }
-    }
-
-    ajustarFechas(); // al cargar
-
-    // Export PDF
+    // Exportar PDF
     document.getElementById('exportPDF').addEventListener('click', () => {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('l','pt','a4');
@@ -270,21 +218,21 @@ $(document).ready(function(){
         doc.setFontSize(12); doc.setTextColor(73,80,87);
         doc.text("Ferretería Michapa, Cuscatlán", doc.internal.pageSize.getWidth()/2,60,{align:'center'});
 
-        const headers=[["ID Venta","Fecha","Empleado","Cliente","Producto","Cantidad","Precio Unitario","Total"]];
+        const headers=[["Código de Venta","Fecha","Empleado","Cliente","Total"]];
         const body=[];
         <?php foreach($resultados as $row): ?>
         body.push([
-            "<?= $row['id_Venta'] ?>",
+            "<?= htmlspecialchars($row['codigo_venta']) ?>",
             "<?= $row['fecha'] ?>",
             "<?= htmlspecialchars($row['empleado']) ?>",
             "<?= htmlspecialchars($row['cliente'] ?? 'N/A') ?>",
-            "<?= htmlspecialchars($row['producto']) ?>",
-            "<?= $row['cantidad'] ?>",
-            "$<?= number_format($row['precio_venta'],2) ?>",
-            "$<?= number_format($row['total'],2) ?>"
+            "$<?= number_format($row['total_venta'],2) ?>"
         ]);
         <?php endforeach; ?>
-        doc.autoTable({startY:80,head:headers,body:body,theme:'grid',headStyles:{fillColor:[13,110,253],textColor:255},styles:{fontSize:9,halign:'center',valign:'middle'},margin:{top:80,left:20,right:20}});
+
+        doc.autoTable({startY:80,head:headers,body:body,theme:'grid',
+            headStyles:{fillColor:[13,110,253],textColor:255},
+            styles:{fontSize:9,halign:'center'}});
         doc.save("Reporte_Ventas.pdf");
     });
 });
