@@ -52,13 +52,13 @@
         </div>
 
         <div class="card stat-card">
-            <a href="reporte_clientes.php">
+            <a href="../reportes/historial_ventas.php">
                 <div class="icon red">
-                    <i class="fas fa-users"></i>
+                    <i class="fas fa-shop"></i>
                 </div>
                 <div class="info">
-                    <h3>Clientes</h3>
-                    <p>Reporte de clientes registrados</p>
+                    <h3>Ventas</h3>
+                    <p>Reporte de Historial de Ventas</p>
                 </div>
             </a>
         </div>

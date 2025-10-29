@@ -152,7 +152,7 @@ if (isset($_POST['id_categoria'])) {
                                    // producto.Categoria,
                                     producto.UnidadMedida,
                                     producto.Proveedor,
-                                    producto.Stock
+                                    parseFloat(producto.Stock).toFixed(2)
                                 ]).draw(false);
                             });
                         },

@@ -8,7 +8,7 @@ class DetalleCompra
     public int $id_Compra;
     public int $id_Producto;
     public int $cantidad;
-    public int $existencia;
+    public float $existencia;
     public float $precio_unitario;
 
     public function __construct($db)
