@@ -318,17 +318,31 @@ date_default_timezone_set('America/El_Salvador');
                 if (factorConversion !== 1) {
                     // Calcular y mostrar la existencia en la unidad de venta seleccionada
                     const existenciaEnVenta = producto.existencia * factorConversion;
-                    const unidadVentaNombre = selectorUnidad.options[selectorUnidad.selectedIndex].text.split(' ')[0];
+                    const unidadVentaTexto = selectorUnidad.options[selectorUnidad.selectedIndex].text;
+                    const unidadVentaNombre = unidadVentaTexto.split(' ')[0];
 
                     existenciaElement.value = `${existenciaEnVenta.toFixed(2)} ${unidadVentaNombre} (equivale a ${producto.existencia} ${producto.simbolo})`;
 
                     // Actualizar el máximo permitido
                     cantidadInput.max = Math.floor(existenciaEnVenta * 100) / 100; // Permitir decimales
+
+                    // Mostrar información de conversión de precios
+                    const precioUnitarioEnUnidadVenta = this.precioUnitarioBase / factorConversion;
+                    console.log(`Precio unitario en ${unidadVentaNombre}: $${precioUnitarioEnUnidadVenta.toFixed(2)}`);
                 } else {
                     // Volver a mostrar la existencia normal
                     existenciaElement.value = `${producto.existencia} ${producto.simbolo}`;
                     cantidadInput.removeAttribute('max');
                 }
+            }
+
+            // Asegurarnos de que el precio de venta también actualice el subtotal cuando cambie
+            calcularSubtotalModal() {
+                const precio = parseFloat(document.getElementById('modalPrecioVenta').value) || 0;
+                const cantidad = parseInt(document.getElementById('modalCantidad').value) || 0;
+                const subtotal = precio * cantidad;
+
+                document.getElementById('modalSubtotal').value = `$${subtotal.toFixed(2)}`;
             }
 
             mostrarProductos(productos) {
@@ -407,7 +421,10 @@ date_default_timezone_set('America/El_Salvador');
 
                 document.getElementById('modalProductoNombre').value = producto.nombre_producto;
                 document.getElementById('modalProductoProveedor').value = producto.proveedor;
-                document.getElementById('modalPrecioCompra').value = `$${parseFloat(producto.precio_unitario).toFixed(2)}`;
+
+                // Guardar el precio unitario base para los cálculos
+                this.precioUnitarioBase = parseFloat(producto.precio_unitario);
+                document.getElementById('modalPrecioCompra').value = `$${this.precioUnitarioBase.toFixed(2)}`;
                 document.getElementById('modalExistencia').value = `${producto.existencia} ${producto.simbolo}`;
 
                 // Cargar unidades de venta disponibles
@@ -433,20 +450,61 @@ date_default_timezone_set('America/El_Salvador');
                 }
 
                 // Actualizar el evento para recalcular cuando cambie la unidad
-                document.getElementById('modalUnidadVenta').addEventListener('change', () => {
+                selectUnidad.addEventListener('change', () => {
+                    this.actualizarPreciosPorUnidad();
                     this.actualizarDisponibilidadPorUnidad();
                 });
-                // Precio de venta sugerido
-                const precioSugerido = 0;
-                document.getElementById('modalPrecioVenta').value = precioSugerido.toFixed(2);
+
+                // Calcular precios iniciales
+                this.actualizarPreciosPorUnidad();
 
                 document.getElementById('modalCantidad').value = 1;
-
                 this.calcularSubtotalModal();
 
                 const modal = new bootstrap.Modal(document.getElementById('modalProducto'));
                 modal.show();
                 this.actualizarDisponibilidadPorUnidad();
+            }
+
+            // Nuevo método para actualizar precios según la unidad seleccionada
+            actualizarPreciosPorUnidad() {
+                const selectorUnidad = document.getElementById('modalUnidadVenta');
+                const factorConversion = parseFloat(selectorUnidad.options[selectorUnidad.selectedIndex].getAttribute('data-factor'));
+                const precioCompraElement = document.getElementById('modalPrecioCompra');
+                const precioVentaElement = document.getElementById('modalPrecioVenta');
+
+                if (factorConversion !== 1) {
+                    // Si se selecciona una unidad derivada (sacos, cubetadas, etc.)
+                    // Calcular el precio unitario en la nueva unidad
+                    const precioUnitarioEnUnidadVenta = this.precioUnitarioBase / factorConversion;
+
+                    // Mostrar el precio de compra en la nueva unidad
+                    precioCompraElement.value = `$${precioUnitarioEnUnidadVenta.toFixed(2)}`;
+
+                    // Calcular precio de venta sugerido (25% de ganancia sobre el precio unitario en la nueva unidad)
+                    const precioVentaSugerido = precioUnitarioEnUnidadVenta * 1.25;
+                    precioVentaElement.value = precioVentaSugerido.toFixed(2);
+
+                    // Mostrar información adicional
+                    const unidadVentaTexto = selectorUnidad.options[selectorUnidad.selectedIndex].text;
+                    const unidadVentaNombre = unidadVentaTexto.split(' ')[0];
+
+                    // Agregar tooltip o información adicional si lo deseas
+                    precioCompraElement.title = `Precio unitario en ${unidadVentaNombre}. Precio base: $${this.precioUnitarioBase.toFixed(2)}`;
+                } else {
+                    // Si se selecciona la unidad base
+                    precioCompraElement.value = `$${this.precioUnitarioBase.toFixed(2)}`;
+
+                    // Precio de venta sugerido para unidad base
+                    const precioVentaSugerido = this.precioUnitarioBase * 1.25;
+                    precioVentaElement.value = precioVentaSugerido.toFixed(2);
+
+                    // Limpiar tooltip
+                    precioCompraElement.title = 'Precio unitario en unidad base';
+                }
+
+                // Recalcular subtotal
+                this.calcularSubtotalModal();
             }
 
             calcularSubtotalModal() {
