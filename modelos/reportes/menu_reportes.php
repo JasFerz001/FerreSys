@@ -21,7 +21,7 @@
                     <i class="fas fa-shopping-cart"></i>
                 </div>
                 <div class="info">
-                    <h3>Compra por Proveedor</h3>
+                    <h3>Compra por proveedor</h3>
                     <p>Reporte de compras por proveedor</p>
                 </div>
             </a>
@@ -32,7 +32,7 @@
                     <i class="fas fa-shopping-cart"></i>
                 </div>
                 <div class="info">
-                    <h3>Historial de Compras</h3>
+                    <h3>Historial de compras</h3>
                     <p>Reporte de compras realizadas</p>
                 </div>
             </a>
@@ -52,16 +52,40 @@
         </div>
 
         <div class="card stat-card">
+            <a href="../reportes/productos_baja_existencia.php">
+                <div class="icon red">
+                    <i class="fas fa-triangle-exclamation"></i>
+                </div>
+                <div class="info">
+                    <h3>Productos con baja existencia</h3>
+                    <p>Reporte de productos con poco stock</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="card stat-card">
             <a href="../reportes/historial_ventas.php">
                 <div class="icon red">
                     <i class="fas fa-shop"></i>
                 </div>
                 <div class="info">
-                    <h3>Ventas</h3>
+                    <h3>Historial de ventas</h3>
                     <p>Reporte de Historial de Ventas</p>
                 </div>
             </a>
         </div>
+        <div class="card stat-card">
+            <a href="../reportes/ventas_rango_fechas.php">
+                <div class="icon blue">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="info">
+                    <h3>Ventas por Rango</h3>
+                    <p>Reporte de ventas diarias, mensuales, trimestrales, semestrales y anuales</p>
+                </div>
+            </a>
+        </div>
+
     </div>
 </body>
 

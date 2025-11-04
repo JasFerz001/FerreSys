@@ -108,10 +108,11 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                             <i class="fas fa-list"></i>
                             <span>Menú de Reportes</span>
                         </a>
-                        <a class="submenu-item" href="../../modelos/reportes/compra_proveedor.php" onclick="abrirFormularios(event)">
+                        <!--<a class="submenu-item" href="../../modelos/reportes/compra_proveedor.php" onclick="abrirFormularios(event)">
                             <i class="fas fa-truck-loading"></i>
                             <span>Compra por Proveedor</span>
                         </a>
+            -->
                     </div>
                 </div>
 
@@ -366,7 +367,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
 
             dashboardCardsContainer.style.display = 'none';
         }
-         document.querySelectorAll('.has-submenu > .submenu-toggle').forEach(toggle => {
+        document.querySelectorAll('.has-submenu > .submenu-toggle').forEach(toggle => {
             toggle.addEventListener('click', function(e) {
                 e.preventDefault();
                 const parent = this.parentElement;
@@ -404,7 +405,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
             if (!userTopIcon.contains(event.target) && !dropdownTop.contains(event.target)) {
                 dropdownTop.style.display = 'none';
             }
-            if(!event.target.closest('.has-submenu')) {
+            if (!event.target.closest('.has-submenu')) {
                 document.querySelectorAll('.has-submenu').forEach(h => h.classList.remove('open'));
             }
         });
