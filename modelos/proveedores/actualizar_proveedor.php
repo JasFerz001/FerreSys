@@ -1,11 +1,21 @@
 <?php
+session_start();
+
+// Verificar sesión activa
+if (!isset($_SESSION['id_Empleado']) || empty($_SESSION['id_Empleado'])) {
+    header("Location: ../acceso/acceso_denegado.php");
+    exit();
+}
+
 include_once '../../conexion/conexion.php';
 include_once '../proveedores/proveedor.php';
+include_once '../../modelos/bitacora/bitacora.php';
 
 $conexion = new Conexion();
 $db = $conexion->getConnection();
-
 $proveedor = new Proveedor($db);
+$bitacora = new Bitacora($db);
+
 $message = '';
 $duplicates = [];
 
@@ -17,6 +27,7 @@ function formatearTexto($texto)
     return ucwords($texto);
 }
 
+// Leer proveedor si se pasa el id por GET
 if (isset($_GET['id'])) {
     $id_Proveedor = (int) $_GET['id'];
     $proveedor->id_Proveedor = $id_Proveedor;
@@ -32,8 +43,8 @@ if (isset($_GET['id'])) {
     }
 }
 
+// Procesar actualización
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Obtener y sanitizar datos del formulario
     $id_Proveedor = (int) $_POST['id_Proveedor'];
     $nombre = formatearTexto(trim($_POST['nombre']));
     $contac_referencia = formatearTexto(trim($_POST['contac_referencia']));
@@ -41,7 +52,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $correo = strtolower(trim($_POST['correo']));
     $estado = intval($_POST['estado']);
 
-    // Asignar valores al objeto Proveedor
     $proveedor->id_Proveedor = $id_Proveedor;
     $proveedor->nombre = $nombre;
     $proveedor->contac_referencia = $contac_referencia;
@@ -49,10 +59,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $proveedor->correo = $correo;
     $proveedor->estado = $estado;
 
-    // Intentar actualizar el proveedor
     $result = $proveedor->actualizar();
+
     if ($result['success']) {
         $message = 'Proveedor actualizado exitosamente.';
+
+        // === Registrar en bitácora ===
+        $bitacora->id_Empleado = $_SESSION['id_Empleado'];
+        $bitacora->accion = "Actualización de proveedor";
+        $bitacora->descripcion = "Se actualizó la información del proveedor '{$nombre}' (ID: {$id_Proveedor}).";
+        $bitacora->registrar();
     } else {
         if (isset($result['duplicates'])) {
             $duplicates = $result['duplicates'];
@@ -62,9 +78,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+// Leer proveedores
 $stmt = $proveedor->leer();
 $stmt1 = $proveedor->leerActivos();
 ?>
+
 
 
 <!DOCTYPE html>

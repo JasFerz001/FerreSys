@@ -168,5 +168,41 @@ class Productos
         return false;
     }
 
+    //  Muestra los productos con existencia menor a 5
+    public function obtenerProductosBajoStock()
+    {
+        $sql = "SELECT 
+                p.id_Producto,
+                p.nombre AS nombre_producto,
+                SUM(dc.existencia) AS total_existencia
+            FROM detalle_compra dc
+            INNER JOIN producto p ON p.id_Producto = dc.id_Producto
+            GROUP BY p.id_Producto, p.nombre
+            HAVING total_existencia < 5";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    //  Devuelve solo la cantidad de productos con existencia menor a 5
+    public function contarProductosBajoStock()
+    {
+        $sql = "SELECT 
+                COUNT(*) AS cantidad_productos_bajo_stock
+            FROM (
+                SELECT p.id_Producto
+                FROM detalle_compra dc
+                INNER JOIN producto p ON p.id_Producto = dc.id_Producto
+                GROUP BY p.id_Producto
+                HAVING SUM(dc.existencia) < 5
+            ) AS productos_bajo_stock";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $resultado['cantidad_productos_bajo_stock'] ?? 0;
+    }
+
 }
 ?>

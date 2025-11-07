@@ -1,40 +1,61 @@
 <?php
-//verificar si el usuario ha iniciado sesión
+// Verificar si el usuario ha iniciado sesión
 session_start();
 if (!isset($_SESSION['id_Empleado']) || empty($_SESSION['id_Empleado'])) {
     header("Location: ../acceso/acceso_denegado.php");
     exit();
 }
 
+// Incluir dependencias
 include_once '../../conexion/conexion.php';
 include_once '../unidad de medida/unidadMedida.php';
+include_once '../bitacora/bitacora.php';
 
+// Conexión a la base de datos
 $conexion = new Conexion();
 $db = $conexion->getConnection();
-$unidadMedida = new unidadMedida($db);
 
+// Instanciar clases
+$unidadMedida = new unidadMedida($db);
+$bitacora = new Bitacora($db);
+
+// Mensaje para alertas
 $message = '';
 
+// Función para limpiar texto
 function formatearTexto($texto)
 {
     $texto = strtolower(trim($texto));
     return ucwords($texto);
 }
 
+// Procesar formulario al enviar
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $nombre = formatearTexto(trim($_POST['nombre']));
-    $simbolo = trim($_POST['simbolo']);
+    $simbolo = strtoupper(trim($_POST['simbolo'])); // Simbolo en mayúsculas
 
     $unidadMedida->nombre = $nombre;
     $unidadMedida->simbolo = $simbolo;
 
-    // Crear la Unidad de Medida
-    $result = $unidadMedida->crear();
+    try {
+        // Crear la Unidad de Medida
+        $result = $unidadMedida->crear();
 
-    if ($result) {
-        $message = 'success';
-    } else {
+        if ($result) {
+            $message = 'success';
+
+            // Registrar en bitácora
+            $bitacora->id_Empleado = $_SESSION['id_Empleado'];
+            $bitacora->accion = "Creación de unidad de medida";
+            $bitacora->descripcion = "Se registró la unidad de medida '$nombre' con símbolo '$simbolo'.";
+            $bitacora->registrar();
+
+        } else {
+            $message = 'error';
+        }
+
+    } catch (Exception $e) {
         $message = 'error';
     }
 }
@@ -42,6 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 // Leer todas las unidades de medida para mostrarlas en la tabla
 $stmt = $unidadMedida->leer();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="es">
@@ -64,7 +86,7 @@ $stmt = $unidadMedida->leer();
             <div class="col-md-4">
                 <div class="card-form h-100">
                     <div class="card-title">Registro de Unidades de Medida</div>
-                    
+
                     <form id="unidadMedidaForm" method="post" action="crear_unidad.php">
                         <input type="hidden" name="id_Medida" id="id_Medida">
                         <div class="row g-3">
