@@ -10,6 +10,8 @@ date_default_timezone_set('America/El_Salvador');
     <title>Realizar Venta</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <link rel="stylesheet" href="../../css/venta.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -36,7 +38,7 @@ date_default_timezone_set('America/El_Salvador');
                                     <label class="form-label">Fecha de Venta</label>
                                     <!-- Campo visible (solo lectura) -->
                                     <input type="text" class="form-control" id="fechaVentaVisual" readonly
-                                        value="<?= date('d-m-Y') ?>">
+                                        value="<?= date('d/m/Y') ?>">
 
                                     <!-- Campo oculto para enviar al servidor -->
                                     <input type="hidden" name="fechaVenta" id="fechaVenta" value="<?= date('Y-m-d') ?>">
@@ -85,6 +87,7 @@ date_default_timezone_set('America/El_Salvador');
                         </div>
                     </div>
                 </div>
+
             </div>
 
             <div class="col-md-4">
@@ -187,6 +190,7 @@ date_default_timezone_set('America/El_Salvador');
         </div>
     </div>
 
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script></script>
     <script>
@@ -194,6 +198,7 @@ date_default_timezone_set('America/El_Salvador');
             constructor() {
                 this.carrito = [];
                 this.productoSeleccionado = null;
+                this.ultimaVenta = null;
                 this.init();
             }
 
@@ -318,17 +323,31 @@ date_default_timezone_set('America/El_Salvador');
                 if (factorConversion !== 1) {
                     // Calcular y mostrar la existencia en la unidad de venta seleccionada
                     const existenciaEnVenta = producto.existencia * factorConversion;
-                    const unidadVentaNombre = selectorUnidad.options[selectorUnidad.selectedIndex].text.split(' ')[0];
+                    const unidadVentaTexto = selectorUnidad.options[selectorUnidad.selectedIndex].text;
+                    const unidadVentaNombre = unidadVentaTexto.split(' ')[0];
 
                     existenciaElement.value = `${existenciaEnVenta.toFixed(2)} ${unidadVentaNombre} (equivale a ${producto.existencia} ${producto.simbolo})`;
 
                     // Actualizar el máximo permitido
                     cantidadInput.max = Math.floor(existenciaEnVenta * 100) / 100; // Permitir decimales
+
+                    // Mostrar información de conversión de precios
+                    const precioUnitarioEnUnidadVenta = this.precioUnitarioBase / factorConversion;
+                    console.log(`Precio unitario en ${unidadVentaNombre}: $${precioUnitarioEnUnidadVenta.toFixed(2)}`);
                 } else {
                     // Volver a mostrar la existencia normal
                     existenciaElement.value = `${producto.existencia} ${producto.simbolo}`;
                     cantidadInput.removeAttribute('max');
                 }
+            }
+
+            // Asegurarnos de que el precio de venta también actualice el subtotal cuando cambie
+            calcularSubtotalModal() {
+                const precio = parseFloat(document.getElementById('modalPrecioVenta').value) || 0;
+                const cantidad = parseInt(document.getElementById('modalCantidad').value) || 0;
+                const subtotal = precio * cantidad;
+
+                document.getElementById('modalSubtotal').value = `$${subtotal.toFixed(2)}`;
             }
 
             mostrarProductos(productos) {
@@ -407,7 +426,10 @@ date_default_timezone_set('America/El_Salvador');
 
                 document.getElementById('modalProductoNombre').value = producto.nombre_producto;
                 document.getElementById('modalProductoProveedor').value = producto.proveedor;
-                document.getElementById('modalPrecioCompra').value = `$${parseFloat(producto.precio_unitario).toFixed(2)}`;
+
+                // Guardar el precio unitario base para los cálculos
+                this.precioUnitarioBase = parseFloat(producto.precio_unitario);
+                document.getElementById('modalPrecioCompra').value = `$${this.precioUnitarioBase.toFixed(2)}`;
                 document.getElementById('modalExistencia').value = `${producto.existencia} ${producto.simbolo}`;
 
                 // Cargar unidades de venta disponibles
@@ -433,20 +455,61 @@ date_default_timezone_set('America/El_Salvador');
                 }
 
                 // Actualizar el evento para recalcular cuando cambie la unidad
-                document.getElementById('modalUnidadVenta').addEventListener('change', () => {
+                selectUnidad.addEventListener('change', () => {
+                    this.actualizarPreciosPorUnidad();
                     this.actualizarDisponibilidadPorUnidad();
                 });
-                // Precio de venta sugerido
-                const precioSugerido = 0;
-                document.getElementById('modalPrecioVenta').value = precioSugerido.toFixed(2);
+
+                // Calcular precios iniciales
+                this.actualizarPreciosPorUnidad();
 
                 document.getElementById('modalCantidad').value = 1;
-
                 this.calcularSubtotalModal();
 
                 const modal = new bootstrap.Modal(document.getElementById('modalProducto'));
                 modal.show();
                 this.actualizarDisponibilidadPorUnidad();
+            }
+
+            // Nuevo método para actualizar precios según la unidad seleccionada
+            actualizarPreciosPorUnidad() {
+                const selectorUnidad = document.getElementById('modalUnidadVenta');
+                const factorConversion = parseFloat(selectorUnidad.options[selectorUnidad.selectedIndex].getAttribute('data-factor'));
+                const precioCompraElement = document.getElementById('modalPrecioCompra');
+                const precioVentaElement = document.getElementById('modalPrecioVenta');
+
+                if (factorConversion !== 1) {
+                    // Si se selecciona una unidad derivada (sacos, cubetadas, etc.)
+                    // Calcular el precio unitario en la nueva unidad
+                    const precioUnitarioEnUnidadVenta = this.precioUnitarioBase / factorConversion;
+
+                    // Mostrar el precio de compra en la nueva unidad
+                    precioCompraElement.value = `$${precioUnitarioEnUnidadVenta.toFixed(2)}`;
+
+                    // Calcular precio de venta sugerido (25% de ganancia sobre el precio unitario en la nueva unidad)
+                    const precioVentaSugerido = precioUnitarioEnUnidadVenta * 1.25;
+                    precioVentaElement.value = precioVentaSugerido.toFixed(2);
+
+                    // Mostrar información adicional
+                    const unidadVentaTexto = selectorUnidad.options[selectorUnidad.selectedIndex].text;
+                    const unidadVentaNombre = unidadVentaTexto.split(' ')[0];
+
+                    // Agregar tooltip o información adicional si lo deseas
+                    precioCompraElement.title = `Precio unitario en ${unidadVentaNombre}. Precio base: $${this.precioUnitarioBase.toFixed(2)}`;
+                } else {
+                    // Si se selecciona la unidad base
+                    precioCompraElement.value = `$${this.precioUnitarioBase.toFixed(2)}`;
+
+                    // Precio de venta sugerido para unidad base
+                    const precioVentaSugerido = this.precioUnitarioBase * 1.25;
+                    precioVentaElement.value = precioVentaSugerido.toFixed(2);
+
+                    // Limpiar tooltip
+                    precioCompraElement.title = 'Precio unitario en unidad base';
+                }
+
+                // Recalcular subtotal
+                this.calcularSubtotalModal();
             }
 
             calcularSubtotalModal() {
@@ -511,9 +574,10 @@ date_default_timezone_set('America/El_Salvador');
 
                 // 🔹 Agregar producto al carrito
                 const unidadVentaNombre = selectorUnidad.options[selectorUnidad.selectedIndex].text.split(' - ')[0];
+                const unidadSimple = unidadVentaNombre.split(' (')[0].trim();
                 const index = this.carrito.findIndex(item =>
                     item.id_Detallecompra === producto.id_Detallecompra &&
-                    item.unidad_venta === unidadVentaNombre
+                    item.unidad_venta === unidadSimple
                 );
 
                 if (index !== -1) {
@@ -525,7 +589,7 @@ date_default_timezone_set('America/El_Salvador');
                         nombre_producto: producto.nombre_producto,
                         proveedor: producto.proveedor,
                         unidad_medida: producto.simbolo,
-                        unidad_venta: unidadVentaNombre,
+                        unidad_venta: unidadSimple,
                         precio_venta: precioVenta,
                         cantidad: cantidad,
                         total: precioVenta * cantidad,
@@ -679,12 +743,18 @@ date_default_timezone_set('America/El_Salvador');
                     const data = await response.json();
 
                     if (data.success) {
+                        this.ultimaVenta = data.venta;
+
+                        // 🔹 Generar PDF automáticamente
+                        this.generarPDF();
+
                         Swal.fire({
                             icon: 'success',
                             title: 'Venta realizada',
-                            text: `Venta registrada con éxito.`,
+                            text: `Venta registrada exitosamente. El ticket se está descargando...`,
                             confirmButtonColor: '#198754'
                         });
+
                         this.carrito = [];
                         this.actualizarCarrito();
                         this.cargarProductos();
@@ -704,6 +774,113 @@ date_default_timezone_set('America/El_Salvador');
                     });
                 }
             }
+
+            generarPDF() {
+                if (!this.ultimaVenta) return;
+
+                const { jsPDF } = window.jspdf;
+
+                const doc = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: [80, 200]
+                });
+
+                const fecha = new Date().toLocaleDateString('es-SV');
+                const hora = new Date().toLocaleTimeString('es-SV', { hour: '2-digit', minute: '2-digit' });
+                const empleado = this.ultimaVenta.empleado?.nombre || document.getElementById('empleadoActual').value;
+                const cliente = this.ultimaVenta.cliente?.nombre || 'Cliente no especificado';
+
+                // Configuración
+                doc.setFontSize(7);
+                doc.setFont('courier', 'normal');
+
+                const marginLeft = 3;
+                let yPosition = 5;
+
+                // Encabezado
+                doc.setFont('courier', 'bold');
+                doc.text('FERRETERIA MICHAPA', 40, yPosition, { align: 'center' });
+                yPosition += 3;
+                doc.setFontSize(6);
+                doc.text('TICKET DE VENTA', 40, yPosition, { align: 'center' });
+                yPosition += 3;
+                doc.text(`#${this.ultimaVenta.id_Venta}`, 40, yPosition, { align: 'center' });
+                yPosition += 3;
+                doc.text(`${fecha} ${hora}`, 40, yPosition, { align: 'center' });
+                yPosition += 5;
+
+                // Información
+                doc.setFont('courier', 'normal');
+                doc.text(`Cliente: ${this.truncateText(cliente, 45)}`, marginLeft, yPosition);
+                yPosition += 3;
+                doc.text(`Empleado: ${this.truncateText(empleado, 60)}`, marginLeft, yPosition);
+                yPosition += 5;
+
+                // Línea separadora
+                doc.line(marginLeft, yPosition, 77, yPosition);
+                yPosition += 3;
+
+                // Encabezado tabla
+                doc.setFont('courier', 'bold');
+                doc.text('PRODUCTO', marginLeft, yPosition);
+                doc.text('CANT', 35, yPosition);
+                doc.text('TOTAL', 65, yPosition);
+                yPosition += 3;
+                doc.line(marginLeft, yPosition, 77, yPosition);
+                yPosition += 3;
+
+                // Productos
+                doc.setFont('courier', 'normal');
+                this.ultimaVenta.detalles.forEach((detalle, index) => {
+                    if (yPosition > 180) {
+                        doc.addPage([80, 200]);
+                        yPosition = 10;
+                    }
+
+                    const nombre = this.truncateText(detalle.nombre_producto, 30);
+
+                    // 🔹 USAR EL SÍMBOLO DESDE LA BASE DE DATOS
+                    const simbolo = detalle.simbolo_venta || 'u';
+                    const cantidad = `${detalle.cantidad}${simbolo}`;
+
+                    const total = `$${parseFloat(detalle.total).toFixed(2)}`;
+
+                    doc.text(nombre, marginLeft, yPosition);
+                    doc.text(cantidad, 35, yPosition);
+                    doc.text(total, 65, yPosition);
+                    yPosition += 3;
+
+                    // Precio unitario debajo
+                    doc.text(`@ $${parseFloat(detalle.precio_venta).toFixed(2)}`, marginLeft + 5, yPosition);
+                    yPosition += 4;
+                });
+
+                // Total
+                yPosition += 2;
+                doc.line(marginLeft, yPosition, 77, yPosition);
+                yPosition += 4;
+                doc.setFont('courier', 'bold');
+                doc.text('TOTAL:', 50, yPosition);
+                doc.text(`$${parseFloat(this.ultimaVenta.total).toFixed(2)}`, 65, yPosition);
+
+                // Pie
+                yPosition += 8;
+                doc.setFont('courier', 'normal');
+                doc.setFontSize(6);
+                doc.text('¡Gracias por su compra!', 40, yPosition, { align: 'center' });
+
+                // Descargar
+                doc.save(`ticket_${this.ultimaVenta.id_Venta}.pdf`);
+            }
+
+            // Método auxiliar para truncar texto (mantener este)
+            truncateText(text, maxLength) {
+                if (!text) return '';
+                return text.length > maxLength ? text.substring(0, maxLength - 1) : text;
+            }
+
+
 
             setupEventListeners() {
                 // Categoría change
@@ -732,6 +909,8 @@ date_default_timezone_set('America/El_Salvador');
                 document.getElementById('buscadorProductos').addEventListener('input', () => {
                     this.filtrarProductos();
                 });
+                // Imprimir ticket
+
 
             }
         }

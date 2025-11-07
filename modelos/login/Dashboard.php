@@ -137,6 +137,11 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                     <span>Restaurar Backup</span>
                 </a>
 
+                <a class="menu-item" title="Bitácora" href="../../modelos/bitacora/ver_bitacora.php" onclick="abrirFormularios(event)">
+                    <i class="fas fa-box"></i>
+                    <span>Bitácora</span>
+                </a>
+
                 <a class="menu-item" title="Ayuda" href="#" onclick="abrirFormularios(event)">
                     <i class="fas fa-circle-question"></i>
                     <span>Ayuda</span>

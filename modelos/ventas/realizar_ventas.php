@@ -271,13 +271,13 @@ function crearVenta() {
         // Iniciar transacción
         $db->beginTransaction();
         
-        // Obtener datos de la venta (los mismos de antes)
+        // Obtener datos de la venta
         $fecha = $_POST['fecha'] ?? date('Y-m-d');
         $id_Cliente = $_POST['id_Cliente'] ?? null;
         $id_Empleado = $_POST['id_Empleado'] ?? $_SESSION['id_Empleado'];
         $detalles = json_decode($_POST['detalles'], true) ?? [];
         
-        // Validaciones básicas (las mismas de antes)
+        // Validaciones básicas
         if (!$id_Cliente) {
             throw new Exception('Debe seleccionar un cliente');
         }
@@ -302,13 +302,17 @@ function crearVenta() {
             throw new Exception('Error al obtener el ID de la venta');
         }
         
+        $totalVenta = 0;
+        $detallesVenta = [];
+        
         // Procesar detalles de la venta CON CONVERSIONES
         foreach ($detalles as $detalle) {
             $id_Detallecompra = $detalle['id_Detallecompra'] ?? null;
             $precio_venta = $detalle['precio_venta'] ?? null;
             $cantidad = $detalle['cantidad'] ?? null;
-            $factor_conversion = $detalle['factor_conversion'] ?? 1; // Nuevo: factor de conversión
-            $usar_conversion = $detalle['usar_conversion'] ?? false; // Nuevo: si usa conversión
+            $factor_conversion = $detalle['factor_conversion'] ?? 1;
+            $usar_conversion = $detalle['usar_conversion'] ?? false;
+            $unidad_venta_frontend = $detalle['unidad_venta'] ?? null;
             
             if (!$id_Detallecompra || !$precio_venta || !$cantidad) {
                 throw new Exception('Datos incompletos en los detalles de la venta');
@@ -316,14 +320,10 @@ function crearVenta() {
             
             // Calcular cantidad a restar (considerando conversión)
             if ($usar_conversion) {
-        // Si estamos vendiendo en unidades derivadas (sacos, cubetadas)
-        // y factor_conversion = 20 (1 metro = 20 sacos)
-        // entonces: cantidad_a_restar = cantidad_vendida / factor_conversion
-        $cantidad_a_restar = $cantidad / $factor_conversion;
-    } else {
-        // Si estamos vendiendo en la unidad base
-        $cantidad_a_restar = $cantidad;
-    }
+                $cantidad_a_restar = $cantidad / $factor_conversion;
+            } else {
+                $cantidad_a_restar = $cantidad;
+            }
             
             // Verificar existencia (considerando conversión)
             $query = "SELECT existencia FROM detalle_compra WHERE id_Detallecompra = :id_Detallecompra";
@@ -342,25 +342,79 @@ function crearVenta() {
             
             // Calcular total
             $total = $precio_venta * $cantidad;
+            $totalVenta += $total;
             
-            // Crear detalle de venta (guardamos también la unidad de venta y factor si aplica)
+            // Obtener información completa del producto incluyendo unidad de medida base
+            $queryProducto = "SELECT 
+                p.nombre,
+                p.id_Producto,
+                um.nombre as unidad_base,
+                um.simbolo as simbolo_base,
+                pr.nombre as proveedor
+                FROM detalle_compra dc
+                INNER JOIN producto p ON dc.id_Producto = p.id_Producto
+                INNER JOIN unidad_medida um ON p.id_Medida = um.id_Medida
+                INNER JOIN compra c ON dc.id_Compra = c.id_Compra
+                INNER JOIN proveedores pr ON c.id_Proveedor = pr.id_Proveedor
+                WHERE dc.id_Detallecompra = :id_Detallecompra";
+            $stmtProducto = $db->prepare($queryProducto);
+            $stmtProducto->bindParam(':id_Detallecompra', $id_Detallecompra);
+            $stmtProducto->execute();
+            $infoProducto = $stmtProducto->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$infoProducto) {
+                throw new Exception('No se pudo obtener la información del producto');
+            }
+            
+            // 🔹 NUEVO: Determinar la unidad y símbolo para el ticket
+            if ($usar_conversion && $unidad_venta_frontend) {
+                // Buscar la unidad de venta en conversion_unidades para obtener el símbolo correcto
+                $queryUnidadVenta = "SELECT 
+                    umv.nombre as unidad_venta,
+                    umv.simbolo as simbolo_venta
+                    FROM conversion_unidades cu
+                    INNER JOIN unidad_medida umv ON cu.id_Unidad_Venta = umv.id_Medida
+                    WHERE cu.id_Producto = :id_Producto 
+                    AND umv.nombre = :unidad_venta
+                    AND cu.es_activo = 1
+                    LIMIT 1";
+                $stmtUnidadVenta = $db->prepare($queryUnidadVenta);
+                $stmtUnidadVenta->bindParam(':id_Producto', $infoProducto['id_Producto']);
+                $stmtUnidadVenta->bindParam(':unidad_venta', $unidad_venta_frontend);
+                $stmtUnidadVenta->execute();
+                $unidadVentaInfo = $stmtUnidadVenta->fetch(PDO::FETCH_ASSOC);
+                
+                $unidad_venta_ticket = $unidadVentaInfo['unidad_venta'] ?? $unidad_venta_frontend;
+                $simbolo_venta = $unidadVentaInfo['simbolo_venta'] ?? substr($unidad_venta_frontend, 0, 2);
+            } else {
+                // Usar unidad base
+                $unidad_venta_ticket = $infoProducto['unidad_base'];
+                $simbolo_venta = $infoProducto['simbolo_base'];
+            }
+            
+            // Guardar información para el ticket
+            $detallesVenta[] = [
+                'nombre_producto' => $infoProducto['nombre'],
+                'cantidad' => $cantidad,
+                'unidad_venta' => $unidad_venta_ticket,
+                'simbolo_venta' => $simbolo_venta, // ← NUEVO: símbolo desde la BD
+                'precio_venta' => $precio_venta,
+                'total' => $total,
+                'proveedor' => $infoProducto['proveedor']
+            ];
+            
+            // Crear detalle de venta en la tabla detalle_venta
             $detalleVenta->id_Detallecompra = $id_Detallecompra;
             $detalleVenta->id_Venta = $id_Venta;
             $detalleVenta->precio_venta = $precio_venta;
             $detalleVenta->cantidad = $cantidad;
             $detalleVenta->total = $total;
             
-            // Agregar campos para conversión si es necesario
-            if ($usar_conversion) {
-                // Podemos agregar campos a la tabla detalle_venta o manejarlo de otra forma
-                // Por simplicidad, asumiremos que la cantidad ya está en la unidad correcta
-            }
-            
             if (!$detalleVenta->crear()) {
                 throw new Exception('Error al crear el detalle de venta');
             }
             
-            // Actualizar existencia (restando la cantidad convertida a unidad base)
+            // Actualizar existencia en detalle_compra
             $query = "UPDATE detalle_compra 
                      SET existencia = existencia - :cantidad 
                      WHERE id_Detallecompra = :id_Detallecompra";
@@ -376,16 +430,42 @@ function crearVenta() {
         // Confirmar transacción
         $db->commit();
         
-         // Registrar en la bitácora SOLO si todo fue exitoso
+        // Registrar en la bitácora
         $bitacora->id_Empleado = $_SESSION['id_Empleado'];
         $bitacora->accion = "Registro de venta";
         $bitacora->descripcion = "Se realizó una nueva venta con ID #$id_Venta al cliente ID #$id_Cliente.";
         $bitacora->registrar();
         
+        // Obtener información del cliente para el ticket
+        $queryCliente = "SELECT nombre, apellido FROM clientes WHERE id_Cliente = :id_Cliente";
+        $stmtCliente = $db->prepare($queryCliente);
+        $stmtCliente->bindParam(':id_Cliente', $id_Cliente);
+        $stmtCliente->execute();
+        $infoCliente = $stmtCliente->fetch(PDO::FETCH_ASSOC);
+        
+        // Obtener información del empleado para el ticket
+        $queryEmpleado = "SELECT nombre, apellido FROM empleados WHERE id_Empleado = :id_Empleado";
+        $stmtEmpleado = $db->prepare($queryEmpleado);
+        $stmtEmpleado->bindParam(':id_Empleado', $id_Empleado);
+        $stmtEmpleado->execute();
+        $infoEmpleado = $stmtEmpleado->fetch(PDO::FETCH_ASSOC);
+        
+        // Devolver datos completos para el ticket
         echo json_encode([
             'success' => true, 
             'message' => 'Venta realizada exitosamente',
-            'id_Venta' => $id_Venta
+            'venta' => [
+                'id_Venta' => $id_Venta,
+                'total' => $totalVenta,
+                'fecha' => $fecha,
+                'cliente' => [
+                    'nombre' => $infoCliente['nombre'] . ' ' . $infoCliente['apellido']
+                ],
+                'empleado' => [
+                    'nombre' => $infoEmpleado['nombre'] . ' ' . $infoEmpleado['apellido']
+                ],
+                'detalles' => $detallesVenta
+            ]
         ]);
         
     } catch (Exception $e) {
