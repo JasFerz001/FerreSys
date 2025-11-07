@@ -38,7 +38,7 @@ date_default_timezone_set('America/El_Salvador');
                                     <label class="form-label">Fecha de Venta</label>
                                     <!-- Campo visible (solo lectura) -->
                                     <input type="text" class="form-control" id="fechaVentaVisual" readonly
-                                        value="<?= date('d-m-Y') ?>">
+                                        value="<?= date('d/m/Y') ?>">
 
                                     <!-- Campo oculto para enviar al servidor -->
                                     <input type="hidden" name="fechaVenta" id="fechaVenta" value="<?= date('Y-m-d') ?>">
