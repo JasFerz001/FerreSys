@@ -102,7 +102,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                 <a class="menu-item" title="Unidad de Conversion"
                     href="../../modelos/unidad de medida/crear_unidadConversion.php" onclick="abrirFormularios(event)">
                     <i class="fas fa-ruler-combined"></i>
-                    <span>Unidad de Conversion</span>
+                    <span>Unidad de Conversión</span>
                 </a>
 
                 <a class="menu-item" title="Clientes" href="../../modelos/cliente/crear_cliente.php"
@@ -149,6 +149,11 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                     <i class="fas fa-database"></i>
                     <i class="fas fa-upload"></i>
                     <span>Restaurar Backup</span>
+                </a>
+
+                <a class="menu-item" title="Bitácora" href="../../modelos/bitacora/ver_bitacora.php" onclick="abrirFormularios(event)">
+                    <i class="fas fa-box"></i>
+                    <span>Bitácora</span>
                 </a>
 
                 <a class="menu-item" title="Ayuda" href="#" onclick="abrirFormularios(event)">
