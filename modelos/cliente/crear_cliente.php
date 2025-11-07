@@ -1,10 +1,19 @@
 <?php
+//verificar si el usuario ha iniciado sesión
+session_start();
+if (!isset($_SESSION['id_Empleado']) || empty($_SESSION['id_Empleado'])) {
+    header("Location: ../acceso/acceso_denegado.php");
+    exit();
+}
+
 include_once '../../conexion/conexion.php';
 include_once '../cliente/cliente.php';
+include_once '../bitacora/bitacora.php';
 
 $conexion = new Conexion();
 $db = $conexion->getConnection();
 $cliente = new Cliente($db);
+$bitacora = new Bitacora($db);
 
 $message = '';
 $duplicates = [];
@@ -40,8 +49,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = $cliente->crear();
     if ($result['success']) {
         $message = 'success';
+         //  Registrar en bitácora solo si fue exitoso
+            $bitacora->id_Empleado = $id_empleado;
+            $bitacora->accion = "Registrar Cliente";
+           $bitacora->descripcion = htmlspecialchars_decode("Se registró el cliente '$nombre' en la base de datos.");
+
         // Limpiar los campos solo si fue exitoso
-        $nombre = $apellido = $dui = $direccion = $correo =  "";
+        $nombre = $apellido = $dui = $direccion = $correo = "";
     } else {
         $message = 'error';
         $duplicates = $result['duplicates'] ?? [];
@@ -82,16 +96,16 @@ $stmt = $cliente->leer();
                                     oninput="this.value = this.value.replace(/[^A-Za-zñÑáéíóúÁÉÍÓÚ\s]/g, '')">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label form-icon"><i
-                                        class="bi bi-person-vcard-fill"></i> Apellido</label>
+                                <label class="form-label form-icon"><i class="bi bi-person-vcard-fill"></i>
+                                    Apellido</label>
                                 <input autocomplete="off" type="text" name="apellido" class="form-control"
                                     placeholder="Ingresar Apellido" required maxlength="25"
                                     value="<?php echo htmlspecialchars($apellido); ?>"
                                     oninput="this.value = this.value.replace(/[^A-Za-zñÑáéíóúÁÉÍÓÚ\s]/g, '')">
                             </div>
                             <div class="col-md-12">
-                                <label class="form-label form-icon"><i
-                                        class="bi bi-credit-card-2-front-fill"></i> DUI</label>
+                                <label class="form-label form-icon"><i class="bi bi-credit-card-2-front-fill"></i>
+                                    DUI</label>
                                 <input autocomplete="off" type="text" name="dui" class="form-control"
                                     placeholder="Ingrese número de dui" required maxlength="10"
                                     value="<?php echo htmlspecialchars($dui); ?>" pattern="\d{8}-\d{1}"
@@ -112,8 +126,11 @@ $stmt = $cliente->leer();
                             </div>
                             <div class="text-muted small mb-3">* Todos los campos son obligatorios</div>
                             <div class="col-12 text-center mt-4 d-flex justify-content-center gap-3 flex-wrap">
-                                <button type="submit" class="btn btn-success flex-grow-1 flex-sm-grow-0" style="max-width: 200px;">Guardar</button>
-                                <button id="btnCancelar" type="button" class="btn btn-warning flex-grow-1 flex-sm-grow-0" style="max-width: 200px;">Cancelar</button>
+                                <button type="submit" class="btn btn-success flex-grow-1 flex-sm-grow-0"
+                                    style="max-width: 200px;">Guardar</button>
+                                <button id="btnCancelar" type="button"
+                                    class="btn btn-warning flex-grow-1 flex-sm-grow-0"
+                                    style="max-width: 200px;">Cancelar</button>
                             </div>
                         </div>
                     </form>
@@ -165,11 +182,11 @@ $stmt = $cliente->leer();
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const form = document.getElementById('clienteForm');
 
             // Validar antes de enviar el formulario
-            form.addEventListener('submit', function(e) {
+            form.addEventListener('submit', function (e) {
                 const dui = document.getElementById('dui').value.trim();
                 const correo = document.getElementById('correo').value.trim();
 
@@ -229,7 +246,7 @@ $stmt = $cliente->leer();
         }
 
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#tablaClientes').DataTable({
                 "language": {
                     "url": "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"

@@ -87,6 +87,16 @@ if ($_POST && isset($_POST['procesar_compra'])) {
                 }
             }
 
+
+            include_once '../bitacora/Bitacora.php';
+            $bitacora = new Bitacora($db);
+
+            $bitacora->id_Empleado = $id_empleado;
+            $bitacora->accion = "Registrar Compra";
+            $bitacora->descripcion = "Se registró la compra con ID #$id_compra_generada con " . count($productos_detalle) . " productos.";
+            $bitacora->registrar();
+
+
             // Éxito - preparar mensaje
             $mensaje_exito = "Compra registrada exitosamente.";
             $mensaje_script = "

@@ -17,10 +17,12 @@ if (!$primera_vez) {
 // Incluir archivos necesarios
 include_once '../../conexion/conexion.php';
 include_once '../empleado/empleado.php';
+include_once '../bitacora/bitacora.php';
 
 $conexion = new Conexion();
 $db = $conexion->getConnection();
 $empleado = new Empleado($db);
+$bitacora = new Bitacora($db);
 
 $message = '';
 $duplicates = [];
@@ -69,6 +71,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = $empleado->crear();
 
     if ($result['success']) {
+        // Registrar en la bitácora
+        $bitacora->id_Empleado = $_SESSION['id_Empleado']; // el que está logueado
+        $bitacora->accion = "Registro de empleado";
+        $bitacora->descripcion = "Se registró al empleado: " . $empleado->nombre . " " . $empleado->apellido;
+        $bitacora->registrar();
+
         // Si es la primera vez, redirigir al login
         if ($primera_vez) {
             header("Location: ../login/login.php");

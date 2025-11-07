@@ -1,5 +1,5 @@
 <?php
-//verificar si el usuario ha iniciado sesión
+// Verificar si el usuario ha iniciado sesión
 session_start();
 if (!isset($_SESSION['id_Empleado']) || empty($_SESSION['id_Empleado'])) {
     header("Location: ../acceso/acceso_denegado.php");
@@ -8,10 +8,12 @@ if (!isset($_SESSION['id_Empleado']) || empty($_SESSION['id_Empleado'])) {
 
 include_once '../../conexion/conexion.php';
 include_once '../categoria/categoria.php';
+include_once '../bitacora/Bitacora.php'; // ← Agregamos la bitácora
 
 $conexion = new Conexion();
 $db = $conexion->getConnection();
 $categoria = new Categoria($db);
+$bitacora = new Bitacora($db); // ← Instancia de bitácora
 
 $message = '';
 
@@ -29,10 +31,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $categoria->nombre = $nombre;
     $categoria->descripcion = $descripcion;
 
-    // Crear la Categoría
+    // Crear la categoría
     $result = $categoria->crear();
 
     if ($result['success']) {
+        // Registrar en bitácora
+        $bitacora->id_Empleado = $_SESSION['id_Empleado'];
+        $bitacora->accion = "Registro de categoría";
+        $bitacora->descripcion = "Se registró la categoría: " . $categoria->nombre;
+        $bitacora->registrar();
+
         $message = 'success';
         // Limpiar los campos solo si fue exitoso
         $nombre = $descripcion = "";
@@ -41,9 +49,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// Leer todos las categorias para mostrarlas en la tabla
+// Leer todas las categorías para mostrarlas en la tabla
 $stmt = $categoria->leer();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="es">

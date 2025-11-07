@@ -10,6 +10,7 @@ include_once '../../conexion/conexion.php';
 include_once '../categoria/categoria.php';
 include_once '../unidad de medida/unidadMedida.php';
 include_once '../productos/productos.php';
+include_once '../bitacora/Bitacora.php'; //  Se agrega la bitácora
 
 $conexion = new Conexion();
 $db = $conexion->getConnection();
@@ -17,6 +18,7 @@ $db = $conexion->getConnection();
 $producto = new productos($db);
 $categorias = new categoria($db);
 $medidas = new unidadMedida($db);
+$bitacora = new Bitacora($db); //  Instancia de bitácora
 
 $categoriasList = $categorias->leer();
 $medidasList = $medidas->leer();
@@ -28,6 +30,8 @@ function formatearTexto($texto)
     $texto = strtolower(trim($texto));
     return ucwords($texto);
 }
+
+$id_empleado = $_SESSION['id_Empleado']; //  Empleado actual logueado
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nombre = formatearTexto(trim($_POST['nombre']));
@@ -62,10 +66,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $producto->imagen = ""; // Imagen vacía si no se sube
     }
 
-    // Crear el Producto
-    if ($producto->crear()) {
-        $message = 'success';
-    } else {
+    try {
+        // Crear el Producto
+        if ($producto->crear()) {
+            $message = 'success';
+
+            //  Registrar en bitácora solo si fue exitoso
+            $bitacora->id_Empleado = $id_empleado;
+            $bitacora->accion = "Registrar Producto";
+           $bitacora->descripcion = htmlspecialchars_decode("Se registró el producto '$nombre' en la base de datos.");
+
+
+            $bitacora->registrar();
+
+        } else {
+            $message = 'error';
+        }
+    } catch (Exception $e) {
         $message = 'error';
     }
 }
@@ -73,6 +90,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 // Leer todos los productos para mostrarlos en la tabla
 $productosList = $producto->leer();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="es">
