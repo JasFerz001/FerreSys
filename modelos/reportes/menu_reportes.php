@@ -13,7 +13,7 @@
 
 <body>
 
-    <h1 class="center">Reportes</h1>
+
     <div class="container">
         <div class="card stat-card">
             <a href="../reportes/compra_proveedor.php">
@@ -76,6 +76,18 @@
         </div>
         <div class="card stat-card">
             <a href="../reportes/ventas_rango_fechas.php">
+                <div class="icon blue">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="info">
+                    <h3>Ventas por Rango</h3>
+                    <p>Reporte de ventas diarias, mensuales, trimestrales, semestrales y anuales</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="card stat-card">
+            <a href="../reportes/productos+-vendidos.php">
                 <div class="icon blue">
                     <i class="fas fa-chart-line"></i>
                 </div>
