@@ -1,28 +1,39 @@
 <?php
+session_start();
+
+// Verificar si hay sesión activa (empleado logueado)
+if (!isset($_SESSION['id_Empleado']) || empty($_SESSION['id_Empleado'])) {
+    header("Location: ../acceso/acceso_denegado.php");
+    exit();
+}
+
 include_once '../../conexion/conexion.php';
 include_once '../proveedores/proveedor.php';
+include_once '../../modelos/bitacora/bitacora.php';
 
 $conexion = new Conexion();
 $db = $conexion->getConnection();
 $proveedor = new Proveedor($db);
+$bitacora = new Bitacora($db);
 
 $message = '';
 $duplicates = [];
 
 $nombre = $contac_referencia = $correo = $telefono = '';
 
-function formatearTexto($texto){
-     $texto = strtolower(trim($texto));
-        return ucwords($texto);
+function formatearTexto($texto)
+{
+    $texto = strtolower(trim($texto));
+    return ucwords($texto);
 }
 
-if($_SERVER['REQUEST_METHOD'] == 'POST'){
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nombre = formatearTexto($_POST['nombre']);
     $contac_referencia = formatearTexto($_POST['contac_referencia']);
     $telefono = $_POST['telefono'];
     $correo = strtolower(trim($_POST['correo']));
 
-    if(empty($nombre) || empty($contac_referencia) || empty($telefono) || empty($correo)){
+    if (empty($nombre) || empty($contac_referencia) || empty($telefono) || empty($correo)) {
         $message = 'Todos los campos son obligatorios.';
     } else {
         $proveedor->nombre = $nombre;
@@ -32,14 +43,22 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $proveedor->estado = 1;
 
         $result = $proveedor->crear();
-        if($result['success']){
+
+        if ($result['success']) {
             $message = 'Proveedor creado exitosamente.';
+
+            // === Registrar en bitácora ===
+            $bitacora->id_Empleado = $_SESSION['id_Empleado'];
+            $bitacora->accion = "Registro de proveedor";
+            $bitacora->descripcion = "Se registró el proveedor '{$nombre}' con contacto '{$contac_referencia}'.";
+            $bitacora->registrar();
+
             // Limpiar los campos después de la creación exitosa
             $nombre = $contac_referencia = $telefono = $correo = '';
         } else {
             $duplicates = $result['duplicates'];
             $message = 'Error: Ya existe un proveedor con el mismo ';
-            if(count($duplicates) > 1){
+            if (count($duplicates) > 1) {
                 $last = array_pop($duplicates);
                 $message .= implode(', ', $duplicates) . ' y ' . $last . '.';
             } else {
@@ -49,15 +68,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
 }
 
-$stmt =$proveedor->leer();
-
+$stmt = $proveedor->leer();
 ?>
+
 
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-   <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Registro de Proveedores</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -66,6 +86,7 @@ $stmt =$proveedor->leer();
     <link rel="stylesheet" href="../../css/proveedor.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+
 <body>
     <div class="container-fluid px-3">
         <div class="row form-table-container d-flex">
@@ -75,25 +96,26 @@ $stmt =$proveedor->leer();
                     <div class="card-title">Registro de Proveedor</div>
                     <form id="proveedorForm" method="post" action="crear_proveedor.php">
                         <input type="hidden" name="id_Proveedor" id="id_Proveedor">
-                        
+
                         <div class="row g-3">
                             <div class="col-md-12">
-                                <label class="form-label form-icon"><i class="bi bi-person-fill"></i> Nombre de la Empresa</label>
+                                <label class="form-label form-icon"><i class="bi bi-person-fill"></i> Nombre de la
+                                    Empresa</label>
                                 <input autocomplete="off" type="text" name="nombre" class="form-control"
                                     placeholder="Ingresar Nombre de la Empresa" required maxlength="75"
                                     value="<?php echo htmlspecialchars($nombre); ?>"
                                     oninput="this.value = this.value.replace(/[^A-Za-zñÑáéíóúÁÉÍÓÚ\s]/g, '')">
                             </div>
                             <div class="col-md-12">
-                                <label class="form-label form-icon"><i class="bi bi-person-vcard-fill"></i> Contacto de Referencia</label>
+                                <label class="form-label form-icon"><i class="bi bi-person-vcard-fill"></i> Contacto de
+                                    Referencia</label>
                                 <input autocomplete="off" type="text" name="contac_referencia" class="form-control"
                                     placeholder="Ingresar Contacto de Referencia" required maxlength="100"
                                     value="<?php echo htmlspecialchars($contac_referencia); ?>"
                                     oninput="this.value = this.value.replace(/[^A-Za-zñÑáéíóúÁÉÍÓÚ\s]/g, '')">
                             </div>
                             <div class="col-md-12">
-                                <label class="form-label form-icon"><i 
-                                        class="bi bi-telephone-fill"></i>Teléfono</label>
+                                <label class="form-label form-icon"><i class="bi bi-telephone-fill"></i>Teléfono</label>
                                 <input autocomplete="off" type="text" name="telefono" class="form-control"
                                     placeholder="Ingresar número de teléfono" required maxlength="9"
                                     value="<?php echo htmlspecialchars($telefono); ?>" pattern="\d{4}-\d{4}"
@@ -106,7 +128,7 @@ $stmt =$proveedor->leer();
                                     placeholder="Ingresar correo electrónico" required
                                     value="<?php echo htmlspecialchars($correo); ?>">
                             </div>
-                             <div class="col-md-6">
+                            <div class="col-md-6">
                                 <label class="form-label form-icon"><i class="bi bi-toggle-on"></i> Estado</label>
                                 <select class="form-select" name="estado" required disabled>
                                     <option value="1" selected>Alta</option>
@@ -115,8 +137,11 @@ $stmt =$proveedor->leer();
                             </div>
                             <div class="text-muted small mb-2">* Todos los campos son obligatorios</div>
                             <div class="col-12 text-center mt-4 d-flex justify-content-center gap-3 flex-wrap">
-                                <button type="submit" class="btn btn-success flex-grow-1 flex-sm-grow-0" style="max-width: 200px;">Guardar</button>
-                                <button id="btnCancelar" type="button" class="btn btn-warning flex-grow-1 flex-sm-grow-0" style="max-width: 200px;">Cancelar</button>
+                                <button type="submit" class="btn btn-success flex-grow-1 flex-sm-grow-0"
+                                    style="max-width: 200px;">Guardar</button>
+                                <button id="btnCancelar" type="button"
+                                    class="btn btn-warning flex-grow-1 flex-sm-grow-0"
+                                    style="max-width: 200px;">Cancelar</button>
                             </div>
                         </div>
                     </form>
@@ -125,7 +150,7 @@ $stmt =$proveedor->leer();
 
 
             <!-- Tabla -->
-               <div class="col-md-8" id="tablaCol">
+            <div class="col-md-8" id="tablaCol">
                 <div class="table-section">
                     <div class="card-title" id="tablaTitle" style="cursor: pointer;">Lista de Proveedores</div>
                     <div class="table-responsive">
@@ -147,7 +172,7 @@ $stmt =$proveedor->leer();
                                         <td><?php echo htmlspecialchars($row['contac_referencia']); ?></td>
                                         <td><?php echo htmlspecialchars($row['telefono']); ?></td>
                                         <td><?php echo htmlspecialchars($row['correo']); ?></td>
-                                         <td>
+                                        <td>
                                             <span
                                                 class="badge <?php echo ($row['estado'] == 1 ? 'badge-success' : 'badge-danger'); ?>">
                                                 <?php echo ($row['estado'] == 1 ? 'Alta' : 'Baja'); ?>
@@ -158,7 +183,7 @@ $stmt =$proveedor->leer();
                                                 style="width: 40px; height: 40px;"
                                                 onclick="location.href='actualizar_proveedor.php?id=<?php echo $row['id_Proveedor']; ?>'">
                                                 <i class="bi bi-pencil" style="font-size: 1.2rem;"></i>
-                                           <!--
+                                                <!--
                                                 <button class="btn btn-sm btn-outline-danger p-1"
                                                 style="width: 40px; height: 40px;"
                                                 onclick="location.href='dar_baja_proveedor.php?id=<?php echo $row['id_Proveedor']; ?>'">
@@ -177,15 +202,15 @@ $stmt =$proveedor->leer();
         </div>
     </div>
 
-     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const form = document.getElementById('proveedorForm');
 
             // Validar antes de enviar el formulario
-            form.addEventListener('submit', function(e) {
+            form.addEventListener('submit', function (e) {
                 const nombre = document.querySelector('input[name="nombre"]').value.trim();
                 const contac_referencia = document.querySelector('input[name="contac_referencia"]').value.trim();
                 const telefono = document.querySelector('input[name="telefono"]').value.trim();
@@ -246,7 +271,7 @@ $stmt =$proveedor->leer();
                 confirmButtonText: 'Entendido'
             });
         } else if (message === 'Todos los campos son obligatorios.') {
-             Swal.fire({
+            Swal.fire({
                 title: 'Campos incompletos',
                 text: message,
                 icon: 'warning',
@@ -256,7 +281,7 @@ $stmt =$proveedor->leer();
         }
 
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#tablaProveedores').DataTable({
                 "language": {
                     "url": "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
@@ -288,4 +313,5 @@ $stmt =$proveedor->leer();
         });
     </script>
 </body>
+
 </html>

@@ -1,12 +1,20 @@
 <?php
+//verificar si el usuario ha iniciado sesión
 session_start();
+if (!isset($_SESSION['id_Empleado']) || empty($_SESSION['id_Empleado'])) {
+    header("Location: ../acceso/acceso_denegado.php");
+    exit();
+}
+//session_start();
 
 include_once '../../conexion/conexion.php';
 include_once '../usuario/usuario.php';
+include_once '../bitacora/bitacora.php';
 
 $conexion = new Conexion();
 $db = $conexion->getConnection();
 $usuario = new Usuario($db);
+$bitacora = new Bitacora($db);
 
 // Revisar si estamos editando
 $editUser = null;
@@ -62,6 +70,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $usuario->estado = (int)$estadoSeleccionado;
 
         if ($usuario->actualizar()) {
+            // Registrar en bitácora solo si fue exitoso
+            $idEmpleadoSesion = $_SESSION['id_Empleado'] ?? null;
+            if ($idEmpleadoSesion) {
+                $bitacora->id_Empleado = $idEmpleadoSesion;
+                $bitacora->accion = "Actualizar Usuario";
+                $bitacora->descripcion = "Se actualizó el usuario con rol '" . $rol . "' (ID Usuario: " . $id_Usuario . ").";
+                $bitacora->registrar();
+            }
+
             unset($_SESSION['old_rol'], $_SESSION['old_estado']);
             header("Location: crear_usuario.php?message=update_success");
             exit();
@@ -92,9 +109,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $usuario->estado = 1;
 
         if ($usuario->crear()) {
+            // Limpiar sesión temporal de formulario
             unset($_SESSION['old_rol'], $_SESSION['old_estado']);
 
-            if ($rol === "administrador" || $rol === "Administrador" || $rol === "ADMINISTRADOR") { // Asegúrate que coincida con mayúsculas
+            // Registrar en bitácora (si hay empleado en sesión)
+            $idEmpleadoSesion = $_SESSION['id_Empleado'] ?? null;
+            if ($idEmpleadoSesion) {
+                $bitacora->id_Empleado = $idEmpleadoSesion;
+                $bitacora->accion = "Registro Usuario";
+                $bitacora->descripcion = "Se registró el usuario '" . $rol . "' en la base de datos.";
+                $bitacora->registrar();
+            }
+
+            // Redirección según rol (hacerla después de registrar en bitácora)
+            if (strcasecmp($rol, "administrador") === 0) {
                 header("Location: ../empleado/crear_empleado.php?primera_vez=1");
                 exit();
             } else {
@@ -105,9 +133,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: crear_usuario.php?message=error");
             exit();
         }
+
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="es">

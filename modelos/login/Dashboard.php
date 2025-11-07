@@ -1,5 +1,15 @@
 <?php
+include_once '../productos/productos.php';
+include_once '../../conexion/conexion.php';
+
+
 session_start();
+$conexion = new Conexion();
+$db = $conexion->getConnection();
+$producto = new Productos($db);
+
+// Obtener cantidad de productos bajo stock
+$totalBajoStock = $producto->contarProductosBajoStock();
 
 // Proteger el dashboard: solo usuarios logueados
 if (!isset($_SESSION['id_Usuario'])) {
@@ -47,68 +57,95 @@ $rol_usuario = $_SESSION['rol'] ?? "";
             </a>
 
             <?php if ($rol_usuario === 'Administrador'): ?>
-                <a class="menu-item" title="Usuarios" href="../../modelos/usuario/crear_usuario.php" onclick="abrirFormularios(event)">
+                <a class="menu-item" title="Usuarios" href="../../modelos/usuario/crear_usuario.php"
+                    onclick="abrirFormularios(event)">
                     <i class="fas fa-user-friends"></i>
                     <span>Usuarios</span>
                 </a>
 
-                <a class="menu-item" title="Empleados" href="../../modelos/empleado/crear_empleado.php" onclick="abrirFormularios(event)">
+                <a class="menu-item" title="Empleados" href="../../modelos/empleado/crear_empleado.php"
+                    onclick="abrirFormularios(event)">
                     <i class="fas fa-users"></i>
                     <span>Empleados</span>
                 </a>
 
-                <a class="menu-item" title="Categorías" href="../../modelos/categoria/crear_categoria.php" onclick="abrirFormularios(event)">
+                <a class="menu-item" title="Categorías" href="../../modelos/categoria/crear_categoria.php"
+                    onclick="abrirFormularios(event)">
                     <i class="fas fa-th-large"></i>
                     <span>Categorías</span>
                 </a>
 
-                <a class="menu-item" title="Unidad de Medida" href="../../modelos/unidad de medida/crear_unidad.php" onclick="abrirFormularios(event)">
+                <a class="menu-item" title="Unidad de Medida" href="../../modelos/unidad de medida/crear_unidad.php"
+                    onclick="abrirFormularios(event)">
                     <i class="fas fa-ruler-combined"></i>
                     <span>Unidad de Medida</span>
                 </a>
 
-                <a class="menu-item" title="Productos" href="../../modelos/productos/crear_producto.php" onclick="abrirFormularios(event)">
+                <a class="menu-item" title="Productos" href="../../modelos/productos/crear_producto.php"
+                    onclick="abrirFormularios(event)">
                     <i class="fas fa-boxes"></i>
                     <span>Productos</span>
                 </a>
 
-                <a class="menu-item" title="Proveedores" href="../../modelos/proveedores/crear_proveedor.php" onclick="abrirFormularios(event)">
+                <a class="menu-item" title="Proveedores" href="../../modelos/proveedores/crear_proveedor.php"
+                    onclick="abrirFormularios(event)">
                     <i class="fas fa-handshake"></i>
                     <span>Proveedores</span>
                 </a>
 
-                <a class="menu-item" title="Compras" href="../../modelos/compras/realizar_compra.php" onclick="abrirFormularios(event)">
+                <a class="menu-item" title="Compras" href="../../modelos/compras/realizar_compra.php"
+                    onclick="abrirFormularios(event)">
                     <i class="fas fa-shopping-cart"></i>
                     <span>Compras</span>
                 </a>
 
-                <a class="menu-item" title="Unidad de Conversion" href="../../modelos/unidad de medida/crear_unidadConversion.php" onclick="abrirFormularios(event)">
+                <a class="menu-item" title="Unidad de Conversion"
+                    href="../../modelos/unidad de medida/crear_unidadConversion.php" onclick="abrirFormularios(event)">
                     <i class="fas fa-ruler-combined"></i>
                     <span>Unidad de Conversión</span>
                 </a>
 
-                <a class="menu-item" title="Clientes" href="../../modelos/cliente/crear_cliente.php" onclick="abrirFormularios(event)">
+                <a class="menu-item" title="Clientes" href="../../modelos/cliente/crear_cliente.php"
+                    onclick="abrirFormularios(event)">
                     <i class="fas fa-users"></i>
                     <span>Clientes</span>
                 </a>
 
-                <a class="menu-item" title="Ventas" href="../../modelos/ventas/ventitas.php" onclick="abrirFormularios(event)">
+                <a class="menu-item" title="Ventas" href="../../modelos/ventas/ventitas.php"
+                    onclick="abrirFormularios(event)">
                     <i class="fas fa-receipt"></i>
                     <span>Ventas</span>
                 </a>
 
-                <a class="menu-item" title="Reportes" href="../../modelos/reportes/menu_reportes.php" onclick="abrirFormularios(event)">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Reportes</span>
-                </a>
+                <div class="menu-item has-submenu" role="group" aria-label="Reportes">
+                    <a href="#" class="submenu-toggle" title="Reportes">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Reportes</span>
+                        <i class="fas fa-chevron-down submenu-caret"></i>
+                    </a>
+                    <div class="submenu">
+                        <a class="submenu-item" href="../../modelos/reportes/menu_reportes.php"
+                            onclick="abrirFormularios(event)">
+                            <i class="fas fa-list"></i>
+                            <span>Menú de Reportes</span>
+                        </a>
+                        <!--<a class="submenu-item" href="../../modelos/reportes/compra_proveedor.php" onclick="abrirFormularios(event)">
+                            <i class="fas fa-truck-loading"></i>
+                            <span>Compra por Proveedor</span>
+                        </a>
+            -->
+                    </div>
+                </div>
 
-                <a class="menu-item" title="Generar Backup" href="../../backup/backup.php" onclick="abrirFormularios(event)">
+                <a class="menu-item" title="Generar Backup" href="../../backup/backup.php"
+                    onclick="abrirFormularios(event)">
                     <i class="fas fa-database"></i>
                     <i class="fas fa-download"></i>
                     <span>Generar Backup</span>
                 </a>
 
-                <a class="menu-item" title="Restaurar Backup" href="../../backup/restaurar_backup.php" onclick="abrirFormularios(event)">
+                <a class="menu-item" title="Restaurar Backup" href="../../backup/restaurar_backup.php"
+                    onclick="abrirFormularios(event)">
                     <i class="fas fa-database"></i>
                     <i class="fas fa-upload"></i>
                     <span>Restaurar Backup</span>
@@ -121,7 +158,8 @@ $rol_usuario = $_SESSION['rol'] ?? "";
             <?php endif; ?>
 
             <?php if ($rol_usuario === 'Vendedor'): ?>
-                <a class="menu-item" title="Clientes" href="../../modelos/cliente/crear_cliente.php" onclick="abrirFormularios(event)">
+                <a class="menu-item" title="Clientes" href="../../modelos/cliente/crear_cliente.php"
+                    onclick="abrirFormularios(event)">
                     <i class="fas fa-users"></i>
                     <span>Clientes</span>
                 </a>
@@ -136,10 +174,30 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                     <span>Ventas</span>
                 </a>
 
-                <a class="menu-item" title="Reportes" href="../../modelos/reportes/menu_reportes.php" onclick="abrirFormularios(event)">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Reportes</span>
-                </a>
+                <div class="menu-item has-submenu" role="group" aria-label="Reportes Vendedor">
+                    <a href="#" class="submenu-toggle" title="Reportes">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Reportes</span>
+                        <i class="fas fa-chevron-down submenu-caret"></i>
+                    </a>
+                    <div class="submenu">
+                        <a class="submenu-item" href="../../modelos/reportes/menu_reportes.php"
+                            onclick="abrirFormularios(event)">
+                            <i class="fas fa-list"></i>
+                            <span>Menú de Reportes</span>
+                        </a>
+                        <a class="submenu-item" href="../../modelos/reportes/compra_proveedor.php"
+                            onclick="abrirFormularios(event)">
+                            <i class="fas fa-truck-loading"></i>
+                            <span>Reportes Compras</span>
+                        </a>
+                        <a class="submenu-item" href="../../modelos/reportes/compra_proveedor.php"
+                            onclick="abrirFormularios(event)">
+                            <i class="fas fa-truck-loading"></i>
+                            <span>Reportes Ventas</span>
+                        </a>
+                    </div>
+                </div>
 
                 <a class="menu-item" title="Ayuda" href="#" onclick="abrirFormularios(event)">
                     <i class="fas fa-circle-question"></i>
@@ -156,8 +214,8 @@ $rol_usuario = $_SESSION['rol'] ?? "";
             <?php
             echo htmlspecialchars(
                 (explode(' ', trim($_SESSION['nombre'] ?? ''))[0] ?? '') . ' ' .
-                    (explode(' ', trim($_SESSION['apellido'] ?? ''))[0] ?? '') . ' - ' .
-                    ($_SESSION['rol'] ?? '')
+                (explode(' ', trim($_SESSION['apellido'] ?? ''))[0] ?? '') . ' - ' .
+                ($_SESSION['rol'] ?? '')
             );
             ?>
         </span>
@@ -248,13 +306,13 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                             <p>Productos en Stock</p>
                         </div>
                     </div>
-
+                    <!-- mostrar la cantidad de productos con stock menor a 5 -->
                     <div class="card stat-card">
                         <div class="icon purple">
                             <i class="fas fa-exclamation-triangle"></i>
                         </div>
                         <div class="info">
-                            <h3>24</h3>
+                            <h3><?php echo $totalBajoStock; ?></h3>
                             <p>Productos Bajo Stock</p>
                         </div>
                     </div>
@@ -435,7 +493,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
         const mainContent = document.querySelector('.main-content');
         const topBar = document.querySelector('.top-bar');
 
-        toggleButton.addEventListener('click', function() {
+        toggleButton.addEventListener('click', function () {
             sidebar.classList.toggle('collapsed');
             mainContent.classList.toggle('expanded');
 
@@ -446,7 +504,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
 
         // Menu items active
         document.querySelectorAll('.menu-item').forEach(item => {
-            item.addEventListener('click', function(e) {
+            item.addEventListener('click', function (e) {
                 if (e.target.closest('.has-submenu')) {
                     return; // No cambiar active en items con submenú
                 }
@@ -467,13 +525,13 @@ $rol_usuario = $_SESSION['rol'] ?? "";
             dashboardCardsContainer.style.display = 'none';
         }
         document.querySelectorAll('.has-submenu > .submenu-toggle').forEach(toggle => {
-            toggle.addEventListener('click', function(e) {
+            toggle.addEventListener('click', function (e) {
                 e.preventDefault();
                 const parent = this.parentElement;
                 parent.classList.toggle('open');
             });
             // permitir toggle con tecla Enter/Space para accesibilidad
-            toggle.addEventListener('keydown', function(e) {
+            toggle.addEventListener('keydown', function (e) {
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     this.parentElement.classList.toggle('open');
@@ -483,7 +541,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
 
         // cuando se abre un formulario desde submenu, marcar item correspondiente como active
         document.querySelectorAll('.submenu-item').forEach(link => {
-            link.addEventListener('click', function() {
+            link.addEventListener('click', function () {
                 // cerrar otros submenus
                 document.querySelectorAll('.has-submenu').forEach(h => h.classList.remove('open'));
                 // marcar el padre como activo visualmente
@@ -500,7 +558,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
             dropdownTop.style.display = dropdownTop.style.display === 'block' ? 'none' : 'block';
         });
 
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             if (!userTopIcon.contains(event.target) && !dropdownTop.contains(event.target)) {
                 dropdownTop.style.display = 'none';
             }

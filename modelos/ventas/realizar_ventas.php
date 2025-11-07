@@ -14,6 +14,7 @@ include_once '../cliente/cliente.php';
 include_once '../empleado/empleado.php';
 include_once '../categoria/categoria.php';
 include_once '../unidad de medida/conversionunidad.php';
+include_once '../bitacora/bitacora.php';
 
 if (!isset($_SESSION['id_Empleado'])) {
     echo json_encode(['success' => false, 'message' => 'No hay sesión activa']);
@@ -29,6 +30,7 @@ $cliente = new Cliente($db);
 $empleado = new Empleado($db);
 $categoria = new Categoria($db);
 $conversionUnidad = new ConversionUnidad($db);
+$bitacora = new Bitacora($db);
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -263,7 +265,7 @@ function verificarExistenciaConversion()
     }
 }
 function crearVenta() {
-    global $venta, $detalleVenta, $db, $conversionUnidad;
+    global $venta, $detalleVenta, $db, $conversionUnidad, $bitacora;
     
     try {
         // Iniciar transacción
@@ -373,6 +375,12 @@ function crearVenta() {
         
         // Confirmar transacción
         $db->commit();
+        
+         // Registrar en la bitácora SOLO si todo fue exitoso
+        $bitacora->id_Empleado = $_SESSION['id_Empleado'];
+        $bitacora->accion = "Registro de venta";
+        $bitacora->descripcion = "Se realizó una nueva venta con ID #$id_Venta al cliente ID #$id_Cliente.";
+        $bitacora->registrar();
         
         echo json_encode([
             'success' => true, 

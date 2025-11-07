@@ -2,11 +2,16 @@
 // Configurar zona horaria de El Salvador
 date_default_timezone_set('America/El_Salvador');
 
-// Incluir la conexión
+// Iniciar sesión (necesario para leer $_SESSION)
+session_start();
+
+// Incluir conexión y modelo de bitácora
 include_once __DIR__ . '/../conexion/conexion.php';
+include_once __DIR__ . '/../modelos/bitacora/bitacora.php';
 
 $conexion = new Conexion();
 $db = $conexion->getConnection();
+$bitacora = new Bitacora($db);
 
 $message = '';
 
@@ -31,6 +36,7 @@ function generarBackup($centralDir)
     $mysqldump = 'C:\\xampp\\mysql\\bin\\mysqldump.exe';
     $command = "\"$mysqldump\" --user=$user --password=$pass --host=$host $dbname > \"$backupFile\"";
 
+    // Ejecutar y esperar resultado
     system($command, $output);
 
     return file_exists($backupFile) ? $backupFile : false;
@@ -54,7 +60,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($admin && password_verify($passwordIngresada, $admin['clave'])) {
             // Contraseña válida → generar backup
             $backupFile = generarBackup($centralDir);
-            $message = $backupFile ? 'success' : 'error';
+            if ($backupFile) {
+                $message = 'success';
+
+                // Registrar en bitácora SI Y SOLO SI existe id_Empleado en sesión
+                if (isset($_SESSION['id_Empleado']) && !empty($_SESSION['id_Empleado'])) {
+                    $idEmpleadoSesion = (int) $_SESSION['id_Empleado']; // casteo seguro a int
+                    $nombreArchivo = basename($backupFile);
+
+                    $bitacora->id_Empleado = $idEmpleadoSesion;
+                    $bitacora->accion = "Respaldo de Base de Datos";
+                    $bitacora->descripcion = "Se generó un respaldo de la base de datos llamado '$nombreArchivo' exitosamente.";
+
+                    // envolver en try/catch para que un fallo en bitácora no rompa la funcionalidad
+                    try {
+                        $bitacora->registrar();
+                    } catch (Throwable $e) {
+                        // opcional: loguear en un archivo de logs si lo deseas
+                        error_log("Error al registrar bitácora de backup: " . $e->getMessage());
+                    }
+                } else {
+                    // no hay sesión o id de empleado -> no registrar bitácora
+                    error_log("Backup generado pero no se registró en bitácora: no hay id_Empleado en sesión.");
+                }
+            } else {
+                $message = 'error';
+            }
         } else {
             // Contraseña incorrecta
             $message = 'invalid';
@@ -63,12 +94,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Listar backups en C:\Backups Ferreteria Michapa (más recientes primero)
-$backups = array_filter(scandir($centralDir), function ($file) use ($centralDir) {
-    return !in_array($file, ['.', '..']);
-});
-usort($backups, function ($a, $b) use ($centralDir) {
-    return filemtime($centralDir . $b) - filemtime($centralDir . $a);
-});
+$backups = [];
+if (is_dir($centralDir)) {
+    $files = array_values(array_filter(scandir($centralDir), function ($file) use ($centralDir) {
+        // incluir solo archivos .sql y omitir . y ..
+        return !in_array($file, ['.', '..']) && is_file($centralDir . $file) && pathinfo($file, PATHINFO_EXTENSION) === 'sql';
+    }));
+
+    usort($files, function ($a, $b) use ($centralDir) {
+        return filemtime($centralDir . $b) - filemtime($centralDir . $a);
+    });
+
+    $backups = $files;
+}
 ?>
 
 <!DOCTYPE html>
@@ -83,13 +121,12 @@ usort($backups, function ($a, $b) use ($centralDir) {
     <style>
         /* Input más pequeño y ancho fijo */
         .small-input {
-            width: 200px;      /* ancho del input */
+            width: 200px;
         }
     </style>
 </head>
 
 <body class="bg-light">
-
     <div class="container mt-5">
         <div class="card shadow-sm border-0 rounded-3">
             <div class="card-body p-4">
@@ -97,7 +134,8 @@ usort($backups, function ($a, $b) use ($centralDir) {
                     <i class="bi bi-database-down"></i> Generar Backup
                 </h3>
                 <p class="text-muted">
-                    Ingresa la <strong>contraseña del Administrador</strong> para generar un respaldo de la base de datos en:
+                    Ingresa la <strong>contraseña del Administrador</strong> para generar un respaldo de la base de
+                    datos en:
                     <code>C:\Backups Ferreteria Michapa</code>
                 </p>
 
@@ -105,8 +143,8 @@ usort($backups, function ($a, $b) use ($centralDir) {
                 <form method="post" id="backupForm" class="mb-4 row g-2 align-items-end">
                     <div class="mb-3 col-auto">
                         <label for="admin_password" class="form-label">Contraseña</label>
-                        <input type="password" class="form-control form-control-sm small-input" 
-                               id="admin_password" name="admin_password" placeholder="Escribe tu contraseña" required>
+                        <input type="password" class="form-control form-control-sm small-input" id="admin_password"
+                            name="admin_password" placeholder="Escribe tu contraseña" required>
                     </div>
                     <div class="mb-3 col-auto">
                         <button type="submit" id="backupBtn" class="btn btn-success btn-sm px-3">
@@ -141,7 +179,6 @@ usort($backups, function ($a, $b) use ($centralDir) {
     <script>
         const message = "<?php echo $message; ?>";
 
-        // Alertas
         if (message === 'success') {
             Swal.fire({
                 icon: 'success',
@@ -168,6 +205,6 @@ usort($backups, function ($a, $b) use ($centralDir) {
 
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-
 </body>
+
 </html>
