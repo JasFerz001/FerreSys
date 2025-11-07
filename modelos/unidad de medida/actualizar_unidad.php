@@ -1,19 +1,27 @@
 <?php
-//verificar si el usuario ha iniciado sesión
+// Verificar si el usuario ha iniciado sesión
 session_start();
 if (!isset($_SESSION['id_Empleado']) || empty($_SESSION['id_Empleado'])) {
     header("Location: ../acceso/acceso_denegado.php");
     exit();
 }
+
+// Incluir dependencias
 include_once '../../conexion/conexion.php';
 include_once '../unidad de medida/unidadMedida.php';
+include_once '../bitacora/bitacora.php';
 
+// Conexión a la base de datos
 $conexion = new Conexion();
 $db = $conexion->getConnection();
+
+// Instanciar clases
 $unidadMedida = new unidadMedida($db);
+$bitacora = new Bitacora($db);
 
 $message = '';
 
+// Función para formatear texto
 function formatearTexto($texto)
 {
     $texto = strtolower(trim($texto));
@@ -23,13 +31,13 @@ function formatearTexto($texto)
 // Obtener el ID de la unidad a editar
 $id_Unidad = isset($_GET['id']) ? $_GET['id'] : '';
 
-// Si no hay ID, redirigir a la página principal
+// Si no hay ID, redirigir
 if (empty($id_Unidad)) {
     header("Location: crear_unidad.php");
     exit();
 }
 
-// Cargar los datos de la unidad de medida
+// Cargar los datos de la unidad
 $unidadMedida->id_Medida = $id_Unidad;
 $unidadEncontrada = $unidadMedida->leerPorId();
 
@@ -39,24 +47,38 @@ if (!$unidadEncontrada) {
     exit();
 }
 
-// Asignar valores para mostrar en el formulario
+// Asignar valores actuales
 $nombre = $unidadMedida->nombre;
 $simbolo = $unidadMedida->simbolo;
 
+// Procesar actualización
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $nombre = formatearTexto(trim($_POST['nombre']));
-    $simbolo = trim($_POST['simbolo']);
 
-    $unidadMedida->id_Unidad = $id_Unidad;
+    $nombre = formatearTexto(trim($_POST['nombre']));
+    $simbolo = strtoupper(trim($_POST['simbolo']));
+
+    $unidadMedida->id_Medida = $id_Unidad;
     $unidadMedida->nombre = $nombre;
     $unidadMedida->simbolo = $simbolo;
 
-    // Actualizar la Unidad de Medida
-    $result = $unidadMedida->actualizar();
+    try {
+        // Actualizar la unidad
+        $result = $unidadMedida->actualizar();
 
-    if ($result) {
-        $message = 'success';
-    } else {
+        if ($result) {
+            $message = 'success';
+
+            // Registrar en bitácora
+            $bitacora->id_Empleado = $_SESSION['id_Empleado'];
+            $bitacora->accion = "Actualización de unidad de medida";
+            $bitacora->descripcion = "Se actualizó la unidad de medida '$nombre' (ID: $id_Unidad) con símbolo '$simbolo'.";
+            $bitacora->registrar();
+
+        } else {
+            $message = 'error';
+        }
+
+    } catch (Exception $e) {
         $message = 'error';
     }
 }
@@ -64,6 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 // Leer todas las unidades de medida para mostrarlas en la tabla
 $stmt = $unidadMedida->leer();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="es">

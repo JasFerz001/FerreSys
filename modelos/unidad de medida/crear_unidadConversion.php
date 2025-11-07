@@ -10,12 +10,14 @@ include_once '../../conexion/conexion.php';
 include_once '../unidad de medida/unidadMedida.php';
 include_once '../unidad de medida/conversionunidad.php';
 include_once '../productos/productos.php';
+include_once '../bitacora/bitacora.php';
 
 $conexion = new Conexion();
 $db = $conexion->getConnection();
 $conversionUnidad = new ConversionUnidad($db);
 $productos = new Productos($db);
 $unidadMedida = new unidadMedida($db);
+$bitacora = new Bitacora($db);
 
 $message = '';
 
@@ -40,6 +42,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = $conversionUnidad->crear();
 
     if ($result) {
+ // Registrar en bitácora
+            $bitacora->id_Empleado = $_SESSION['id_Empleado'];
+            $bitacora->accion = "Creación de unidad de conversión";
+            $bitacora->descripcion = "Se registró la unidad de conversion.";
+            $bitacora->registrar();
         $message = 'success';
     } else {
         $message = 'error';

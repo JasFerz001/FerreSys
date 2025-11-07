@@ -10,6 +10,7 @@ include_once '../../conexion/conexion.php';
 include_once '../categoria/categoria.php';
 include_once '../unidad de medida/unidadMedida.php';
 include_once '../productos/productos.php';
+include_once '../bitacora/Bitacora.php'; //  Se incluye la clase bitácora
 
 $conexion = new Conexion();
 $db = $conexion->getConnection();
@@ -17,14 +18,18 @@ $db = $conexion->getConnection();
 $producto = new productos($db);
 $categorias = new categoria($db);
 $medidas = new unidadMedida($db);
+$bitacora = new Bitacora($db); //  Instancia de bitácora
 
 $message = '';
 
+// Función para formatear texto
 function formatearTexto($texto)
 {
     $texto = strtolower(trim($texto));
     return ucwords($texto);
 }
+
+$id_empleado = $_SESSION['id_Empleado']; //  Se obtiene el id del empleado logueado
 
 // Obtener el ID del producto a editar
 $id_Producto = isset($_GET['id']) ? $_GET['id'] : '';
@@ -93,16 +98,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $producto->imagen = $imagen;
     }
 
-    // Actualizar el Producto
-    $result = $producto->actualizar();
+    try {
+        // Actualizar el Producto
+        $result = $producto->actualizar();
 
-    if ($result['success']) {
-        $message = 'success';
-        // Actualizar la variable de imagen si se cambió
-        if (!empty($_FILES['imagen']['name'])) {
-            $imagen = $producto->imagen;
+        if ($result['success']) {
+            $message = 'success';
+
+            //  Registrar en bitácora solo si fue exitoso
+            $bitacora->id_Empleado = $id_empleado;
+            $bitacora->accion = "Actualizar Producto";
+            $bitacora->descripcion = "Se actualizó el producto '{$nombre}'";
+            $bitacora->registrar();
+
+            // Actualizar la variable de imagen si se cambió
+            if (!empty($_FILES['imagen']['name'])) {
+                $imagen = $producto->imagen;
+            }
+        } else {
+            $message = 'error';
         }
-    } else {
+    } catch (Exception $e) {
         $message = 'error';
     }
 }
@@ -114,6 +130,7 @@ $medidasList = $medidas->leer();
 // Leer todos los productos para mostrarlos en la tabla
 $productosList = $producto->leer();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="es">

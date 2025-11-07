@@ -1,10 +1,18 @@
 <?php
+//verificar si el usuario ha iniciado sesión
+session_start();
+if (!isset($_SESSION['id_Empleado']) || empty($_SESSION['id_Empleado'])) {
+    header("Location: ../acceso/acceso_denegado.php");
+    exit();
+}
 include_once '../../conexion/conexion.php';
 include_once '../cliente/cliente.php';
+include_once '../bitacora/bitacora.php';
 
 $conexion = new Conexion();
 $db = $conexion->getConnection();
 $cliente = new Cliente($db);
+$bitacora = new Bitacora($db);
 
 $message = '';
 $duplicates = [];
@@ -61,6 +69,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($result['success']) {
         $message = 'success';
+         //  Registrar en bitácora solo si fue exitoso
+            $bitacora->id_Empleado = $id_empleado;
+            $bitacora->accion = "Actualizar Cliente";
+           $bitacora->descripcion = htmlspecialchars_decode("Se actualizo el cliente '$nombre' en la base de datos.");
+
     } else {
         $message = 'error';
         $duplicates = $result['duplicates'];
