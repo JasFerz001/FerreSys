@@ -86,6 +86,18 @@
             </a>
         </div>
 
+        <div class="card stat-card">
+            <a href="../reportes/productos+-vendidos.php">
+                <div class="icon blue">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="info">
+                    <h3>Ventas por Rango</h3>
+                    <p>Reporte de ventas diarias, mensuales, trimestrales, semestrales y anuales</p>
+                </div>
+            </a>
+        </div>
+
     </div>
 </body>
 

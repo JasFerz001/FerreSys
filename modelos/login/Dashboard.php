@@ -84,7 +84,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
 
                 <a class="menu-item" title="Unidad de Conversion" href="../../modelos/unidad de medida/crear_unidadConversion.php" onclick="abrirFormularios(event)">
                     <i class="fas fa-ruler-combined"></i>
-                    <span>Unidad de Conversion</span>
+                    <span>Unidad de Conversión</span>
                 </a>
 
                 <a class="menu-item" title="Clientes" href="../../modelos/cliente/crear_cliente.php" onclick="abrirFormularios(event)">
@@ -97,24 +97,10 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                     <span>Ventas</span>
                 </a>
 
-                <div class="menu-item has-submenu" role="group" aria-label="Reportes">
-                    <a href="#" class="submenu-toggle" title="Reportes">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>Reportes</span>
-                        <i class="fas fa-chevron-down submenu-caret"></i>
-                    </a>
-                    <div class="submenu">
-                        <a class="submenu-item" href="../../modelos/reportes/menu_reportes.php" onclick="abrirFormularios(event)">
-                            <i class="fas fa-list"></i>
-                            <span>Menú de Reportes</span>
-                        </a>
-                        <!--<a class="submenu-item" href="../../modelos/reportes/compra_proveedor.php" onclick="abrirFormularios(event)">
-                            <i class="fas fa-truck-loading"></i>
-                            <span>Compra por Proveedor</span>
-                        </a>
-            -->
-                    </div>
-                </div>
+                <a class="menu-item" title="Reportes" href="../../modelos/reportes/menu_reportes.php" onclick="abrirFormularios(event)">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Reportes</span>
+                </a>
 
                 <a class="menu-item" title="Generar Backup" href="../../backup/backup.php" onclick="abrirFormularios(event)">
                     <i class="fas fa-database"></i>
@@ -145,32 +131,15 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                     <span>Productos</span>
                 </a>
 
-                <a class="menu-item" title="Ventas" href="#" onclick="abrirFormularios(event)">
+                <a class="menu-item" title="Ventas" href="../../modelos/ventas/ventitas.php" onclick="abrirFormularios(event)">
                     <i class="fas fa-receipt"></i>
                     <span>Ventas</span>
                 </a>
 
-                <div class="menu-item has-submenu" role="group" aria-label="Reportes Vendedor">
-                    <a href="#" class="submenu-toggle" title="Reportes">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>Reportes</span>
-                        <i class="fas fa-chevron-down submenu-caret"></i>
-                    </a>
-                    <div class="submenu">
-                        <a class="submenu-item" href="../../modelos/reportes/menu_reportes.php" onclick="abrirFormularios(event)">
-                            <i class="fas fa-list"></i>
-                            <span>Menú de Reportes</span>
-                        </a>
-                        <a class="submenu-item" href="../../modelos/reportes/compra_proveedor.php" onclick="abrirFormularios(event)">
-                            <i class="fas fa-truck-loading"></i>
-                            <span>Reportes Compras</span>
-                        </a>
-                        <a class="submenu-item" href="../../modelos/reportes/compra_proveedor.php" onclick="abrirFormularios(event)">
-                            <i class="fas fa-truck-loading"></i>
-                            <span>Reportes Ventas</span>
-                        </a>
-                    </div>
-                </div>
+                <a class="menu-item" title="Reportes" href="../../modelos/reportes/menu_reportes.php" onclick="abrirFormularios(event)">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Reportes</span>
+                </a>
 
                 <a class="menu-item" title="Ayuda" href="#" onclick="abrirFormularios(event)">
                     <i class="fas fa-circle-question"></i>
@@ -215,7 +184,32 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                             <i class="fas fa-shopping-cart"></i>
                         </div>
                         <div class="info">
-                            <h3>152</h3>
+                            <?php
+                            // Incluir la clase Conexion
+                            require_once '../../conexion/conexion.php';
+
+                            $conexion = new Conexion();
+                            $conn = $conexion->getConnection();
+
+                            // Query para obtener el número de ventas del día
+                            $query = "SELECT COUNT(*) AS ventas_hoy 
+                  FROM ventas 
+                  WHERE DATE(fecha) = CURDATE()";
+
+                            try {
+                                $stmt = $conn->prepare($query);
+                                $stmt->execute();
+
+                                $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+                                $ventasHoy = $resultado['ventas_hoy'] ? $resultado['ventas_hoy'] : '0';
+                            } catch (PDOException $exception) {
+                                $ventasHoy = 'Error';
+                            }
+
+                            // Cerrar conexión
+                            $conn = null;
+                            ?>
+                            <h3><?php echo $ventasHoy; ?></h3>
                             <p>Ventas Hoy</p>
                         </div>
                     </div>
@@ -225,7 +219,32 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                             <i class="fas fa-box"></i>
                         </div>
                         <div class="info">
-                            <h3>1,258</h3>
+                            <?php
+                            // Incluir la clase Conexion
+                            require_once '../../conexion/conexion.php'; // Ajusta la ruta según donde tengas la clase
+
+                            $conexion = new Conexion();
+                            $conn = $conexion->getConnection();
+
+                            // Query para obtener el total de productos en stock
+                            $query = "SELECT SUM(existencia) AS total_stock 
+                  FROM detalle_compra 
+                  WHERE existencia > 0";
+
+                            try {
+                                $stmt = $conn->prepare($query);
+                                $stmt->execute();
+
+                                $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+                                $totalStock = $resultado['total_stock'] ? number_format($resultado['total_stock']) : '0';
+                            } catch (PDOException $exception) {
+                                $totalStock = 'Error';
+                            }
+
+                            // Cerrar conexión
+                            $conn = null;
+                            ?>
+                            <h3><?php echo $totalStock; ?></h3>
                             <p>Productos en Stock</p>
                         </div>
                     </div>
@@ -245,8 +264,31 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                             <i class="fas fa-shopping-bag"></i>
                         </div>
                         <div class="info">
-                            <h3>15</h3>
-                            <p>Compras </p>
+                            <?php
+                            require_once '../../conexion/conexion.php';
+
+                            $conexion = new Conexion();
+                            $conn = $conexion->getConnection();
+
+                            // Query para obtener las compras del día
+                            $query = "SELECT COUNT(*) AS compras_hoy 
+                  FROM compra 
+                  WHERE DATE(fecha) = CURDATE()";
+
+                            try {
+                                $stmt = $conn->prepare($query);
+                                $stmt->execute();
+
+                                $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+                                $comprasHoy = $resultado['compras_hoy'] ? number_format($resultado['compras_hoy']) : '0';
+                            } catch (PDOException $exception) {
+                                $comprasHoy = 'Error';
+                            }
+
+                            $conn = null;
+                            ?>
+                            <h3><?php echo $comprasHoy; ?></h3>
+                            <p>Compras Hoy</p>
                         </div>
                     </div>
 
@@ -255,8 +297,41 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                             <i class="fas fa-cubes"></i>
                         </div>
                         <div class="info">
-                            <h3>5</h3>
-                            <p>Productos Más Vendidos</p>
+                            <?php
+                            // Incluir la clase Conexion
+                            require_once '../../conexion/conexion.php';
+
+                            $conexion = new Conexion();
+                            $conn = $conexion->getConnection();
+
+                            // Query para obtener la cantidad de productos más vendidos (top 5)
+                            $query = "SELECT COUNT(*) AS total_productos_vendidos
+                  FROM (
+                      SELECT p.id_Producto
+                      FROM producto p
+                      INNER JOIN detalle_compra dc ON p.id_Producto = dc.id_Producto
+                      INNER JOIN detalle_venta dv ON dc.id_Detallecompra = dv.id_Detallecompra
+                      GROUP BY p.id_Producto
+                      HAVING SUM(dv.cantidad) > 0
+                      ORDER BY SUM(dv.cantidad) DESC
+                      LIMIT 5
+                  ) AS top_productos";
+
+                            try {
+                                $stmt = $conn->prepare($query);
+                                $stmt->execute();
+
+                                $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+                                $productosVendidos = $resultado['total_productos_vendidos'] ? $resultado['total_productos_vendidos'] : '0';
+                            } catch (PDOException $exception) {
+                                $productosVendidos = 'Error';
+                            }
+
+                            // Cerrar conexión
+                            $conn = null;
+                            ?>
+                            <h3><?php echo $productosVendidos; ?></h3>
+                            <p>Productos más Vendidos</p>
                         </div>
                     </div>
 
@@ -265,7 +340,31 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                             <i class="fas fa-users"></i>
                         </div>
                         <div class="info">
-                            <h3>12</h3>
+                            <?php
+                            // Incluir la clase Conexion
+                            require_once '../../conexion/conexion.php';
+
+                            $conexion = new Conexion();
+                            $conn = $conexion->getConnection();
+
+                            // Query para obtener el total de clientes
+                            $query = "SELECT COUNT(*) AS total_clientes 
+                  FROM clientes";
+
+                            try {
+                                $stmt = $conn->prepare($query);
+                                $stmt->execute();
+
+                                $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+                                $totalClientes = $resultado['total_clientes'] ? number_format($resultado['total_clientes']) : '0';
+                            } catch (PDOException $exception) {
+                                $totalClientes = 'Error';
+                            }
+
+                            // Cerrar conexión
+                            $conn = null;
+                            ?>
+                            <h3><?php echo $totalClientes; ?></h3>
                             <p>Clientes</p>
                         </div>
                     </div>
