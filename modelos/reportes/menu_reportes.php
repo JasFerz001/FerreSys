@@ -13,7 +13,7 @@
 
 <body>
 
-    <h1 class="center">Reportes</h1>
+
     <div class="container">
         <div class="card stat-card">
             <a href="../reportes/compra_proveedor.php">

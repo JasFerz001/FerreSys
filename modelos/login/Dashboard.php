@@ -117,25 +117,11 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                     <span>Ventas</span>
                 </a>
 
-                <div class="menu-item has-submenu" role="group" aria-label="Reportes">
-                    <a href="#" class="submenu-toggle" title="Reportes">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>Reportes</span>
-                        <i class="fas fa-chevron-down submenu-caret"></i>
-                    </a>
-                    <div class="submenu">
-                        <a class="submenu-item" href="../../modelos/reportes/menu_reportes.php"
-                            onclick="abrirFormularios(event)">
-                            <i class="fas fa-list"></i>
-                            <span>Menú de Reportes</span>
-                        </a>
-                        <!--<a class="submenu-item" href="../../modelos/reportes/compra_proveedor.php" onclick="abrirFormularios(event)">
-                            <i class="fas fa-truck-loading"></i>
-                            <span>Compra por Proveedor</span>
-                        </a>
-            -->
-                    </div>
-                </div>
+                <a class="menu-item" title="Reportes" href="../../modelos/reportes/menu_reportes.php"
+                    onclick="abrirFormularios(event)">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Reportes</span>
+                </a>
 
                 <a class="menu-item" title="Generar Backup" href="../../backup/backup.php"
                     onclick="abrirFormularios(event)">
@@ -174,30 +160,11 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                     <span>Ventas</span>
                 </a>
 
-                <div class="menu-item has-submenu" role="group" aria-label="Reportes Vendedor">
-                    <a href="#" class="submenu-toggle" title="Reportes">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>Reportes</span>
-                        <i class="fas fa-chevron-down submenu-caret"></i>
-                    </a>
-                    <div class="submenu">
-                        <a class="submenu-item" href="../../modelos/reportes/menu_reportes.php"
-                            onclick="abrirFormularios(event)">
-                            <i class="fas fa-list"></i>
-                            <span>Menú de Reportes</span>
-                        </a>
-                        <a class="submenu-item" href="../../modelos/reportes/compra_proveedor.php"
-                            onclick="abrirFormularios(event)">
-                            <i class="fas fa-truck-loading"></i>
-                            <span>Reportes Compras</span>
-                        </a>
-                        <a class="submenu-item" href="../../modelos/reportes/compra_proveedor.php"
-                            onclick="abrirFormularios(event)">
-                            <i class="fas fa-truck-loading"></i>
-                            <span>Reportes Ventas</span>
-                        </a>
-                    </div>
-                </div>
+                <a class="menu-item" title="Reportes" href="../../modelos/reportes/menu_reportes.php"
+                    onclick="abrirFormularios(event)">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Reportes</span>
+                </a>
 
                 <a class="menu-item" title="Ayuda" href="#" onclick="abrirFormularios(event)">
                     <i class="fas fa-circle-question"></i>
