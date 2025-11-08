@@ -108,7 +108,7 @@ $secciones = [
                 <li>Seleccione el proveedor, agregue los productos y confirme la compra.</li>
                 <li>Tenga en cuenta que estas compras llevan el 13% de IVA (impuesto al valor agregado).</li>
                 <li>Para ver la orden de compra dirijase al menú lateral y haga clic en "Reportes".</li>
-                <li>Busque uno llamado "Historial de Compra" haga clic ahí para ver compras actuales o anteriores.</li>
+                <li>Busque uno llamado "Historial de Compras" haga clic ahí para ver compras actuales o anteriores.</li>
                 </ol>'
     ],
     'clientes' => [
