@@ -33,7 +33,7 @@ function formatearTexto($texto)
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $nombre = formatearTexto(trim($_POST['nombre']));
-    $simbolo = strtoupper(trim($_POST['simbolo'])); // Simbolo en mayúsculas
+    $simbolo = trim($_POST['simbolo']); // Simbolo en mayúsculas
 
     $unidadMedida->nombre = $nombre;
     $unidadMedida->simbolo = $simbolo;

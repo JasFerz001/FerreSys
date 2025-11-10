@@ -63,7 +63,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $cliente->dui = $dui;
     $cliente->direccion = $direccion;
     $cliente->correo = $correo;
-
     // Actualizar el cliente
     $result = $cliente->actualizar();
 

@@ -55,7 +55,7 @@ $simbolo = $unidadMedida->simbolo;
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $nombre = formatearTexto(trim($_POST['nombre']));
-    $simbolo = strtoupper(trim($_POST['simbolo']));
+    $simbolo = trim($_POST['simbolo']);
 
     $unidadMedida->id_Medida = $id_Unidad;
     $unidadMedida->nombre = $nombre;

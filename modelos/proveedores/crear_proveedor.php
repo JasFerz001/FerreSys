@@ -28,7 +28,7 @@ function formatearTexto($texto)
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $nombre = formatearTexto($_POST['nombre']);
+    $nombre = $_POST['nombre'];
     $contac_referencia = formatearTexto($_POST['contac_referencia']);
     $telefono = $_POST['telefono'];
     $correo = strtolower(trim($_POST['correo']));

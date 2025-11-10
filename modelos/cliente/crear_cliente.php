@@ -49,10 +49,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = $cliente->crear();
     if ($result['success']) {
         $message = 'success';
-         //  Registrar en bitácora solo si fue exitoso
-            $bitacora->id_Empleado = $id_empleado;
-            $bitacora->accion = "Registrar Cliente";
-           $bitacora->descripcion = htmlspecialchars_decode("Se registró el cliente '$nombre' en la base de datos.");
+        //  Registrar en bitácora solo si fue exitoso
+        //   $bitacora->id_Empleado = $id_empleado;
+        $bitacora->id_Empleado = $_SESSION['id_Empleado'];
+        $bitacora->accion = "Registrar Cliente";
+        $bitacora->descripcion = htmlspecialchars_decode("Se registró el cliente '$nombre' en la base de datos.");
 
         // Limpiar los campos solo si fue exitoso
         $nombre = $apellido = $dui = $direccion = $correo = "";

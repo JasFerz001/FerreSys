@@ -84,7 +84,7 @@ $stmt = $categoria->leer();
                                     <i class="bi bi-tags-fill"></i> Nombre
                                 </label>
                                 <input autocomplete="off" type="text" name="nombre" class="form-control"
-                                    placeholder="Ingresar Nombre" required maxlength="25"
+                                    placeholder="Ingresar Nombre" required maxlength="75"
                                     value="<?php echo isset($nombre) ? $nombre : ''; ?>"
                                     oninput="this.value = this.value.replace(/[^A-Za-zñÑáéíóúÁÉÍÓÚ\s]/g, '')">
                             </div>

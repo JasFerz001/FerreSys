@@ -46,7 +46,7 @@ if (isset($_GET['id'])) {
 // Procesar actualización
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id_Proveedor = (int) $_POST['id_Proveedor'];
-    $nombre = formatearTexto(trim($_POST['nombre']));
+    $nombre = trim($_POST['nombre']);
     $contac_referencia = formatearTexto(trim($_POST['contac_referencia']));
     $telefono = trim($_POST['telefono']);
     $correo = strtolower(trim($_POST['correo']));

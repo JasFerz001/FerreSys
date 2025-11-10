@@ -111,9 +111,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($usuario->crear()) {
             // Limpiar sesión temporal de formulario
             unset($_SESSION['old_rol'], $_SESSION['old_estado']);
-
             // Registrar en bitácora (si hay empleado en sesión)
-            $idEmpleadoSesion = $_SESSION['id_Empleado'] ?? null;
+            // Redirección según rol (hacerla después de registrar en bitácora)
+            if (strcasecmp($rol, "administrador") === 0) {
+                header("Location: ../empleado/crear_empleado.php?primera_vez=1");
+                exit();
+            } else {    
+                header("Location: crear_usuario.php?message=success");
+                $idEmpleadoSesion = $_SESSION['id_Empleado'] ?? null;
             if ($idEmpleadoSesion) {
                 $bitacora->id_Empleado = $idEmpleadoSesion;
                 $bitacora->accion = "Registro Usuario";
@@ -121,12 +126,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $bitacora->registrar();
             }
 
-            // Redirección según rol (hacerla después de registrar en bitácora)
-            if (strcasecmp($rol, "administrador") === 0) {
-                header("Location: ../empleado/crear_empleado.php?primera_vez=1");
-                exit();
-            } else {
-                header("Location: crear_usuario.php?message=success");
                 exit();
             }
         } else {

@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id_Unidad_Base = trim($_POST['id_Unidad_Base']);
     $id_Unidad_Venta = trim($_POST['id_Unidad_Venta']);
     $factor_conversion = trim($_POST['factor_conversion']);
-    $es_activo = isset($_POST['es_activo']) ? 1 : 0;
+    $es_activo = 1; // Asegurar que siempre se registre como "alta"
 
     $conversionUnidad->id_Producto = $id_Producto;
     $conversionUnidad->id_Unidad_Base = $id_Unidad_Base;
@@ -42,11 +42,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = $conversionUnidad->crear();
 
     if ($result) {
- // Registrar en bitácora
-            $bitacora->id_Empleado = $_SESSION['id_Empleado'];
-            $bitacora->accion = "Creación de unidad de conversión";
-            $bitacora->descripcion = "Se registró la unidad de conversion.";
-            $bitacora->registrar();
+        // Registrar en bitácora
+        $bitacora->id_Empleado = $_SESSION['id_Empleado'];
+        $bitacora->accion = "Creación de unidad de conversión";
+        $bitacora->descripcion = "Se registró la unidad de conversion.";
+        $bitacora->registrar();
         $message = 'success';
     } else {
         $message = 'error';

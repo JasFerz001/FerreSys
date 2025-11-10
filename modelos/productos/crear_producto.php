@@ -35,7 +35,7 @@ $id_empleado = $_SESSION['id_Empleado']; //  Empleado actual logueado
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nombre = formatearTexto(trim($_POST['nombre']));
-    $descripcion = formatearTexto(trim($_POST['descripcion']));
+    $descripcion = trim($_POST['descripcion']);
     $id_Categoria = $_POST['id_Categoria'];
     $id_Medida = $_POST['id_Medida'];
     $estado = 1; // Siempre activo por defecto
@@ -283,7 +283,7 @@ $productosList = $producto->leer();
                                 <input type="file" name="imagen" class="form-control" accept="image/*">
                                 <div id="imagenPreview" class="mt-2"></div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <label class="form-label form-icon"><i class="bi bi-tags"></i> Categoría</label>
                                 <select class="form-select" name="id_Categoria" required>
                                     <option value="">Seleccione</option>
@@ -295,7 +295,7 @@ $productosList = $producto->leer();
                                     ?>
                                 </select>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <label class="form-label form-icon"><i class="bi bi-rulers"></i> Medida</label>
                                 <select class="form-select" name="id_Medida" required>
                                     <option value="">Seleccione</option>
