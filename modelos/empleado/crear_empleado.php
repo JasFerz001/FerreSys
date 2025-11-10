@@ -72,10 +72,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($result['success']) {
         // Registrar en la bitácora
-        $bitacora->id_Empleado = $_SESSION['id_Empleado']; // el que está logueado
-        $bitacora->accion = "Registro de empleado";
-        $bitacora->descripcion = "Se registró al empleado: " . $empleado->nombre . " " . $empleado->apellido;
-        $bitacora->registrar();
 
         // Si es la primera vez, redirigir al login
         if ($primera_vez) {
@@ -84,9 +80,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         $message = 'success';
+        $bitacora->id_Empleado = $_SESSION['id_Empleado']; // el que está logueado
+        $bitacora->accion = "Registro de empleado";
+        $bitacora->descripcion = "Se registró al empleado: " . $empleado->nombre . " " . $empleado->apellido;
+        $bitacora->registrar();
         // Limpiar los campos solo si fue exitoso
         $nombre = $apellido = $DUI = $telefono = $direccion = $correo = $clave = "";
         $id_Usuario = $estado = "";
+        
     } else {
         $message = 'error';
         $duplicates = $result['duplicates'];

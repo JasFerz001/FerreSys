@@ -142,7 +142,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                     <span>Bitácora</span>
                 </a>
 
-                <a class="menu-item" title="Ayuda" href="#" onclick="abrirFormularios(event)">
+                <a class="menu-item" title="Ayuda" href="../../modelos/ayuda/ayuda.php" onclick="abrirFormularios(event)">
                     <i class="fas fa-circle-question"></i>
                     <span>Ayuda</span>
                 </a>
@@ -171,7 +171,7 @@ $rol_usuario = $_SESSION['rol'] ?? "";
                     <span>Reportes</span>
                 </a>
 
-                <a class="menu-item" title="Ayuda" href="#" onclick="abrirFormularios(event)">
+                <a class="menu-item" title="Ayuda" href="../../modelos/ayuda/ayuda.php" onclick="abrirFormularios(event)">
                     <i class="fas fa-circle-question"></i>
                     <span>Ayuda</span>
                 </a>

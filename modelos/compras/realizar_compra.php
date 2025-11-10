@@ -162,7 +162,7 @@ if ($_POST && isset($_POST['procesar_compra'])) {
                         <div class="form-group">
                             <label for="fecha">Fecha</label>
                             <!-- ✅ Fecha corregida: ahora muestra el día actual según la hora de El Salvador -->
-                            <input type="text" id="fecha" value="<?php echo date('d-m-Y'); ?>" readonly
+                            <input type="text" id="fecha" value="<?php echo date('d/m/Y'); ?>" readonly
                                 class="form-control">
                         </div>
                     </div>
