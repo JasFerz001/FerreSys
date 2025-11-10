@@ -69,10 +69,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($result['success']) {
         $message = 'success';
-         //  Registrar en bitácora solo si fue exitoso
-            $bitacora->id_Empleado = $id_empleado;
+
+          // Registrar en bitácora solo si el empleado está logueado
+        if (!empty($_SESSION['id_Empleado'])) {
+            $bitacora->id_Empleado = $_SESSION['id_Empleado'];
             $bitacora->accion = "Actualizar Cliente";
-           $bitacora->descripcion = htmlspecialchars_decode("Se actualizo el cliente '$nombre' en la base de datos.");
+            $bitacora->descripcion = htmlspecialchars_decode("Se actualizo el cliente '$nombre' en la base de datos.");
+            $bitacora->registrar();
+        }
+        
 
     } else {
         $message = 'error';
