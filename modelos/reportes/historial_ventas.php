@@ -250,7 +250,8 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1' && isset($_GET['id_venta'])) {
                                 <tr>
                                     <th>Producto</th>
                                     <th>Categoría</th>
-                                    <th>Unidad</th>
+                                    <th>Unidad Base</th>
+                                    <th>Unidad Venta</th>
                                     <th>Cantidad</th>
                                     <th>Precio Venta</th>
                                     <th>Subtotal</th>
@@ -264,7 +265,8 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1' && isset($_GET['id_venta'])) {
                             <tr>
                                 <td>${detalle.producto}</td>
                                 <td>${detalle.categoria}</td>
-                                <td>${detalle.unidad_medida}</td>
+                                <td>${detalle.unidad_base}</td>
+                                <td>${detalle.unidad_venta}</td>
                                 <td>${detalle.cantidad}</td>
                                 <td>$${parseFloat(detalle.precio_venta).toFixed(2)}</td>
                                 <td>$${parseFloat(detalle.total).toFixed(2)}</td>

@@ -17,7 +17,7 @@ if ($rol === 'vendedor' || $rol === 'ventas' || $rol === '2') $rol = 'vendedor';
 function puedeVer($section, $rol) {
     if ($rol === 'admin') return true;
     if ($rol === 'vendedor') {
-        $permitidas = ['introduccion', 'navegacion', 'clientes', 'ventas', 'reportes', 'faq', 'contacto', 'flujo_venta'];
+        $permitidas = ['introduccion', 'navegacion', 'clientes', 'ventas', 'reportes', 'productos', 'faq', 'flujo_venta'];
         return in_array($section, $permitidas, true);
     }
     $publicas = ['introduccion', 'faq', 'contacto'];
@@ -190,7 +190,7 @@ $secciones = [
         .seccion h2 {
             font-size: 18px;
             cursor: pointer;
-            color: #0d6efd;
+            color: #2c3e50;
         }
         .seccion h2:hover {
             text-decoration: underline;
@@ -207,11 +207,10 @@ $secciones = [
 <body>
     <div class="container">
         <div class="help-container">
-            <h1 class="text-center">Manual de Usuario - FerreSys</h1>
+            <h1 class="text-center">Ayuda al Usuario - FerreSys</h1>
             <p class="text-center text-muted">Guía para el uso del sistema</p>
             <div class="text-center mb-3">
-                <button class="btn btn-primary" onclick="window.print()">Imprimir Manual</button>
-                <button class="btn btn-secondary" onclick="expandAll()">Expandir Todo</button>
+                <button class="btn btn-success" onclick="expandAll()">Expandir Todo</button>
             </div>
             <?php foreach ($secciones as $clave => $s): ?>
                 <?php if (!puedeVer($clave, $rol)) continue; ?>

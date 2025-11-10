@@ -898,6 +898,18 @@ date_default_timezone_set('America/El_Salvador');
                 });
 
                 document.getElementById('btnAgregarCarrito').addEventListener('click', () => {
+                    const precioVenta = parseFloat(document.getElementById('modalPrecioVenta').value);
+                    const precioCompra = parseFloat(document.getElementById('modalPrecioCompra').value.replace('$', ''));
+
+                    if (precioVenta < precioCompra) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Precio inválido',
+                            text: 'El precio de venta no puede ser menor al precio de compra.'
+                        });
+                        return;
+                    }
+
                     this.agregarAlCarrito();
                 });
 
