@@ -15,22 +15,27 @@ class Bitacora
         $this->conn = $db;
     }
 
-    // 🔹 Registrar una acción en la bitácora
     public function registrar(): bool
     {
+        // Ajustar zona horaria a El Salvador
+        date_default_timezone_set('America/El_Salvador');
+
+        // Obtener la fecha y hora local correctas
+        $this->fecha_hora = date('Y-m-d H:i:s');
+
         $query = "INSERT INTO " . $this->table_name . " 
-              (id_Empleado, accion, descripcion)
-              VALUES (:id_Empleado, :accion, :descripcion)";
+              (id_Empleado, accion, descripcion, fecha_hora)
+              VALUES (:id_Empleado, :accion, :descripcion, :fecha_hora)";
+
         $stmt = $this->conn->prepare($query);
 
-        // Limpiar solo etiquetas HTML, sin codificar comillas
         $this->accion = strip_tags($this->accion);
         $this->descripcion = strip_tags($this->descripcion);
 
-        // Enlazar parámetros
         $stmt->bindParam(":id_Empleado", $this->id_Empleado);
         $stmt->bindParam(":accion", $this->accion);
         $stmt->bindParam(":descripcion", $this->descripcion);
+        $stmt->bindParam(":fecha_hora", $this->fecha_hora);
 
         return $stmt->execute();
     }
